@@ -235,6 +235,8 @@ scripts/                    22 个工具 + 自测
 | `worldbook-pack.mjs` | 世界书并入人设（仅入口不支持世界书时） |
 | `export-raw.mjs` | 平台原始数据 → 可导入 JSON |
 | `gen-facts.mjs` | 由 `facts.json` 重生成事实表（`--check` 校验一致性） |
+| `gen-fields.mjs` | 由 `fields.json` 重生成字段索引 |
+| `gen-errors.mjs` | 由 `errors.json` 重生成错题索引 |
 | `field-add.mjs` | 字段库登记：先 `--find` 查重，再新增 |
 | `error-log.mjs` | 错题本：`--find` / `--show` / `--add` / `--hit` / `--set` / `--retire` |
 | `test.mjs` | 脚本自测（47 项） |
