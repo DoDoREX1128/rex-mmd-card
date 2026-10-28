@@ -1,0 +1,29 @@
+{
+  "format": "rex-samelayer-release",
+  "platform": "mmd",
+  "chatVersion": 0,
+  "name": "samelayer-demo",
+  "theme": "demo",
+  "ignite": "independent",
+  "stateKey": "REXHUDSTATE",
+  "markerPrefix": "REXHUD",
+  "rules": 3,
+  "chunks": {
+    "host": 1,
+    "frame": 1
+  },
+  "maxReplacementUtf16": 7470,
+  "payload": {
+    "host": 6537,
+    "frame": 6903
+  },
+  "files": {
+    "samelayer-demo-regex.json": "594ce531c11fa57fc0eeb04f475b987b67ff6fea6e0613f54f5979ecd3279aca"
+  },
+  "evidence": {
+    "static": "PASS",
+    "localBrowser": "NOT RUN",
+    "realMmd": "NOT RUN",
+    "physicalMobile": "NOT RUN"
+  }
+}

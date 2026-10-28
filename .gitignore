@@ -1,0 +1,19 @@
+# 每次做卡的草稿与产物
+work/
+
+# 预览/测试临时页
+*.tmp.html
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+node_modules/
+
+# 分发副本与自测临时文件
+dist/
+test/tmp/
+
+# 安装器保留的旧版本副本
+*.old-*

@@ -1,0 +1,19 @@
+{
+  "name": "霜蓝玻璃",
+  "colors": {
+    "bg": "#080d12",
+    "surface": "#101820",
+    "text": "#e6f0f6",
+    "muted": "#8ba3b3",
+    "accent": "#6fc3d9",
+    "accent2": "#b0725a"
+  },
+  "fonts": {
+    "display": "思源宋体 SemiBold",
+    "body": "HarmonyOS Sans SC",
+    "num": "DIN Alternate"
+  },
+  "texture": "glass",
+  "radius": 10,
+  "motion": "subtle"
+}

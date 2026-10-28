@@ -1,0 +1,590 @@
+{
+  "schema": "rex-errors/2",
+  "updated": "2026-10-28",
+  "naming": {
+    "id": "E-三位序号",
+    "rule": "编号只增不复用；判决改变时保留编号与历史"
+  },
+  "entries": [
+    {
+      "id": "E-001",
+      "title": "链式标记在独立拓扑下只有第 1 条生效",
+      "versions": [
+        "v0"
+      ],
+      "layer": "ignite",
+      "scope": "platform",
+      "symptom": "一百多条分片只有第一条跑，后面全部不执行；页面空白，控制台干净。",
+      "cause": "平台可能不是把上一条替换结果串给下一条，而是每条规则各自作用于原文。链式标记传到第二条就找不到了。",
+      "fix": "默认按独立拓扑写：所有标记一次性放进 beginning，每条规则只认自己那一个。要复刻链式成品才用链式，并双语义重放。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 3,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §1 真站对照实验",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-002",
+      "title": "onerror 载体用了合法 1×1 GIF，永远不会失败",
+      "versions": [
+        "v0"
+      ],
+      "layer": "ignite",
+      "scope": "author",
+      "symptom": "规则一条都不跑，页面无变化，无报错。",
+      "cause": "引用的 base64 是合法透明 GIF，图片加载成功，onerror 也就永不触发。看着像坏图，实际是有效资源。",
+      "fix": "载体固定用 src=\"data:,\"（空资源必然失败）。不要拿\"看起来像坏图\"的 base64 赌它坏。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §3 对照实验：合法 gif → slp:null；data:, → slp:60",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-003",
+      "title": "Markdown 与净化器会改写代码里的 __ * <",
+      "versions": [
+        "v0"
+      ],
+      "layer": "charset",
+      "scope": "platform",
+      "symptom": "代码在本地看着对，贴进平台后变形：__X__ 变粗体、/*x*/ 变斜体、< 被当标签开头提前闭合。",
+      "cause": "注入内容会被聊天管线或编辑器再处理一遍，Markdown 语法先于脚本生效。",
+      "fix": "内联代码里避免裸 _ * < >：全局名用纯大写、循环用 !==、比较用减法、标记用【…】。打包器加 guard() 检测到危险字符直接退出。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 3,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §2",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-004",
+      "title": "平台里已有别的卡在自动点火，测到的是它",
+      "versions": [
+        "v0"
+      ],
+      "layer": "ignite",
+      "scope": "platform",
+      "symptom": "改了自己的代码但页面毫无变化；或者出现两套 HUD 叠在一起。",
+      "cause": "同一页面里可能已有上一张卡的实例在跑，后注入的界面被旧实例覆盖或抢占。",
+      "fix": "测试前先找到旧实例并 destroy()，或换一个干净会话。不确认旧实例状态，测出来的结果不可信。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §5",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-005",
+      "title": "注入失败只留白屏，作者无法判断是否跑过",
+      "versions": [
+        "v0"
+      ],
+      "layer": "observ",
+      "scope": "author",
+      "symptom": "页面白屏，无提示；只能反复截图问\"为什么没出来\"。",
+      "cause": "所有失败路径都只写 console.error，聊天页里看不到控制台。",
+      "fix": "把失败画在屏幕上：装载徽标显示「装载 N/60」、boot 包 try/catch 并在 2.2s 后兜底挂壳、任何 catch 都把 message 写进页面。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §4",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-006",
+      "title": "white-space:pre-line 把标签间换行撑成空白条",
+      "versions": [
+        "v0"
+      ],
+      "layer": "css",
+      "scope": "platform",
+      "symptom": "气泡里出现大段空白，实际内容只有几行；元素高度远大于子元素之和。",
+      "cause": "旧版气泡容器 .content 带 white-space:pre-line，注入 HTML 标签之间的换行被当成真实换行。",
+      "fix": "注入片段压缩成单行，或在容器上显式重置 white-space。p:empty 与 br 都无效（实测不存在这两个节点）；Shadow DOM 内要写 :host{white-space:normal}。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "24 §4.1 实测：高 102px / 子元素合计 51px",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-007",
+      "title": "元素 ID 不带时间戳，第二次打开就失效",
+      "versions": [
+        "v0"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "第一次进页面正常，切走再回来按钮全哑；或同一页面出现两套同名元素。",
+      "cause": "同一父文档内元素 ID 必须唯一。固定 ID 在重复注入时产生冲突，后挂的节点抢不到引用。",
+      "fix": "ID 统一命名 类型_功能_毫秒时间戳，同模块共用同一时间戳；data-s 引用的 ID 与 label for 必须一致。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "24 §4.2",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-008",
+      "title": "personality 字段贴了也不读，以为人设已生效",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "protocol",
+      "scope": "platform",
+      "symptom": "人设写得很细，但模型表现完全不受影响；对话像另一张卡。",
+      "cause": "导入 JSON 里的 personality 只作留档，平台不会把它当人设源；人设需要在卡片编辑页另行粘贴。",
+      "fix": "交付说明里明确写「pipeline：导入正则 → 粘贴人设 → 单独导入世界书」，并核对编辑页里实际内容。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "20 分流表 / 洛璃 mmd.md",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-009",
+      "title": "用沙盒校验器验旧版卡，把 chatVersion 改成了 1",
+      "versions": [
+        "v0"
+      ],
+      "layer": "process",
+      "scope": "author",
+      "symptom": "一张旧版同层卡导入后页面正常但按钮全哑、零报错。",
+      "cause": "沙盒校验器提示「chatVersion 必须是 1」，照它改，旧版卡被当成新页处理，iframe 与原生桥接全部失效。",
+      "fix": "校验器按版本专用：旧版只跑 legacy 通道。交付前单独断言一次 chatVersion，不依赖构建脚本默认值。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": null,
+      "source": "20 §5 真实事故 2026-10-27",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-010",
+      "title": "全局 busy 闸没释放，点一次没反应过会又好了",
+      "versions": [
+        "v0"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "点按钮没反应，等几秒再点就好了；偶发。",
+      "cause": "动作入口挂了一个全局 busy 状态，上一轮动作抛错后没有清掉，后续点击被拦在闸外。",
+      "fix": "所有动作用 try/finally 释放 busy；拦住时在界面上显示\"处理中\"，而不是静默丢弃点击。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §8",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-011",
+      "title": "revision 过期，面板开着但按钮全失效",
+      "versions": [
+        "v0"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "面板还开着，里面所有按钮都不响应，关掉重开又正常。",
+      "cause": "每次开面板 revision+1，动作带旧 revision 调用会被判过期。面板没重开就继续用时 revision 不匹配。",
+      "fix": "动作调用带当前 revision；界面提供\"重开面板\"的显式入口，或在过期时自动重挂。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §8",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-012",
+      "title": "动作名不在注册表，永远没反应也不报错",
+      "versions": [
+        "v0"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "某个按钮从第一次出现就没反应，别的按钮正常。",
+      "cause": "动作名拼错或模块没注册，A.actions[name] 不存在，调用被静默忽略。",
+      "fix": "绑定前打印动作名并断言 A.actions[name] 存在；构建期做一次\"界面里引用的动作 ⊆ 注册表\"的静态核对。",
+      "verdict": "confirmed",
+      "evidence": "device",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §8",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-013",
+      "title": "在 Node 假 DOM 里手动调 onerror 冒充验证",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "accept",
+      "scope": "skill",
+      "symptom": "本地\"验证通过\"，上真站后一条都不跑。",
+      "cause": "手动调用 handler 只是执行了自己写的函数，没有验证平台是否真的会触发它。这是自证。",
+      "fix": "必须真浏览器 + 真实页面 + 截图；判定看页面可见结果（徽标、iframe、文字），不看日志。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "53 §6",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-014",
+      "title": "message:mount 读到「消息生成中」占位就开始解析",
+      "versions": [
+        "v1"
+      ],
+      "layer": "sdk",
+      "scope": "platform",
+      "symptom": "状态块偶尔被解析成空值，或旧状态被清空；重新生成一次又好了。",
+      "cause": "流式阶段消息体里先是占位文案（消息生成中），此时读取 DOM 得到的是占位内容而不是最终文本。",
+      "fix": "在 message:done 里解析，或 mount 时校验文本里确实有协议块再解析；解析失败保留上一份有效状态。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "21 §6 事件表",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-015",
+      "title": "sdk.save.get 在首次保存前不可用",
+      "versions": [
+        "v1"
+      ],
+      "layer": "sdk",
+      "scope": "platform",
+      "symptom": "首次进卡时读存档拿到 null 或直接抛错，界面初始化中断。",
+      "cause": "存档键在第一次 save 之前不存在，get 没有可返回值。",
+      "fix": "所有读存档都用 try/catch 包住并给默认值；写入放在首次有效交互之后。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "21 §6 / 瘦预览矩阵",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-016",
+      "title": "瘦预览里写类能力抛 NOT_SUPPORTED，被当成卡坏了",
+      "versions": [
+        "v1"
+      ],
+      "layer": "sdk",
+      "scope": "platform",
+      "symptom": "在创卡页预览时点击无反应、控制台报 NOT_SUPPORTED，误判成代码错。",
+      "cause": "创卡页是瘦环境：input / save / message.send 等写类能力一律不可用，属于设计行为而非缺陷。",
+      "fix": "把能力检测做成运行时分支（能写就写，不能写就只提示），并在交付说明里写清\"创卡页预览只验渲染\"。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "21 §11 瘦预览矩阵",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-017",
+      "title": "z-index 1000–1999 被舞台层压住",
+      "versions": [
+        "v1"
+      ],
+      "layer": "css",
+      "scope": "platform",
+      "symptom": "自绘 HUD 在本地正常，真站里被舞台 / 立绘盖住，点击也点不到。",
+      "cause": "平台自身占用较高层级：舞台内容约 2000、全屏层约 3000，作者层的 1000–1999 落在它们下面。",
+      "fix": "作者页面级浮层用 3500–7999；气泡内元素才用 1–999；不要把 1000–3499 当安全带。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "洛璃 mmd-sandbox 实测区间；本 skill 42 §4 已按此改",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-018",
+      "title": "在 :root / html / body 上写样式污染宿主",
+      "versions": [
+        "v1"
+      ],
+      "layer": "css",
+      "scope": "platform",
+      "symptom": "自己的界面正常，平台顶栏、输入框、弹窗被改坏；或样式的生效范围比预期大。",
+      "cause": ":root 与 html/body 是全页作用域，作者样式会溢出到宿主 UI。",
+      "fix": "所有选择器从 [data-chat=\"root\"] 或自建根节点起算；全局重置一律显式限定作用域。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "洛璃平台文档 / 官方 contract 的扁平 CSS 要求",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-019",
+      "title": "只映射 6 个 --chat-*，底栏与弹窗不跟着变",
+      "versions": [
+        "v1"
+      ],
+      "layer": "css",
+      "scope": "platform",
+      "symptom": "气泡与顶栏换色成功，但输入区、底栏、弹窗仍是默认蓝，界面割裂。",
+      "cause": "平台共 29 个主题变量（气泡与整页 10 + 底栏与白名单弹窗 18 + 别名 1），只覆盖前 10 个不足以改变全部表面。",
+      "fix": "按 21 §4 的 29 个变量逐个映射；覆盖要写在 [data-chat=\"root\"] 且特异性足够高。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "洛璃 sandbox-kit 主题层 / 21 §4",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-020",
+      "title": "findRegex 缺右斜杠，静默走字面量分支",
+      "versions": [
+        "v1"
+      ],
+      "layer": "regex",
+      "scope": "author",
+      "symptom": "正则看着像正则，实际按纯文本匹配：a.b 匹配不到 axb，量词也不生效。",
+      "cause": "平台按首尾斜杠判断是否正则；写成 /…/ 但语法不完整时退回字面量分支，且不报错。",
+      "fix": "正则一律写完整的 /…/flags；校验器对\"以 / 开头但不闭合\"的写法告警。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "compilePattern 等价逻辑 / validate.mjs 已加规则",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-021",
+      "title": "findRegex 里含 HTML 标签被净化",
+      "versions": [
+        "v1"
+      ],
+      "layer": "regex",
+      "scope": "platform",
+      "symptom": "规则数量正确、标记也在，但一条都不命中；换纯文本标记立刻正常。",
+      "cause": "匹配式里的 <xxx> 会被当作标签处理，进入管线时已被剥离或转义。",
+      "fix": "匹配式只用不含尖括号的标记，例如【rex-boot】；正文里才出现真正的 HTML。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": "2026-10-28 全链改【rex-xxx】",
+      "source": "21 §1 禁令 / 洛璃 7 条 WARN",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-022",
+      "title": "replaceString 超 20000 字被静默回滚",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "data",
+      "scope": "platform",
+      "symptom": "某条规则的内容贴进去后不生效，其余规则正常；没有任何提示。",
+      "cause": "单条替换内容有 20000 字上限，超限时编辑器拒绝保存或整条回滚，不弹错。",
+      "fix": "按关注点拆规则，每条落在 8–15K；构建期累计长度并断言，超限直接失败。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "facts.json limits.replaceString",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-023",
+      "title": "JSON 带 BOM 导致导入失败",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "data",
+      "scope": "author",
+      "symptom": "导入时提示格式错误，用编辑器打开看内容完全正常。",
+      "cause": "Windows 下某些编辑器写 UTF-8 会带 BOM，JSON 解析器把它当非法字符。",
+      "fix": "统一以无 BOM 的 UTF-8 落盘；构建脚本读取时先剥 BOM 再解析。",
+      "verdict": "suspected",
+      "evidence": "guess",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": null,
+      "source": "未在本机复现，按编码常识记录",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-024",
+      "title": "世界书不随正则包导入，以为漏了",
+      "versions": [
+        "v1"
+      ],
+      "layer": "data",
+      "scope": "platform",
+      "symptom": "正则装好了，但世界观相关设定完全不生效。",
+      "cause": "世界书是独立资产，不包含在正则 JSON 里，需要单独导入或另行打包。",
+      "fix": "交付清单里把世界书单列一项；worldbook-pack 产出的文件要能独立导入并核对条目数。",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "source": "21 §11 导入顺序",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-025",
+      "title": "校验器把字符串里的 sdk.stage 判成能力名",
+      "versions": [
+        "v1"
+      ],
+      "layer": "tooling",
+      "scope": "skill",
+      "symptom": "卡本身能跑，第三方校验器报「能力名不在 contract 内」，指向的却是一句提示文案。",
+      "cause": "校验器直接在整段代码里搜 sdk.xxx，没有剥离字符串字面量，也没有识别命名空间前缀。",
+      "fix": "对被检查的卡而言这是误报，忽略该报错；在自己的校验器里剥掉字符串与命名空间前缀后再比对能力表。",
+      "verdict": "confirmed",
+      "evidence": "probe",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": null,
+      "source": "2026-10-28 交叉实测（洛璃 SBK 产物）",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-026",
+      "title": "把「交付下限」叫成「工程骨架」，用视觉清单卡死设计",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "作者被要求\"封面必须全屏、必须分层视差、必须中央入口\"，原创卡也被按复刻标准卡。",
+      "cause": "术语混淆：把呈现形态与体验下限写进了骨架清单，于是\"骨架\"变成了视觉模板，压缩了创作空间。",
+      "fix": "四词分治：工程骨架（能跑）、创作皮肉（值得玩）、交付下限（及格线）、复现项（仅复刻）。复现要求只对复刻模式生效。",
+      "verdict": "confirmed",
+      "evidence": "probe",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": "2026-10-28 45 重写",
+      "source": "作者当面纠正",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-027",
+      "title": "三套 L 编号并存，同一个字母三种含义",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "文档里 L0–L4 既指阶段、又指托管档、又指验收级，引用时无法判断指哪一层。",
+      "cause": "编号体系各自演化后合并，没有做命名空间隔离。",
+      "fix": "阶段 S0–S5、验收级 E1–E5、托管档只用名称不编号；全库禁止再用裸 L 编号。",
+      "verdict": "confirmed",
+      "evidence": "probe",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": "2026-10-28 全库替换",
+      "source": "2026-10-28 术语审计",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-028",
+      "title": "同一个上限数字写在十几处，改一处漏一处",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "data",
+      "scope": "skill",
+      "symptom": "文档说 20000、脚本写 10000、另一篇又写 10240；以哪个为准靠猜。",
+      "cause": "限额散落在文档、脚本、校验器三处各自硬编码，没有单一真源。",
+      "fix": "facts.json 为唯一真源，脚本运行时读取，事实表由生成器产出并纳入自测（--check）。",
+      "verdict": "confirmed",
+      "evidence": "probe",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": "2026-10-28 facts.json",
+      "source": "2026-10-28 漂移审计",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-029",
+      "title": "用旧版的 iframe 思路做新版卡，动作全部无效",
+      "versions": [
+        "v1"
+      ],
+      "layer": "process",
+      "scope": "author",
+      "symptom": "按同层卡方式写了 iframe 与原生桥接，新版页面里既不显示也无法交互。",
+      "cause": "新版是沙盒模型：没有 iframe 宿主、没有原生动作桥，能力全部走 sdk.* 与 DOM 插槽。",
+      "fix": "选路线前先定版本：新版走 sdk + [data-chat]，旧版才谈 iframe 与动作注册表。两套产物不可互换。",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 1,
+      "instead": null,
+      "fixedIn": null,
+      "source": "21 / 22 边界表",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "E-030",
+      "title": "二次进入时事件重复订阅，点一次动两次",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "第一次进卡正常，切走再回来点一次按钮，动作执行了两遍。",
+      "cause": "每次挂载都重新绑定一遍事件，旧监听没有解绑；或模块被重新执行但没做单例守卫。",
+      "fix": "绑定前设单例守卫（window.__REX__ 已存在则复用）并给节点打 data-bound 标记；订阅前先解绑旧的。",
+      "verdict": "confirmed",
+      "evidence": "probe",
+      "checks": 2,
+      "instead": null,
+      "fixedIn": null,
+      "note": "",
+      "source": "52 §5 与 e2e 断言：切宽屏 / 重进页面后动作只执行一次",
+      "date": "2026-10-28"
+    }
+  ],
+  "scopeRule": "platform=平台机制约束，只能绕；author=作者代码写法，可改；skill=本 skill 的文档或工具，由维护者改"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "赭石纸草（示例 · 原创皮肉）",
+  "colors": {
+    "bg": "#191410",
+    "surface": "#241c15",
+    "text": "#eadfc9",
+    "muted": "#a08e74",
+    "accent": "#b4642a",
+    "accent2": "#5e6b4a"
+  },
+  "fonts": {
+    "display": "Noto Serif SC",
+    "body": "Noto Sans SC",
+    "num": "ui-monospace"
+  },
+  "texture": "grain",
+  "radius": 6,
+  "motion": "none"
+}

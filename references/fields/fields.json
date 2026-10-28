@@ -1,0 +1,2060 @@
+{
+  "schema": "rex-fields/1",
+  "updated": "2026-10-28",
+  "naming": {
+    "name": "2–4 个汉字",
+    "key": "2–4 个小写字母",
+    "rule": "库层用汉字检索，运行时用字母键，一一对应"
+  },
+  "fields": [
+    {
+      "name": "姓名",
+      "key": "name",
+      "type": "text",
+      "category": "identity",
+      "life": "一次性",
+      "range": "2–6 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "名字",
+        "角色名"
+      ],
+      "sources": [
+        "persona",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "性别",
+      "key": "sex",
+      "type": "enum",
+      "category": "identity",
+      "life": "一次性",
+      "range": "男/女/其他",
+      "status": "core",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "年龄",
+      "key": "age",
+      "type": "num",
+      "category": "identity",
+      "life": "一次性",
+      "range": "0–999",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "岁数"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "种族",
+      "key": "race",
+      "type": "text",
+      "category": "identity",
+      "life": "一次性",
+      "range": "2–4 字",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "族裔"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "出身",
+      "key": "born",
+      "type": "text",
+      "category": "identity",
+      "life": "一次性",
+      "range": "≤30 字",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "来历",
+        "家世"
+      ],
+      "sources": [
+        "persona",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "职业",
+      "key": "job",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "2–8 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "营生"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "身份",
+      "key": "idn",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "2–10 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "头衔",
+        "社会身份"
+      ],
+      "sources": [
+        "yinyu",
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "外貌",
+      "key": "face",
+      "type": "text",
+      "category": "identity",
+      "life": "一次性",
+      "range": "3–5 短语",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "容貌",
+        "长相"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "身高",
+      "key": "hgt",
+      "type": "num",
+      "category": "identity",
+      "life": "一次性",
+      "range": "cm",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "个头"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "体重",
+      "key": "wgt",
+      "type": "num",
+      "category": "identity",
+      "life": "一次性",
+      "range": "kg",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "重量"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "背景",
+      "key": "bg",
+      "type": "text",
+      "category": "identity",
+      "life": "一次性",
+      "range": "≤300 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "过去",
+        "经历"
+      ],
+      "sources": [
+        "persona",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "立场",
+      "key": "aln",
+      "type": "enum",
+      "category": "identity",
+      "life": "阶段",
+      "range": "同伴/友方/中立/陌生/敌对/邪恶/异类/未知",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "阵营倾向"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "体态",
+      "key": "body",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "按题材",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "身形"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "称号",
+      "key": "ttl",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "2–8 字",
+      "status": "niche",
+      "conflict": null,
+      "aliases": [
+        "名号"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "归属",
+      "key": "bel",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "2–8 字",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "势力归属",
+        "所属"
+      ],
+      "sources": [
+        "yuji"
+      ],
+      "note": ""
+    },
+    {
+      "name": "生命",
+      "key": "hp",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "core",
+      "conflict": "生命组",
+      "aliases": [
+        "血量",
+        "气血",
+        "HP"
+      ],
+      "sources": [
+        "luoli",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "体力",
+      "key": "sta",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "core",
+      "conflict": "耐力组",
+      "aliases": [
+        "耐力",
+        "精力"
+      ],
+      "sources": [
+        "luoli",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "精力",
+      "key": "eng",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": "耐力组",
+      "aliases": [
+        "精神头"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "气血",
+      "key": "qi",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": "生命组",
+      "aliases": [
+        "真气",
+        "元气"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "饥饿",
+      "key": "hun",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "饱食",
+        "饿"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "口渴",
+      "key": "ths",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "口干"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "疲劳",
+      "key": "fat",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "困倦"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "睡眠",
+      "key": "slp",
+      "type": "bar",
+      "category": "body",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "休息"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "伤势",
+      "key": "inj",
+      "type": "tag",
+      "category": "body",
+      "life": "阶段",
+      "range": "≤4 条",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "受伤"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "中毒",
+      "key": "poi",
+      "type": "tag",
+      "category": "body",
+      "life": "阶段",
+      "range": "≤3 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "毒"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "疾病",
+      "key": "dis",
+      "type": "tag",
+      "category": "body",
+      "life": "阶段",
+      "range": "≤3 条",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "病症"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "体温",
+      "key": "temp",
+      "type": "num",
+      "category": "body",
+      "life": "每轮",
+      "range": "℃",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "温度"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "洁净",
+      "key": "hyg",
+      "type": "bar",
+      "category": "body",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "卫生",
+        "肮脏"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "心情",
+      "key": "mood",
+      "type": "enum",
+      "category": "mind",
+      "life": "每轮",
+      "range": "平静/愉悦/低落/烦躁/恐惧/愤怒",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "情绪",
+        "心绪"
+      ],
+      "sources": [
+        "luoli",
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "情绪",
+      "key": "emo",
+      "type": "tag",
+      "category": "mind",
+      "life": "每轮",
+      "range": "≤3 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "感受"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "压力",
+      "key": "str",
+      "type": "bar",
+      "category": "mind",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "紧张"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "恐惧",
+      "key": "fear",
+      "type": "bar",
+      "category": "mind",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "害怕"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "理智",
+      "key": "san",
+      "type": "bar",
+      "category": "mind",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "理智值",
+        "SAN"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "意志",
+      "key": "wil",
+      "type": "bar",
+      "category": "mind",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "毅力"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "精神",
+      "key": "spi",
+      "type": "bar",
+      "category": "mind",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "心智"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "性欲",
+      "key": "lust",
+      "type": "bar",
+      "category": "eros",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "情欲",
+        "欲望"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "堕落",
+      "key": "deg",
+      "type": "bar",
+      "category": "eros",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "沉沦"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "敏感",
+      "key": "sen",
+      "type": "tag",
+      "category": "eros",
+      "life": "阶段",
+      "range": "部位/程度",
+      "status": "niche",
+      "conflict": null,
+      "aliases": [
+        "敏感点"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "癖好",
+      "key": "kink",
+      "type": "tag",
+      "category": "eros",
+      "life": "阶段",
+      "range": "≤5 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "喜好",
+        "性癖"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "童贞",
+      "key": "vir",
+      "type": "bool",
+      "category": "eros",
+      "life": "一次性",
+      "range": "是/否",
+      "status": "niche",
+      "conflict": null,
+      "aliases": [
+        "处女",
+        "处男"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "受孕",
+      "key": "preg",
+      "type": "bool",
+      "category": "eros",
+      "life": "阶段",
+      "range": "是/否",
+      "status": "niche",
+      "conflict": "受孕组",
+      "aliases": [
+        "怀孕"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "私处",
+      "key": "priv",
+      "type": "text",
+      "category": "eros",
+      "life": "每轮",
+      "range": "部位:描述",
+      "status": "niche",
+      "conflict": null,
+      "aliases": [
+        "下体"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "精液",
+      "key": "sem",
+      "type": "text",
+      "category": "eros",
+      "life": "每轮",
+      "range": "部位+ml",
+      "status": "niche",
+      "conflict": null,
+      "aliases": [
+        "体液"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "子宫",
+      "key": "womb",
+      "type": "text",
+      "category": "eros",
+      "life": "阶段",
+      "range": "五字段",
+      "status": "niche",
+      "conflict": "受孕组",
+      "aliases": [
+        "宫腔"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "服装",
+      "key": "fit",
+      "type": "tag",
+      "category": "eros",
+      "life": "阶段",
+      "range": "≤8 层",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "穿着",
+        "衣着"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "好感",
+      "key": "fav",
+      "type": "bar",
+      "category": "rel",
+      "life": "每轮",
+      "range": "-100–100",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "好感度",
+        "喜欢"
+      ],
+      "sources": [
+        "luoli",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "亲密",
+      "key": "inti",
+      "type": "bar",
+      "category": "rel",
+      "life": "每轮",
+      "range": "0–100",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "亲密度"
+      ],
+      "sources": [
+        "luoli",
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "信任",
+      "key": "tru",
+      "type": "bar",
+      "category": "rel",
+      "life": "阶段",
+      "range": "-500–500",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "信任度"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "怀疑",
+      "key": "sus",
+      "type": "bar",
+      "category": "rel",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "疑心"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "敌意",
+      "key": "hos",
+      "type": "bar",
+      "category": "rel",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "敌视"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "关系",
+      "key": "rel",
+      "type": "list",
+      "category": "rel",
+      "life": "阶段",
+      "range": "一行一人",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "人际",
+        "名录"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "同伴",
+      "key": "mate",
+      "type": "list",
+      "category": "rel",
+      "life": "阶段",
+      "range": "≤12 人",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "队友"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "队伍",
+      "key": "crew",
+      "type": "text",
+      "category": "rel",
+      "life": "阶段",
+      "range": "人数/士气/补给",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "团队"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "随从",
+      "key": "ret",
+      "type": "list",
+      "category": "rel",
+      "life": "阶段",
+      "range": "≤8 人",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "部下"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "声望",
+      "key": "rep",
+      "type": "num",
+      "category": "social",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "core",
+      "conflict": "名望组",
+      "aliases": [
+        "名声",
+        "威望"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "名望",
+      "key": "fam",
+      "type": "num",
+      "category": "social",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": "名望组",
+      "aliases": [
+        "名气"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "名誉",
+      "key": "hon",
+      "type": "num",
+      "category": "social",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": "名望组",
+      "aliases": [
+        "荣誉"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "地位",
+      "key": "rank",
+      "type": "enum",
+      "category": "social",
+      "life": "阶段",
+      "range": "低/中/高",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "阶层"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "势力",
+      "key": "fct",
+      "type": "text",
+      "category": "social",
+      "life": "阶段",
+      "range": "2–8 字",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "组织",
+        "门派"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "阵营",
+      "key": "camp",
+      "type": "enum",
+      "category": "social",
+      "life": "阶段",
+      "range": "按题材",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "派系"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "情报",
+      "key": "intl",
+      "type": "list",
+      "category": "social",
+      "life": "每轮",
+      "range": "一行一目标",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "情报板"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "线索",
+      "key": "clue",
+      "type": "list",
+      "category": "social",
+      "life": "阶段",
+      "range": "≤8 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "线索板"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "金钱",
+      "key": "gold",
+      "type": "num",
+      "category": "res",
+      "life": "每轮",
+      "range": "0–∞",
+      "status": "core",
+      "conflict": "货币组",
+      "aliases": [
+        "钱",
+        "金币"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "灵石",
+      "key": "gem",
+      "type": "num",
+      "category": "res",
+      "life": "每轮",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "晶石"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "物资",
+      "key": "mat",
+      "type": "num",
+      "category": "res",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "材料"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "补给",
+      "key": "supp",
+      "type": "num",
+      "category": "res",
+      "life": "阶段",
+      "range": "天数",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "辎重"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "食物",
+      "key": "food",
+      "type": "num",
+      "category": "res",
+      "life": "每轮",
+      "range": "份/天",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "口粮"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "饮水",
+      "key": "wat",
+      "type": "num",
+      "category": "res",
+      "life": "每轮",
+      "range": "份/天",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "水"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "弹药",
+      "key": "amm",
+      "type": "num",
+      "category": "res",
+      "life": "每轮",
+      "range": "发",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "子弹"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "货币",
+      "key": "cur",
+      "type": "num",
+      "category": "res",
+      "life": "阶段",
+      "range": "按题材",
+      "status": "supplement",
+      "conflict": "货币组",
+      "aliases": [
+        "钱币"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "存款",
+      "key": "dep",
+      "type": "num",
+      "category": "res",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "储蓄"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "负债",
+      "key": "dbt",
+      "type": "num",
+      "category": "res",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "欠款"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "等级",
+      "key": "lv",
+      "type": "num",
+      "category": "prog",
+      "life": "阶段",
+      "range": "1–99",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "级别",
+        "LV"
+      ],
+      "sources": [
+        "luoli",
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "经验",
+      "key": "exp",
+      "type": "num",
+      "category": "prog",
+      "life": "每轮",
+      "range": "0–∞",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "EXP"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "境界",
+      "key": "rlm",
+      "type": "enum",
+      "category": "prog",
+      "life": "阶段",
+      "range": "按体系",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "修为境界"
+      ],
+      "sources": [
+        "yinyu",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "修为",
+      "key": "clt",
+      "type": "num",
+      "category": "prog",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "功力"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "技能",
+      "key": "skl",
+      "type": "tag",
+      "category": "prog",
+      "life": "阶段",
+      "range": "≤6 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "招式"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "熟练",
+      "key": "pft",
+      "type": "num",
+      "category": "prog",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "精通"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "天赋",
+      "key": "tal",
+      "type": "tag",
+      "category": "prog",
+      "life": "一次性",
+      "range": "≤4 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "特长"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "任务",
+      "key": "task",
+      "type": "list",
+      "category": "prog",
+      "life": "阶段",
+      "range": "≤3 条进行中",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "委托"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "章节",
+      "key": "chap",
+      "type": "num",
+      "category": "prog",
+      "life": "阶段",
+      "range": "1–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "幕"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "轮次",
+      "key": "turn",
+      "type": "num",
+      "category": "prog",
+      "life": "每轮",
+      "range": "1–∞",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "回合"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "进度",
+      "key": "prog",
+      "type": "bar",
+      "category": "prog",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "完成度"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "成就",
+      "key": "ach",
+      "type": "tag",
+      "category": "prog",
+      "life": "一次性",
+      "range": "≤20",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "奖杯"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "攻击",
+      "key": "atk",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "攻击力"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "防御",
+      "key": "def",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "防御力"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "速度",
+      "key": "spd",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "敏捷"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "命中",
+      "key": "hit",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "命中率"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "闪避",
+      "key": "dge",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "回避"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "暴击",
+      "key": "crt",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "会心"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "护甲",
+      "key": "arm",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–∞",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "护甲值"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "士气",
+      "key": "mor",
+      "type": "bar",
+      "category": "combat",
+      "life": "阶段",
+      "range": "0–100",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "斗志"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "地点",
+      "key": "loc",
+      "type": "text",
+      "category": "space",
+      "life": "每轮",
+      "range": "节点名",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "位置",
+        "所在"
+      ],
+      "sources": [
+        "persona",
+        "yuji"
+      ],
+      "note": ""
+    },
+    {
+      "name": "区域",
+      "key": "reg",
+      "type": "text",
+      "category": "space",
+      "life": "每轮",
+      "range": "2–8 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "大区"
+      ],
+      "sources": [
+        "yuji",
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "世界",
+      "key": "wld",
+      "type": "text",
+      "category": "space",
+      "life": "一次性",
+      "range": "2–12 字",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "位面"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "地图",
+      "key": "map",
+      "type": "list",
+      "category": "space",
+      "life": "阶段",
+      "range": "四层节点",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "地形"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "方位",
+      "key": "dir",
+      "type": "enum",
+      "category": "space",
+      "life": "阶段",
+      "range": "东南西北等",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "方向"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "距离",
+      "key": "dst",
+      "type": "text",
+      "category": "space",
+      "life": "阶段",
+      "range": "数字+单位",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "路程"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "地盘",
+      "key": "dom",
+      "type": "list",
+      "category": "space",
+      "life": "阶段",
+      "range": "≤8 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "领地"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "时间",
+      "key": "time",
+      "type": "text",
+      "category": "time",
+      "life": "每轮",
+      "range": "HH:MM",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "时刻"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "日期",
+      "key": "dat",
+      "type": "text",
+      "category": "time",
+      "life": "每轮",
+      "range": "年-月-日",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "日子"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "天气",
+      "key": "wx",
+      "type": "enum",
+      "category": "time",
+      "life": "每轮",
+      "range": "晴/雨/雪/雾等",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "天候"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "季节",
+      "key": "sea",
+      "type": "enum",
+      "category": "time",
+      "life": "阶段",
+      "range": "春夏秋冬",
+      "status": "supplement",
+      "conflict": null,
+      "aliases": [
+        "时令"
+      ],
+      "sources": [
+        "common"
+      ],
+      "note": ""
+    },
+    {
+      "name": "物品",
+      "key": "itm",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤8 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "东西"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "装备",
+      "key": "gear",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤8 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "随身物"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "背包",
+      "key": "bag",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤20 格",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "包裹"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "行囊",
+      "key": "pack",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤8 条",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "行李"
+      ],
+      "sources": [
+        "yinyu"
+      ],
+      "note": ""
+    },
+    {
+      "name": "道具",
+      "key": "prop",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤10",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "物件"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "武器",
+      "key": "wpn",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤3",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "兵器"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "防具",
+      "key": "armr",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤3",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "护具"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "消耗品",
+      "key": "csm",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "≤10",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "用品"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "状态",
+      "key": "st",
+      "type": "tag",
+      "category": "meta",
+      "life": "每轮",
+      "range": "≤4 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "状况"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "标记",
+      "key": "flag",
+      "type": "tag",
+      "category": "meta",
+      "life": "每轮",
+      "range": "≤6 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "flags"
+      ],
+      "sources": [
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "选项",
+      "key": "opt",
+      "type": "tag",
+      "category": "meta",
+      "life": "每轮",
+      "range": "2–4 条",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "行动选项"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "属性",
+      "key": "attr",
+      "type": "list",
+      "category": "meta",
+      "life": "一次性",
+      "range": "按体系",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "八维"
+      ],
+      "sources": [
+        "persona",
+        "luoli"
+      ],
+      "note": ""
+    },
+    {
+      "name": "能力",
+      "key": "pow",
+      "type": "list",
+      "category": "meta",
+      "life": "阶段",
+      "range": "按体系",
+      "status": "core",
+      "conflict": null,
+      "aliases": [
+        "技能组"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "模块",
+      "key": "mod",
+      "type": "list",
+      "category": "meta",
+      "life": "一次性",
+      "range": "按需",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "开关"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    },
+    {
+      "name": "信念",
+      "key": "crd",
+      "type": "list",
+      "category": "meta",
+      "life": "阶段",
+      "range": "三轴",
+      "status": "common",
+      "conflict": null,
+      "aliases": [
+        "信条"
+      ],
+      "sources": [
+        "persona"
+      ],
+      "note": ""
+    }
+  ]
+}

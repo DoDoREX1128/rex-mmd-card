@@ -1,0 +1,37 @@
+{
+  "A": {
+    "name": "示例 A",
+    "colors": [
+      "#913c2c",
+      "#243e35",
+      "#294e3d",
+      "#36594b",
+      "#efe6d3",
+      "#fff3d9"
+    ],
+    "fonts": [
+      "CityWenkai",
+      "Jianghu Wenkai",
+      "JianghuDialogue",
+      "JianghuOptions",
+      "JianghuOpening"
+    ],
+    "texture": "paper"
+  },
+  "B": {
+    "name": "示例 B",
+    "colors": [
+      "#d4b371",
+      "#c9a962",
+      "#e8dfd4",
+      "#251e19",
+      "#1c1714",
+      "#2f2620"
+    ],
+    "fonts": [
+      "ZML Isenheim",
+      "ZML Noto Serif SC"
+    ],
+    "texture": "parchment"
+  }
+}

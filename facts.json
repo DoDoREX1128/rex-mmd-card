@@ -1,0 +1,708 @@
+{
+  "schema": "rex-facts/1",
+  "updated": "2026-10-28",
+  "note": "本文件是 Rex-MMD角色卡 的唯一平台事实真源。脚本从它读限额/能力/事件/选择器/变量/层级；references/23-平台-事实表.md 由 scripts/gen-facts.mjs 生成，不要手改。每条事实带 source 与 evidence：source 记录出处，evidence 取值 official|source|device|external|todo。",
+  "markers": {
+    "ignition": {
+      "open": "【",
+      "close": "】",
+      "prefix": "rex-",
+      "note": "注入标记，出现在 beginning / statusbar / findRegex。用中文方括号而非尖括号：避开创卡页对 findRegex 的 HTML 标签文案禁令，也不受正则转义影响。",
+      "evidence": "official"
+    },
+    "content": {
+      "block": "<rex-status>",
+      "note": "内容协议标记，只出现在模型正文与解析脚本里，不进 findRegex。带连字符的标签名不会被平台的标签剥离正则（字符类不含 -）命中，因此可存活；不要改成中文尖括号标签，中文标签会被整段剥掉。",
+      "evidence": "source"
+    }
+  },
+  "versions": {
+    "sandbox": {
+      "chatVersion": 1,
+      "label": "新版沙盒卡（新聊天页）",
+      "topKeys": [
+        "chatVersion",
+        "pageDepth",
+        "statusbar",
+        "beginning",
+        "personality",
+        "regex_scripts"
+      ],
+      "requiredTopKeys": [
+        "chatVersion",
+        "pageDepth",
+        "statusbar",
+        "beginning",
+        "regex_scripts"
+      ],
+      "optionalTopKeys": [
+        "personality"
+      ],
+      "forbiddenTopKeys": [
+        "role",
+        "presentation",
+        "worldbook",
+        "world_book",
+        "lorebook",
+        "lore_book",
+        "entries",
+        "characterBook",
+        "character_book"
+      ],
+      "ruleKeys": [
+        "id",
+        "scriptName",
+        "findRegex",
+        "replaceString"
+      ],
+      "idRule": "负数，导入时平台重编号",
+      "pageDepth": 2,
+      "source": "官方导入白名单 + 洛璃 mmd-sandbox §8.1",
+      "evidence": "official"
+    },
+    "legacy": {
+      "chatVersion": 0,
+      "label": "旧版卡（旧聊天页）",
+      "topKeys": [
+        "chatVersion",
+        "pageDepth",
+        "statusbar",
+        "beginning",
+        "personality",
+        "regex_scripts"
+      ],
+      "requiredTopKeys": [
+        "pageDepth",
+        "statusbar",
+        "beginning",
+        "regex_scripts"
+      ],
+      "optionalTopKeys": [
+        "personality",
+        "chatVersion"
+      ],
+      "forbiddenTopKeys": [
+        "role",
+        "presentation",
+        "worldbook",
+        "world_book",
+        "lorebook",
+        "lore_book",
+        "entries",
+        "characterBook",
+        "character_book"
+      ],
+      "ruleKeys": [
+        "id",
+        "scriptName",
+        "findRegex",
+        "replaceString"
+      ],
+      "idRule": "-1 固定；导入时平台重编号",
+      "pageDepth": 2,
+      "source": "洛璃 mmd.md 四键为必填；chatVersion:0 可随包携带（平台只在新建卡导入时读），personality 仅留档",
+      "evidence": "device"
+    }
+  },
+  "limits": {
+    "common": {
+      "scriptName": {
+        "ui": 20,
+        "source": 200,
+        "use": 20,
+        "evidence": "source"
+      },
+      "findRegex": {
+        "ui": 1000,
+        "source": 4096,
+        "use": 1000,
+        "evidence": "source"
+      },
+      "replaceString": {
+        "editor": 20000,
+        "import": 100000,
+        "use": 20000,
+        "evidence": "device"
+      },
+      "rules": {
+        "max": 130,
+        "evidence": "source"
+      },
+      "worldbookEntryContent": {
+        "max": 3000,
+        "evidence": "official"
+      },
+      "worldbookComment": {
+        "max": 20,
+        "evidence": "official"
+      }
+    },
+    "sandbox": {
+      "statusbar": {
+        "max": 200,
+        "evidence": "source"
+      },
+      "beginning": {
+        "max": 4000,
+        "evidence": "source"
+      },
+      "personality": {
+        "max": 10000,
+        "evidence": "official"
+      },
+      "imageUrl": {
+        "max": 2048,
+        "evidence": "source"
+      },
+      "publish": {
+        "transmissionChars": [
+          2000,
+          15000
+        ],
+        "beginningMin": 200,
+        "evidence": "official",
+        "note": "仅公开发布审核口径；私人卡不适用。固定传输 = 人设 + 已启用且常驻且概率 100% 的世界书正文。"
+      }
+    },
+    "legacy": {
+      "statusbar": {
+        "max": 200,
+        "evidence": "official"
+      },
+      "beginning": {
+        "max": 4000,
+        "evidence": "official"
+      },
+      "personality": {
+        "max": 10000,
+        "evidence": "official"
+      },
+      "fixedTransmission": {
+        "max": 15000,
+        "evidence": "device",
+        "note": "超出截断，不报错"
+      }
+    }
+  },
+  "capabilities": [
+    "input.get",
+    "input.set",
+    "input.add",
+    "input.insert",
+    "input.clear",
+    "input.focus",
+    "input.blur",
+    "input.getCursor",
+    "input.setCursor",
+    "composer.show",
+    "composer.hide",
+    "composer.visible",
+    "message.send",
+    "message.edit",
+    "cache.get",
+    "cache.set",
+    "cache.remove",
+    "save.get",
+    "save.set",
+    "save.remove",
+    "save.keys",
+    "stage.open",
+    "stage.close",
+    "stage.el",
+    "stage.visible",
+    "role.get",
+    "user.get",
+    "on",
+    "debug.log",
+    "version"
+  ],
+  "capabilityNamespaces": [
+    "input",
+    "composer",
+    "message",
+    "cache",
+    "save",
+    "stage",
+    "role",
+    "user",
+    "debug"
+  ],
+  "absentCapabilities": [
+    "once",
+    "off",
+    "vars",
+    "theme.set",
+    "memory"
+  ],
+  "events": [
+    "ready",
+    "message:new",
+    "message:done",
+    "message:stream",
+    "message:mount",
+    "message:unmount",
+    "input:change",
+    "conversation:switch",
+    "theme:change",
+    "back",
+    "stage:close",
+    "dispose"
+  ],
+  "eventPayloads": {
+    "message:new": "{ content, id, role, serverId }",
+    "message:mount": "{ content, id, role, serverId }",
+    "message:done": "{ content, id, role, serverId }",
+    "message:stream": "{ content, id, role, serverId }",
+    "ready": "undefined",
+    "message:unmount": "无载荷",
+    "input:change": "无载荷",
+    "conversation:switch": "无载荷",
+    "theme:change": "无载荷",
+    "back": "无载荷",
+    "stage:close": "无载荷",
+    "dispose": "无载荷"
+  },
+  "eventOrder": {
+    "coldStart": [
+      "message:new",
+      "message:mount",
+      "message:done",
+      "ready"
+    ],
+    "replay": [
+      "message:mount",
+      "message:done"
+    ],
+    "noReplay": [
+      "ready"
+    ],
+    "source": "洛璃 mmd-sandbox §2.6 / §4.9",
+    "evidence": "device"
+  },
+  "errorCodes": {
+    "source": [
+      "UNAUTHORIZED",
+      "RATE_LIMITED",
+      "INVALID_ARGS",
+      "HOST_DENIED",
+      "NETWORK",
+      "NOT_SUPPORTED",
+      "BUSY",
+      "MODEL_UNAVAILABLE",
+      "UNKNOWN_CAPABILITY"
+    ],
+    "inContract": [
+      "UNAUTHORIZED",
+      "RATE_LIMITED",
+      "INVALID_ARGS",
+      "HOST_DENIED",
+      "NETWORK",
+      "NOT_SUPPORTED",
+      "BUSY"
+    ],
+    "extraInSource": [
+      "MODEL_UNAVAILABLE",
+      "UNKNOWN_CAPABILITY"
+    ],
+    "evidence": "source"
+  },
+  "rateLimits": {
+    "window": 60,
+    "perWindow": {
+      "save.set": 20,
+      "message.send.gesture": 3,
+      "message.send.auto": 3,
+      "message.edit": 10
+    },
+    "evidence": "official"
+  },
+  "selectors": {
+    "chat": [
+      "root",
+      "header",
+      "header-back",
+      "header-title",
+      "header-actions",
+      "messages",
+      "list",
+      "list-spacer",
+      "message-frame",
+      "message",
+      "message-avatar",
+      "message-name",
+      "message-body",
+      "message-time",
+      "message-actions",
+      "author-stage",
+      "author-css",
+      "composer",
+      "input",
+      "send",
+      "model-chip",
+      "shortcut",
+      "instruction-bar",
+      "instruction-back",
+      "instruction-chip",
+      "more-panel",
+      "message-menu",
+      "alert",
+      "toast",
+      "snack",
+      "share-bar",
+      "assistant",
+      "assistant-tip",
+      "assistant-tips",
+      "paste",
+      "clear",
+      "alert-ok",
+      "share-pick-bar",
+      "share-pick-toggle",
+      "share-pick-cancel",
+      "share-pick-switch",
+      "share-shot-intro",
+      "share-shot-header",
+      "share-shot-footer",
+      "share-shot-loading",
+      "summary-bubble"
+    ],
+    "slots": [
+      "header-extra",
+      "statusbar",
+      "left",
+      "right",
+      "toolbar",
+      "message-extra",
+      "sdk-debug"
+    ],
+    "slotsMissingOnNarrow": [
+      "left",
+      "right"
+    ],
+    "slotNotes": {
+      "statusbar": "为空时整块不存在",
+      "header-extra": ":empty 时 display:none",
+      "left/right": "root 直接子节点，可安全挂浮层；窄屏可能不存在，只作增强",
+      "sdk-debug": "SDK 调试槽，platform 所有，不要占用"
+    },
+    "stateAttrs": {
+      "message": [
+        "data-from=user|ai",
+        "data-state",
+        "data-msg-id",
+        "data-generating=1"
+      ],
+      "root": [
+        "data-theme=dark|light",
+        "data-composer=visible|hidden"
+      ],
+      "stage": [
+        "data-stage=closed|content|full"
+      ]
+    },
+    "source": "洛璃 mmd-sandbox §5 / 真页契约 2026-08-29",
+    "evidence": "device"
+  },
+  "chatVars": {
+    "total": 29,
+    "definedOn": [
+      "[data-theme=dark]",
+      "[data-theme=light]"
+    ],
+    "groups": {
+      "bubblePage": [
+        "--chat-bg",
+        "--chat-surface",
+        "--chat-text",
+        "--chat-text-muted",
+        "--chat-border",
+        "--chat-accent",
+        "--chat-share-pick-bg",
+        "--chat-bubble-user-bg",
+        "--chat-bubble-ai-bg",
+        "--chat-bubble-text"
+      ],
+      "composerAndModal": [
+        "--chat-composer-bg",
+        "--chat-composer-text",
+        "--chat-shortcut-bg",
+        "--chat-shortcut-text",
+        "--chat-input-bg",
+        "--chat-input-text",
+        "--chat-input-placeholder",
+        "--chat-input-border",
+        "--chat-modal-bg",
+        "--chat-modal-surface",
+        "--chat-modal-text",
+        "--chat-modal-muted",
+        "--chat-modal-accent",
+        "--chat-modal-input-bg",
+        "--chat-modal-input-text",
+        "--chat-modal-cancel-bg",
+        "--chat-modal-btn-bg",
+        "--chat-modal-btn-border"
+      ],
+      "alias": [
+        "--chat-more-item-bg"
+      ]
+    },
+    "aliases": {
+      "--chat-bubble-user-bg": "var(--chat-bg)",
+      "--chat-bubble-ai-bg": "var(--chat-bg)",
+      "--chat-bubble-text": "var(--chat-text)",
+      "--chat-more-item-bg": "var(--chat-modal-surface)"
+    },
+    "overrideNote": "写 [data-chat=\"root\"][data-theme=\"dark|light\"]（特异性 0,2,0）可跟随深浅色；令牌本身 0,1,0，作者样式 hoist 在平台之后故可覆盖，无需 !important。唯一需要 !important 的是换页面背景（root 带内联 background-image）。",
+    "source": "洛璃 mmd-sandbox §6.1；真页契约 2026-08-29",
+    "evidence": "device"
+  },
+  "zIndex": {
+    "sandbox": {
+      "platform": {
+        "snackbar": 10090,
+        "alert": 9000,
+        "message-menu": 8200,
+        "composer-snack": 8100,
+        "share-loading": 8000,
+        "stage-full": 3000,
+        "stage-content": 2000,
+        "sdk-debug": 40,
+        "assistant-tip": 10,
+        "history-loading": 2,
+        "rate-tip": 1
+      },
+      "author": {
+        "decoration": [
+          1,
+          999
+        ],
+        "overlay": [
+          3500,
+          7999
+        ],
+        "deadBand": [
+          1000,
+          3499
+        ],
+        "note": "平台 header/composer/messages 实测 z-index:auto + position:static，不进 8000 段；页面级浮层用 3500–7999，低于 1000 只作气泡内装饰。气泡内任何 z-index 都翻不出气泡（message-body 的 opacity 创建层叠上下文）。"
+      },
+      "source": "洛璃 mmd-sandbox §6.3 + 样式表穷举",
+      "evidence": "device"
+    },
+    "legacy": {
+      "platform": {
+        "summary-panel": 1000000000,
+        "msg-option-menu": 99999,
+        "dialogs": 10075,
+        "side-containers": 9999,
+        "chat-bottom": 999,
+        "scroll-view": 999,
+        "chat-scope-box": 11,
+        "modify-btn": 2
+      },
+      "author": {
+        "decoration": [
+          1,
+          999
+        ],
+        "overlay": [
+          10000,
+          9998
+        ]
+      },
+      "note": "旧版没有统一安全带：浮层要压过 9999 的两侧容器就取 10000 以上、压过 10075 的弹窗则需更高，且不得越过 99999 的长按菜单。",
+      "source": "洛璃 mmd.md §六层级表",
+      "evidence": "device"
+    }
+  },
+  "preview": {
+    "thin": {
+      "throws": [
+        "save.get",
+        "save.keys"
+      ],
+      "undefined": [
+        "cache.get"
+      ],
+      "notSupported": [
+        "input.set",
+        "input.add",
+        "input.insert",
+        "input.clear",
+        "input.focus",
+        "input.blur",
+        "input.setCursor",
+        "composer.show",
+        "composer.hide",
+        "message.send",
+        "message.edit",
+        "save.set",
+        "save.remove"
+      ],
+      "works": [
+        "cache.set",
+        "cache.remove",
+        "on",
+        "debug.log",
+        "version",
+        "role.get",
+        "user.get",
+        "stage.open",
+        "stage.close",
+        "stage.el",
+        "stage.visible",
+        "composer.visible"
+      ],
+      "returns": {
+        "composer.visible": true,
+        "input.get": "",
+        "input.getCursor": 0,
+        "stage.el": "DIV"
+      },
+      "note": "save.get/save.keys 是同步抛 SdkError，不是返回 NOT_SUPPORTED：不包 try/catch 会整段脚本失效且页面无提示。",
+      "source": "洛璃 mmd-sandbox §2.5",
+      "evidence": "device"
+    }
+  },
+  "regex": {
+    "slashFlags": "gimsuy",
+    "autoAddGlobal": true,
+    "literalEscaped": true,
+    "badSlash": "整条规则静默丢弃，不降级为字面量",
+    "disablePrefix": "__",
+    "order": "按 regexSort 升序执行",
+    "budget": {
+      "formula": "max(262144, inputLength*4)",
+      "onExceed": "整条规则回滚，仅在调试面板告警"
+    },
+    "tokens": [
+      "$1",
+      "$名字",
+      "{{random:甲::乙::丙}}"
+    ],
+    "source": "洛璃 mmd-sandbox §7 + worker 源码",
+    "evidence": "source"
+  },
+  "sanitizer": {
+    "whitelist": [
+      "p",
+      "b",
+      "a",
+      "div",
+      "span",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "ul",
+      "li",
+      "ol",
+      "strong",
+      "em",
+      "br",
+      "img",
+      "pre",
+      "font",
+      "i",
+      "button",
+      "table",
+      "th",
+      "tr",
+      "td",
+      "input",
+      "textarea",
+      "label",
+      "select",
+      "option",
+      "video",
+      "script",
+      "user",
+      "summary",
+      "details",
+      "code",
+      "blockquote",
+      "hr",
+      "del",
+      "thead",
+      "tbody",
+      "s",
+      "svg",
+      "g",
+      "path",
+      "circle",
+      "ellipse",
+      "rect",
+      "line",
+      "polyline",
+      "polygon",
+      "text",
+      "tspan",
+      "defs",
+      "use",
+      "linearGradient",
+      "radialGradient",
+      "stop",
+      "clipPath",
+      "title",
+      "style"
+    ],
+    "removed": [
+      "iframe",
+      "link",
+      "meta",
+      "base",
+      "form",
+      "object",
+      "embed"
+    ],
+    "removedAttrs": [
+      "data-*（作者自写）",
+      "aria-*",
+      "role"
+    ],
+    "keptEventAttrs": "HTML 元素上的 on* 保留；SVG 内的 on* 被删",
+    "stripRule": "非白名单标签按正则剥壳，只删标签保留文字；标签名字符类不含连字符，故 <rex-status> 存活、<状态> 被整段剥掉",
+    "source": "洛璃 mmd-sandbox §5.2",
+    "evidence": "source"
+  },
+  "silentFailures": [
+    "chatVersion 写成 0 或漏写：规则照装，sdk.* 与 [data-chat] 全不在，无报错",
+    "findRegex 写成 /…/ 但语法错：整条丢弃，无报错",
+    "字面量匹配式重复：后一条永不命中",
+    "可见 HTML 的标记没接进 statusbar/beginning/前序替换：界面永不出现",
+    "能力名或事件名拼错：永不生效、永不触发",
+    "自写 data-* 被净化：后续 querySelector 全查不到",
+    "z-index 落在 1000–3499：被舞台（2000/3000）压住",
+    "替换产物超输出预算：整条规则回滚，仅调试面板可见",
+    "sdk.on 写进 message:mount 回调：每挂一条气泡多订一份",
+    "在 message:mount 里读 message-body 当正文：读到「消息生成中」占位"
+  ],
+  "evidenceLevels": [
+    {
+      "id": "source",
+      "label": "源码确证",
+      "meaning": "平台安装包内代码逐字可见"
+    },
+    {
+      "id": "device",
+      "label": "实机实测",
+      "meaning": "真实聊天页或真机探针复现"
+    },
+    {
+      "id": "official",
+      "label": "官方手册",
+      "meaning": "官方文档或 contract.json 明示"
+    },
+    {
+      "id": "external",
+      "label": "外部整理",
+      "meaning": "其他技能/第三方整理，未在本机复验"
+    },
+    {
+      "id": "todo",
+      "label": "待验证",
+      "meaning": "有线索但缺复现证据，不得当结论引用"
+    }
+  ]
+}

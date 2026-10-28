@@ -1,0 +1,19 @@
+{
+  "name": "示例 A 原样（用于演示原创检查会拦什么）",
+  "colors": {
+    "bg": "#efe6d3",
+    "surface": "#36594b",
+    "text": "#202822",
+    "muted": "#59624f",
+    "accent": "#913c2c",
+    "accent2": "#294e3d"
+  },
+  "fonts": {
+    "display": "CityWenkai",
+    "body": "Jianghu Wenkai",
+    "num": "Georgia"
+  },
+  "texture": "paper",
+  "radius": 10,
+  "motion": "subtle"
+}
