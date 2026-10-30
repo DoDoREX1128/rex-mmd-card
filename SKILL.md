@@ -4,7 +4,7 @@ description: 为 MMD 创建、修改、检查角色人设、世界书、状态�
 license: MIT
 metadata:
   author: DoDoREX1128
-  version: "2.0.1"
+  version: "2.1.0"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
   compatibility: Node.js 18+；基础脚本无第三方依赖，浏览器回归需要 Chrome 或 Edge。
 ---
@@ -12,6 +12,16 @@ metadata:
 # Rex MMD 角色卡制作
 
 沿用用户已确定的平台、素材、结构、文风与授权。只完成当前任务需要的产物；纯文字、人设、世界书或检查任务不强制走整卡工程。
+
+## 从零做整卡：先准备用户交付区与Agent工程区
+
+路线确定后，在用户指定的主项目目录先运行 `project.mjs init`，再开始创作。主目录只分为“交付”和“工程”；不要把用户项目直接堆在 skill 安装目录，也不要迁移或覆盖已有工程来凑规范。
+
+“交付”固定准备：`00-使用与验收.md`、`01-人设审阅.txt`、`02-开场白审阅.txt`、`03-世界书审阅.md`，以及生成的 `persona.txt`、`regex.json`、`worldbook.json`。初始化时它们是明确标记的空白草稿，不能伪装为已完成角色卡。
+
+用户只需修改审阅稿、查看成果与体验；不要求读源码。世界书MD提供全书概览、条目目录、逐条触发与正文、独立修改意见，保留导入元数据但不把技术JSON当成审阅内容。
+
+Agent在“工程”维护源文件、任务记录、构建快照、报告和备份。继续前先 `project status`，按需 `sync`，成功构建后才更新导入文件；审阅稿与源内容双改、未处理修改意见或外部产物改动时，先核对，不静默选源码覆盖用户。完整结构、回写规则和边界见 [02工作区与审阅交付](references/02-项目工作区与审阅交付.md)。纯内容、小修和已有工程按实际范围使用，不强制重新初始化。
 
 ## 任务与流程
 
@@ -28,7 +38,7 @@ metadata:
 
 | 阶段 | 要解决什么 | 可复查产物与下一步 |
 |---|---|---|
-| S0定位 | 本次范围、环境、路线、已有资产 | 关键信息确定或已有授权可代选 |
+| S0定位 | 本次范围、环境、路线、已有资产；从零整卡先初始化工作区 | 关键信息确定或已有授权可代选，交付/工程目录已就位 |
 | S1方案 | 核心循环、信息架构、字段、权威源、存档和未知项 | 方案与必要线框，按[10](references/10-流程-三问与方案.md)检查衔接 |
 | S2原型 | 首屏、一个主功能和完整返回链 | 可点击假数据页，方向符合本次要求 |
 | S3本地 | 对应路线构建、协议、错误与重入 | 静态/行为结果和截图，失败项已处理或说明 |
@@ -43,9 +53,9 @@ metadata:
 
 | 路线 | 运行方式 | 生成与验证 |
 |---|---|---|
-| 新版沙盒卡 | chatVersion=1；公开 SDK、data-chat/data-slot、sdk.stage | init --route sandbox；build --route sandbox；validate --platform sandbox |
-| 旧版同层卡 | 旧页；Host 适配原生 DOM，隔离 Frame 提供 UI | init --route same；pack-samelayer；validate --platform legacy；preview-samelayer |
-| 旧版原生卡 | 保留旧版聊天；纯文字、KV/气泡、换肤、可选逐消息引擎 | init --route native；build --route native；validate --platform legacy |
+| 新版沙盒卡 | chatVersion=1；公开 SDK、data-chat/data-slot、sdk.stage | project init --route sandbox → project build；底层build/validate sandbox |
+| 旧版同层卡 | 旧页；Host 适配原生 DOM，隔离 Frame 提供 UI | project init --route same → project build；底层pack-samelayer/validate legacy |
+| 旧版原生卡 | 保留旧版聊天；纯文字、KV/气泡、换肤、可选逐消息引擎 | project init --route native → project build；底层build native/validate legacy |
 
 新版/旧版是执行环境；同层/原生是呈现方式。旧版原生增强与轻量 Host 可以按需组合，不能混用跨版本 SDK、导入包和选择器。旧版原生动作并非 iframe 专属，但需要目标 DOM 适配。详见 [20](references/20-平台-分流.md)。
 
@@ -84,14 +94,19 @@ metadata:
 
 所有脚本从本 skill 的 scripts 目录解析；项目目录由用户指定，已有文件默认保留。
 
-    node scripts/init.mjs --route sandbox --out work/src
-    node scripts/build.mjs --route sandbox --src work/src --out work/out --name example
-    node scripts/validate.mjs work/out/example-regex.json --platform sandbox
-    node scripts/preview.mjs --card work/out/example-regex.json --src work/src --out work/out
-    node scripts/e2e.mjs --card work/out/example-regex.json --src work/src --out work/out
+从零整卡优先使用以下入口，先把 `<项目目录>` 替换为用户位置；用户不需要执行命令：
+
+    node scripts/project.mjs init "<项目目录>" --route sandbox --name example --title 卡名
+    node scripts/project.mjs status "<项目目录>"
+    node scripts/project.mjs sync "<项目目录>"
+    node scripts/project.mjs build "<项目目录>"
+
+底层init/build/pack/preview继续保留给已有工程与调试，具体参数见20/40/51。工作区工具完成三路线构建和静态检查，不自动宣布行为或目标站通过。维护skill工具时按改动执行：
+
     node scripts/test.mjs
     node --test scripts/test-contracts.mjs
     node --test scripts/test-authoring.mjs
+    node --test scripts/test-project.mjs
 
 维护骨架的封面/创建流程时，另跑 `node scripts/e2e-authoring.mjs`，验证发布包的四种开局配置和真实按钮/输入行为；它不是每张纯文字卡的强制步骤。
 
@@ -105,6 +120,7 @@ metadata:
 
 | 当前任务 | 参考 |
 |---|---|
+| 新整卡准备目录、给用户审阅/修改、同步和重建 | [02标准工作区](references/02-项目工作区与审阅交付.md) |
 | 定位、方案、一句话补全、继续 | [01流程](references/01-流程-心流与状态机.md)、[10方案模板](references/10-流程-三问与方案.md)、[11推导方法](references/11-流程-一句话补全.md) |
 | 三路线与平台机制 | [20分流](references/20-平台-分流.md)、[21新版](references/21-平台-新页事实.md)、[22同层](references/22-平台-同层卡架构.md)、[24原生](references/24-平台-旧版事实.md)、[25 SDK](references/25-平台-SDK速查.md) |
 | 模型数据、内容、存档 | [30状态](references/30-内容-状态与字段.md)、[31世界书](references/31-内容-世界书.md)、[32人设](references/32-内容-人设与文风.md)、[33续档](references/33-内容-存档与续档.md) |
@@ -116,7 +132,7 @@ metadata:
 
 ### 交付说明要包含
 
-卡名与路线、文件与用途、导入步骤、已验证层级、未验证项与原因、能力限制。新版分离交付人设另贴，世界书独立导入；整卡PNG仍须新建并首次保存前选新版。创建、状态、存档三种协议不能混为一谈，默认草稿可改，失败保留。
+先链接“交付/00-使用与验收.md”和实际审阅稿，说明卡名与路线、导入步骤、已验证层级、未验证项和能力限制；工程日志不是用户必读材料。新版分离交付人设另贴，世界书独立导入；整卡PNG仍须新建并首次保存前选新版。创建、状态、存档三种协议不能混为一谈，默认草稿可改，失败保留。
 
 ## 资料与维护
 

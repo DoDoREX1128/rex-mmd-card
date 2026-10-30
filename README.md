@@ -6,10 +6,12 @@
 
 支持 **新版沙盒卡、旧版同层卡、旧版原生卡**，不处理酒馆或其他平台。
 
+**2.1.0** 新增“交付 / 工程”工作区和三份可回写审阅稿：用户直接修改正文，Agent 负责同步、构建和冲突处理。详见[项目工作区与审阅交付](references/02-项目工作区与审阅交付.md)。
+
 <p align="center">
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://nodejs.org"><img alt="Node.js 18 or newer" src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg"></a>
-  <a href="references/58-内容恢复与验收.md"><img alt="Version 2.0.1" src="https://img.shields.io/badge/version-2.0.1-informational.svg"></a>
+  <a href="references/02-项目工作区与审阅交付.md"><img alt="Version 2.1.0" src="https://img.shields.io/badge/version-2.1.0-informational.svg"></a>
 </p>
 
 [这是什么](#这是什么) · [能做什么](#能做什么) · [安装](#安装) · [怎么用](#怎么用) · [三条路线](#三条路线) · [工具链](#工具链) · [目录](#目录)
@@ -157,7 +159,39 @@ Windows 下 `~` 通常指用户主目录。不安装也可以在克隆的目录�
 
 日常使用可以让助手运行这些工具，不需要记住所有命令。需要手动构建时，先按路线选择起点。
 
-### 新版沙盒卡
+### 从零做整卡：先建立项目工作区
+
+先把 `<项目目录>` 换成用户指定位置，再由 Agent 执行；用户不必接触命令或源码：
+
+```bash
+node scripts/project.mjs init "<项目目录>" --route sandbox --name river --title 渡口来信
+node scripts/project.mjs status "<项目目录>"
+node scripts/project.mjs sync "<项目目录>"
+node scripts/project.mjs build "<项目目录>"
+```
+
+把 route 改成 `native` 或 `same` 即选择另外两条路线，目录规范一致，底层构建分别处理。主项目仅分两区：
+
+```text
+项目/
+├─ 交付/  ← 用户只看这里
+│  ├─ 00-使用与验收.md
+│  ├─ 01-人设审阅.txt
+│  ├─ 02-开场白审阅.txt
+│  ├─ 03-世界书审阅.md
+│  ├─ persona.txt
+│  ├─ regex.json
+│  └─ worldbook.json
+└─ 工程/  ← Agent维护源码、任务记录、构建、报告和备份
+```
+
+用户直接修改三份审阅稿。世界书按“概览 / 目录 / 条目触发 / 正文 / 修改意见”组织，保留导入元数据而不展示技术 JSON。修改意见由 Agent 处理，不混进世界设定；审阅稿和源码双改时先处理冲突，不覆盖用户文件。
+
+初始化先准备空白草稿；构建成功、正式静态校验通过后才更新导入文件。已有工程不会被自动搬迁。纯人设、小修也不强制创建整套工程。详细结构与同步流程见[项目工作区与审阅交付](references/02-项目工作区与审阅交付.md)。
+
+以下底层命令仍用于已有项目、机制调试与单独构建。
+
+### 新版沙盒卡的底层构建
 
 ```bash
 node scripts/init.mjs --route sandbox --out work/src
@@ -190,6 +224,7 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 
 | 工具 | 用途 |
 |---|---|
+| `project.mjs` | 初始化交付/工程区，双向同步审阅稿、检查冲突、调用对应路线构建 |
 | `analyze.mjs` / `replay.mjs` | 拆解已有卡、检查正则链与残留标记 |
 | `validate-worldbook.mjs` | 单独检查世界书结构与字段类型 |
 | `worldbook-project.mjs` | 中大型世界书的稳定源条目、重排、归档、构建与核对 |
@@ -199,6 +234,8 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 | `pack-skill.mjs` | 生成不含工作现场、测试临时文件与版本库的分发副本 |
 
 ## 交付与验证
+
+从零整卡先把“交付/00-使用与验收.md”和三份审阅稿给用户；工程代码、快照和校验日志无需用户阅读。可运行的体验页或真实目标链接按作品需要另提供，目录生成本身不代表已有通用预览。
 
 按任务交付独立正则、人设、世界书，或将相关内容封进 v2 整卡。MMD 整卡默认推荐 PNG；JSON 可以作为备份与再加工源，直接导入是否可用需确认目标入口。
 
@@ -219,8 +256,11 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 ```bash
 node scripts/test.mjs
 node --test scripts/test-contracts.mjs
+node --test scripts/test-project.mjs
 node scripts/gen-facts.mjs --check
 ```
+
+2.1.0 的工作区合同测试 **12/12 通过**，覆盖三路线的实际构建、审阅稿回写、世界书元数据保留、双改冲突、待处理意见及失败保护；原有 60 项脚本检查和 31 项合同检查也通过。这些结果不代替真实 MMD 或实体设备验证。
 
 ## 2.0.1：恢复详细制作方法
 
@@ -236,7 +276,7 @@ rex-mmd-card/
 ├── facts.json               已记录的平台值、证据与实现能力
 ├── README.md / LICENSE
 ├── references/
-│   ├── 00 / 01 / 10 / 11    阅读路径、流程与需求补全
+│   ├── 00 / 01 / 02 / 10 / 11 阅读路径、工作区、流程与需求补全
 │   ├── 20–25                平台分流、事实表与 SDK 速查
 │   ├── 30–33                状态、世界书、人设、存档与续档
 │   ├── 40–47                界面、视觉、可选捏人、外链与宿主边界
