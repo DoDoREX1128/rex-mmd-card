@@ -9,7 +9,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://nodejs.org"><img alt="Node.js 18 or newer" src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg"></a>
-  <a href="references/57-修订验收.md"><img alt="Version 2.0.0" src="https://img.shields.io/badge/version-2.0.0-informational.svg"></a>
+  <a href="references/58-内容恢复与验收.md"><img alt="Version 2.0.1" src="https://img.shields.io/badge/version-2.0.1-informational.svg"></a>
 </p>
 
 [这是什么](#这是什么) · [能做什么](#能做什么) · [安装](#安装) · [怎么用](#怎么用) · [三条路线](#三条路线) · [工具链](#工具链) · [目录](#目录)
@@ -222,6 +222,12 @@ node --test scripts/test-contracts.mjs
 node scripts/gen-facts.mjs --check
 ```
 
+## 2.0.1：恢复详细制作方法
+
+本版补回入口阶段说明、完整资料路由，以及被过度删减的操作方法、扩展示例和验收模板。三路线分开、人设可自定义、统一 `[status]` 与此前代码修复继续保留；旧规则有误的地方按实际契约纠正。逐篇恢复、迁移与不原样恢复的原因见[内容恢复映射](references/58-内容恢复与验收.md)。
+
+新增 `node --test scripts/test-authoring.mjs` 覆盖创建开关、字段校验、草稿失败、原始导出和文档扩展示例；`node scripts/e2e-authoring.mjs` 在本地 Chrome/Edge 中点击四种开局组合、校验表单与输入失败回退。代码测试只证明被测场景，不能证明所有创作任务和真实目标部署。
+
 ## 目录
 
 ```text
@@ -234,7 +240,7 @@ rex-mmd-card/
 │   ├── 20–25                平台分流、事实表与 SDK 速查
 │   ├── 30–33                状态、世界书、人设、存档与续档
 │   ├── 40–47                界面、视觉、可选捏人、外链与宿主边界
-│   ├── 50–57                拆解、验收、交付、裁决与修订记录
+│   ├── 50–58                拆解、验收、交付、裁决与修订记录
 │   ├── fields/              可选字段候选库
 │   └── errors/              带版本与证据的历史错题本
 ├── assets/

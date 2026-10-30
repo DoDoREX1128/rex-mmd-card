@@ -56,8 +56,38 @@
   /* ================= 捏人 ================= */
 
   REX.beginForge = function () {
+    if (!(C().features || {}).forge) {
+      this.closeStage();
+      this.refresh();
+      return;
+    }
     this.state.forge = this.state.forge || {};
     this.go('forge');
+  };
+
+  /* One validator serves both the button state and the actual commit. */
+  REX.validateForge = function () {
+    var st = this.state.forge || {}, values = {}, errors = [];
+    ((C().player || {}).fields || []).forEach(function (f) {
+      if (!f || typeof f.key !== 'string' || !/^[\p{L}_][\p{L}\p{N}_-]{0,63}$/u.test(f.key) ||
+          ['__proto__', 'constructor', 'prototype'].indexOf(f.key) >= 0) {
+        errors.push('创建字段名无效'); return;
+      }
+      var raw = Object.prototype.hasOwnProperty.call(st, f.key) ? st[f.key] : f.default;
+      var value = String(raw == null ? '' : raw).trim(), label = f.label || f.key;
+      values[f.key] = value;
+      if (!value) { if (!f.optional) errors.push('请填写或选择' + label); return; }
+      if (f.type === 'text') {
+        var max = Number(f.maxLength == null ? f.max : f.maxLength);
+        if (isFinite(max) && max > 0 && value.length > max) errors.push(label + '最多' + max + '字');
+      } else {
+        var options = f.source === 'map.nodes'
+          ? ((C().map || {}).nodes || []).map(function (n) { return n.name; })
+          : (f.options || []).map(function (o) { return opt(o).v; });
+        if (options.map(String).indexOf(value) < 0) errors.push('请重新选择' + label);
+      }
+    });
+    return {values:values, errors:errors};
   };
 
   REX.scene('forge', {
@@ -66,7 +96,7 @@
       var st = R.state.forge || (R.state.forge = {});
       var nodes = (C().map || {}).nodes || [];
       var rows = p.map(function (f) {
-        var fv = st[f.key] || '';
+        var fv = st[f.key] == null ? (f.default == null ? '' : String(f.default)) : st[f.key];
         var body;
         if (f.type === 'text') {
           body = f.multiline
@@ -106,14 +136,12 @@
     after: function (R, node) {
       var p = (C().player || {}).fields || [];
       var st = R.state.forge || (R.state.forge = {});
-      var need = p.filter(function (f) { return !f.optional && f.type !== 'text'; });
       var check = function () {
-        var miss = need.filter(function (f) { return !st[f.key]; });
-        var ok = !miss.length;
+        var errors = R.validateForge().errors;
         var btn = node.querySelector('[data-act="enter"]');
-        if (btn) btn.disabled = !ok;
+        if (btn) btn.disabled = !!errors.length;
         var tip = node.querySelector('[data-need]');
-        if (tip) tip.textContent = !miss.length ? '' : ('还差 ' + miss.map(function (f) { return f.label; }).join(' / '));
+        if (tip) tip.textContent = errors[0] || '';
       };
       node.addEventListener('input', function (e) {
         var f = e.target.getAttribute('data-f');
@@ -136,18 +164,31 @@
         }
         var a = e.target.closest('[data-act]');
         if (!a) return;
-        if (a.getAttribute('data-act') === 'back') R.go('cover');
+        if (a.getAttribute('data-act') === 'back') {
+          if ((C().features || {}).cover) R.go('cover');
+          else { R.closeStage(); R.refresh(); }
+        }
         if (a.getAttribute('data-act') === 'enter') R.commitForge();
       });
       check();
     }
   });
 
-  REX.commitForge = function () {
-    var st = this.state.forge || {}, p = (C().player || {}).fields || [];
-    var player = {};
-    p.forEach(function (f) { player[f.key] = String(st[f.key] == null ? (f.default || '') : st[f.key]).trim(); });
+  REX.commitForge = async function () {
+    if (this._forgeSubmitting) return false;
+    var checked = this.validateForge(), p = (C().player || {}).fields || [];
+    if (checked.errors.length) { this.toast(checked.errors[0]); return false; }
+    var player = checked.values;
     if (!player.name) player.name = (C().meta || {}).defaultName || '无名';
+    var lines = ['【角色创建】'];
+    p.forEach(function (f) { if (player[f.key]) lines.push(f.label + '：' + player[f.key]); });
+    this.state.creationDraft = lines.join('\n');
+    this._forgeSubmitting = true;
+    try {
+      if (!await this.writeDraft(this.state.creationDraft)) {
+        this.toast('输入框写入失败，创建选择与草稿已保留'); return false;
+      }
+    } finally { this._forgeSubmitting = false; }
     this.data.player = player;
 
     var sf = (C().status || {}).fields || [];
@@ -156,7 +197,7 @@
     sf.forEach(function (f) {
       if (self.data.status[f.key] !== undefined) return;
       self.data.status[f.key] = f.type === 'bar' ? Math.round((f.max || 100) * (f.init == null ? 0.7 : f.init))
-        : f.type === 'tag' ? [] : (f.init || '');
+        : f.type === 'tag' || f.type === 'tags' ? [] : f.type === 'num' ? Number(f.init || 0) : (f.init || '');
     });
     var start = player.origin || (((C().map || {}).nodes || [])[0] || {}).name || '';
     this.data.map = { at: start, visited: start ? [start] : [] };
@@ -166,11 +207,9 @@
     this.persist(true);
 
     /* 只写进输入框，绝不代发 —— 代发会让用户失去最后一次改口的机会 */
-    var lines = ['【角色创建】'];
-    p.forEach(function (f) { if (player[f.key]) lines.push(f.label + '：' + player[f.key]); });
-    this.fillInput(lines.join('\n'));
     this.closeStage();
     this.refresh();
     this.toast('已写入输入框，确认后发送');
+    return true;
   };
 })();

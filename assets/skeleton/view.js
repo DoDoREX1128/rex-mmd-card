@@ -236,6 +236,19 @@
     return false;
   };
 
+  /* Creation must wait for the actual SDK result before discarding its screen. */
+  REX.writeDraft = async function (text) {
+    var sdk = this.sdkGet();
+    if (!sdk || !sdk.input || typeof sdk.input.set !== 'function') return false;
+    try {
+      await sdk.input.set(text);
+      if (typeof sdk.input.focus === 'function') {
+        try { await sdk.input.focus(); } catch (e) { /* Draft was written; focus is optional. */ }
+      }
+      return true;
+    } catch (e) { return false; }
+  };
+
   /* Persistence lives in store.js; keep one runtime authority. */
 
   /* ================= 装配 ================= */
@@ -327,6 +340,8 @@
         if (self.stageVisible()) self.stageClose();
       } else if ((self.content().features || {}).cover) {
         self.go('cover');
+      } else if ((self.content().features || {}).forge) {
+        self.beginForge();
       } else { self.refresh(); }
       self.log('boot', self.state.mode, has ? 'resume' : 'new');
     };

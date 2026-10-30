@@ -4,7 +4,7 @@ description: 为 MMD 创建、修改、检查角色人设、世界书、状态�
 license: MIT
 metadata:
   author: DoDoREX1128
-  version: "2.0.0"
+  version: "2.0.1"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
   compatibility: Node.js 18+；基础脚本无第三方依赖，浏览器回归需要 Chrome 或 Edge。
 ---
@@ -23,6 +23,21 @@ metadata:
 | 继续 | 读项目记录，核对实际文件，接续已授权事项 |
 
 简单任务直接执行。复杂新界面可用定位→方案→原型→本地模拟→目标站→实机；按本次范围选择阶段。用户委托代选时自行完成设计并说明选择，不重复确认。只有缺失信息会实质改变产物时才提问。详细流程见 [01](references/01-流程-心流与状态机.md)。
+
+### 复杂制作保留的操作骨架
+
+| 阶段 | 要解决什么 | 可复查产物与下一步 |
+|---|---|---|
+| S0定位 | 本次范围、环境、路线、已有资产 | 关键信息确定或已有授权可代选 |
+| S1方案 | 核心循环、信息架构、字段、权威源、存档和未知项 | 方案与必要线框，按[10](references/10-流程-三问与方案.md)检查衔接 |
+| S2原型 | 首屏、一个主功能和完整返回链 | 可点击假数据页，方向符合本次要求 |
+| S3本地 | 对应路线构建、协议、错误与重入 | 静态/行为结果和截图，失败项已处理或说明 |
+| S4目标站 | 实际平台净化、SDK/Host、输入、保存与布局 | 按[54](references/54-验收-真实平台测试.md)留可见步骤与证据 |
+| S5实体设备 | 触摸、软键盘、横屏、后台再进和多轮体验 | 设备与失败点，未运行不推定 |
+
+纯内容、小修、只读比较只执行适用部分；复杂项目也可合并阶段。缺真实站或设备时完成可做部分并列NOT RUN，不制造审批等待。
+
+已有工程先读main.md/plan.md/manifest（若存在）、保留当前产物，核对入口、协议与字段，再重现问题；按文案→皮肤→模块→骨架评估必要改动。复刻先analyze并写对照表，不能通过改名换色就声称已复现。一句话需求先提取时代、场景、关系、压力和欲求，再按[11](references/11-流程-一句话补全.md)补假设，不硬塞固定玩法。
 
 ## 三类卡分别选工具
 
@@ -76,6 +91,9 @@ metadata:
     node scripts/e2e.mjs --card work/out/example-regex.json --src work/src --out work/out
     node scripts/test.mjs
     node --test scripts/test-contracts.mjs
+    node --test scripts/test-authoring.mjs
+
+维护骨架的封面/创建流程时，另跑 `node scripts/e2e-authoring.mjs`，验证发布包的四种开局配置和真实按钮/输入行为；它不是每张纯文字卡的强制步骤。
 
 旧版原生命令把 route 改为 native；旧版同层使用 pack-samelayer --host/--frame。世界书可独立 validate-worldbook；大型世界书使用 worldbook-project 的稳定源条目。整卡可由 build 生成 v2 JSON，再以 card-png 封装 PNG；PNG 封装成功不代替内部格式与导入验收。
 
@@ -83,10 +101,27 @@ metadata:
 
 验证分开报告：E1 已生成 / E2 静态通过 / E3 本地行为通过 / E4 目标站通过 / E5 实体设备通过。未执行写 NOT RUN，不把静态、模拟或 PNG 回读当真站验证。发布检查见 [55](references/55-交付-发布前检查.md)。
 
+### 按任务读取详细方法
+
+| 当前任务 | 参考 |
+|---|---|
+| 定位、方案、一句话补全、继续 | [01流程](references/01-流程-心流与状态机.md)、[10方案模板](references/10-流程-三问与方案.md)、[11推导方法](references/11-流程-一句话补全.md) |
+| 三路线与平台机制 | [20分流](references/20-平台-分流.md)、[21新版](references/21-平台-新页事实.md)、[22同层](references/22-平台-同层卡架构.md)、[24原生](references/24-平台-旧版事实.md)、[25 SDK](references/25-平台-SDK速查.md) |
+| 模型数据、内容、存档 | [30状态](references/30-内容-状态与字段.md)、[31世界书](references/31-内容-世界书.md)、[32人设](references/32-内容-人设与文风.md)、[33续档](references/33-内容-存档与续档.md) |
+| 模块、布局、视觉 | [40真实接口与扩展例子](references/40-界面-卡架构.md)、[41三种布局](references/41-界面-基线.md)、[42主题与视觉](references/42-界面-视觉.md) |
+| 封面、捏人、改造与素材 | [43构图与交互](references/43-界面-封面与捏人.md)、[44创建协议](references/44-界面-捏人协议.md)、[45骨架与内容](references/45-界面-骨架与皮肉.md)、[可选身体档案](assets/kits/body-dossier/authoring.md) |
+| 外链、媒体、宿主 | [46 CSP与回退](references/46-界面-外链与CSP.md)、[47三个换肤通道](references/47-界面-宿主与弹窗边界.md) |
+| 拆卡与复刻 | [50历史样本](references/50-验收-示例拆解.md)、[51导出/重放/对照](references/51-验收-复刻验收.md) |
+| 校验、排障、真站、交付 | [52冒烟](references/52-验收-静态与冒烟.md)、[53排障](references/53-验收-真平台踩坑.md)、[54可执行用例](references/54-验收-真实平台测试.md)、[55交付清单](references/55-交付-发布前检查.md) |
+
+### 交付说明要包含
+
+卡名与路线、文件与用途、导入步骤、已验证层级、未验证项与原因、能力限制。新版分离交付人设另贴，世界书独立导入；整卡PNG仍须新建并首次保存前选新版。创建、状态、存档三种协议不能混为一谈，默认草稿可改，失败保留。
+
 ## 资料与维护
 
 [总览](references/00-总览与阅读路径.md) · [事实表](references/23-平台-事实表.md) · [字段候选库](references/fields/README.md) · [错题本](references/errors/README.md) · [证据裁决](references/56-裁决记录.md)。facts.json 维护已记录平台值；作者偏好与实现能力分列。生成表一致不等于运行时一致，修改后运行三路线与协议合同回归。
 
-本次修订与执行结果见 [2.0.0 验收记录](references/57-修订验收.md)。
+[2.0.0验收记录](references/57-修订验收.md)仅记录当时本地结果；资料恢复、纠错与本轮验证见[2.0.1恢复映射](references/58-内容恢复与验收.md)。测试数不代表已覆盖所有技能步骤。
 
 不处理酒馆，不绕过平台鉴权，不伪造原生能力、保存成功或验证结论。只在明确需要时加载可选视觉/身体档案组件，不把参考卡题材变成所有作品的要求。

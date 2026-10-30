@@ -55,7 +55,7 @@ const candidates=[process.env.CHROME_PATH,'C:/Program Files/Google/Chrome/Applic
 const browser=candidates.find(p=>fs.existsSync(p));
 if(!browser){console.log('NOT RUN：未找到 Chrome/Edge。设置 CHROME_PATH 后重跑。手动入口 '+p);process.exit(2);}
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'rex-browser-'));
-const result=spawnSync(browser,['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--allow-file-access-from-files','--user-data-dir='+profile,'--virtual-time-budget=10000','--dump-dom',new URL('file:///'+p.replaceAll('\\','/')).href],{encoding:'utf8',timeout:60000,maxBuffer:8*1024*1024});
+const result=spawnSync(browser,['--headless=new','--disable-extensions','--disable-background-networking','--disable-component-update','--disable-gpu','--no-first-run','--no-default-browser-check','--allow-file-access-from-files','--user-data-dir='+profile,'--virtual-time-budget=10000','--dump-dom',new URL('file:///'+p.replaceAll('\\','/')).href],{encoding:'utf8',timeout:60000,maxBuffer:8*1024*1024,windowsHide:true,env:{...process.env,SSLKEYLOGFILE:''}});
 fs.writeFileSync(path.join(out,'e2e-dom.html'),result.stdout||'');
 const message=(result.stdout||'').match(/<pre id="results">([\s\S]*?)<\/pre>/)?.[1]||'浏览器未返回测试结果';console.log(message);
 if(!/data-result="PASS"/.test(result.stdout||'')){console.error(result.error?.message||result.stderr?.slice(-2000)||'browser failed');process.exit(1);}

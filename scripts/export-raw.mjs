@@ -5,7 +5,7 @@
  *   node export-raw.mjs --role r.json --regexp x.json --out c.json --personality
  * 说明:
  *   - 按 regexSort 升序还原执行顺序（平台 loadRoleRegex 会 reverse）
- *   - id 重编号为 -1..-n
+ *   - 新版 id 为负整数；旧版 id 固定 -1，独立包不带 chatVersion/personality
  *   - beginning 优先 beginningZh
  *   - chatVersion 归一为 0/1
  */
@@ -25,35 +25,41 @@ let raw = unwrap(rexPath);
 if (!Array.isArray(raw)) raw = raw.regex_scripts || raw.list || [];
 const asc = raw.slice().sort((a, b) => (a.regexSort ?? a.sort ?? 0) - (b.regexSort ?? b.sort ?? 0));
 
+const v = Number(role.chatVersion) >= 1 ? 1 : 0;
 const rules = asc.map((r, i) => ({
-  id: -(i + 1),
-  scriptName: String(r.name ?? r.scriptName ?? `rule-${i + 1}`).slice(0, 20),
+  id: v === 1 ? -(i + 1) : -1,
+  scriptName: String(r.name ?? r.scriptName ?? `rule-${i + 1}`),
   findRegex: String(r.regex ?? r.findRegex ?? ''),
   replaceString: String(r.content ?? r.replaceString ?? '')
 }));
 
-const v = Number(role.chatVersion) >= 1 ? 1 : 0;
 const beginning = (role.beginningZh && String(role.beginningZh).trim()) ? role.beginningZh : (role.beginning ?? '');
 const card = {
-  chatVersion: v,
+  ...(v === 1 ? {chatVersion:1} : {}),
   pageDepth: Number(role.pageDepth ?? 2),
   statusbar: String(role.statusbar ?? ''),
   beginning,
   regex_scripts: rules
 };
-if (v === 1 || flag('personality')) {
+if (v === 1) {
   const persona = role.personalityZh || role.personality;
   if (persona) card.personality = persona;
+}
+const personaOut = opt('persona-out') || (v === 0 && flag('personality') ? outPath.replace(/\.json$/i, '') + '-persona.txt' : null);
+if (personaOut) {
+  const target = path.resolve(personaOut);
+  fs.mkdirSync(path.dirname(target), {recursive:true});
+  fs.writeFileSync(target, String(role.personalityZh || role.personality || ''), 'utf8');
 }
 
 fs.mkdirSync(path.dirname(path.resolve(outPath)), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(card, null, 2), 'utf8');
 
-const maxR = Math.max(...rules.map((r) => r.replaceString.length));
+const maxR = Math.max(0, ...rules.map((r) => r.replaceString.length));
 const total = rules.reduce((n, r) => n + r.replaceString.length, 0);
 const sha = crypto.createHash('sha256').update(JSON.stringify(card)).digest('hex').slice(0, 16);
 console.log('输出      ', path.resolve(outPath));
-console.log('平台      ', v === 1 ? '新版沙盒卡（chatVersion:1）' : '旧版同层卡（chatVersion:0）');
+console.log('平台      ', v === 1 ? '新版沙盒卡（chatVersion:1）' : '旧版（原生或同层，独立包无 chatVersion）');
 console.log('规则数    ', rules.length, '| 总字数', total.toLocaleString(), '| 最大条', maxR.toLocaleString());
 console.log('beginning ', String(beginning).length, '字', role.beginningZh ? '(用 beginningZh)' : '(用 beginning)');
 console.log('statusbar ', JSON.stringify(card.statusbar));
