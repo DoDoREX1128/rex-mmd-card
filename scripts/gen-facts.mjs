@@ -47,7 +47,7 @@ const lim = [
   ['replaceString', `${F.limits.common.replaceString.use}`, `编辑器上限 ${F.limits.common.replaceString.editor} / 导入路径 ${F.limits.common.replaceString.import}；超编辑器上限表现为整条改动不保存`, F.limits.common.replaceString.evidence],
   ['regex_scripts 条数', `${F.limits.common.rules.max}`, '导入时超出直接截断', F.limits.common.rules.evidence],
   ['statusbar', `${F.limits.sandbox.statusbar.max}`, '两版一致', F.limits.sandbox.statusbar.evidence],
-  ['beginning', `${F.limits.sandbox.beginning.max}`, '两版一致；官方旧文档写 10240 已被源码证伪', F.limits.sandbox.beginning.evidence],
+  ['beginning', `${F.limits.sandbox.beginning.max}`, '两版一致', F.limits.sandbox.beginning.evidence],
   ['personality', `${F.limits.sandbox.personality.max}`, '公开卡审核另有 2000–15000 口径', F.limits.sandbox.personality.evidence],
   ['imageUrl', `${F.limits.sandbox.imageUrl.max}`, '超出静默截断', F.limits.sandbox.imageUrl.evidence],
   ['世界书单条 content', `${F.limits.common.worldbookEntryContent.max}`, '超出截断', F.limits.common.worldbookEntryContent.evidence],
@@ -305,7 +305,7 @@ p('| 等级 | 含义 |');
 p('|---|---|');
 F.evidenceLevels.forEach((e) => p(`| ${e.label} | ${e.meaning} |`));
 p();
-p('先匹配版本、目标、日期和适用范围，再比较证据；源码与实测冲突保留最小复现，见56裁决记录，不按作者身份覆盖。');
+p('先匹配版本、目标、日期和适用范围，再比较证据；源码与实测冲突保留最小复现，见[能力边界与证据](56-能力边界与证据.md)。');
 p();
 
 const text = L.join('\n');

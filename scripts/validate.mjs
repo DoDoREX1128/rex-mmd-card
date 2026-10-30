@@ -252,8 +252,7 @@ if (leftovers.length) err('这些注入标记没有规则匹配，会原样显�
 ran('标记点火覆盖');
 
 /* ---------- 人设 ---------- */
-/* 句式禁令四项（facts.sentenceBans）：仅在显式 --style-lint 时给笔记体偏好提示。
-   2026-10-29 起全部只报 WARN，不做硬拦截——格式交给 Agent 自查，门禁只管平台会坏的东西。 */
+/* facts.sentenceBans仅在显式--style-lint时给可选笔记体WARN，不阻断交付。 */
 const declLine = (line) => /句式禁忌|禁止|禁忌|禁用|反例|✗/.test(line);
 const JARGON = ['外显', '建制', '成正比', '位移', '闭环', '赋能', '维度', '底层逻辑'];
 const normSentence = (s) => s.replace(/[\s，。；：！？、,.!?;:"""''（）()【】\[\]—…·]/g, '');
@@ -305,8 +304,7 @@ function reportBans(label, text, limit = 3) {
   return hits.length;
 }
 
-/* AI 腔体检：阈值来自人写稿与 AI 稿的量化差（32 §0）。
-   全部 WARN——题材不同会合理偏离，只提示"这里像文章不像笔记"。 */
+/* 可选笔记体检查：仅提示WARN，按用户文风判断是否调整。 */
 function reportAiTone(label, text) {
   const src = String(text || '');
   const body = src.split('\n').filter((l) => !/禁止|句式禁忌/.test(l)).join('\n');
@@ -329,7 +327,7 @@ function reportAiTone(label, text) {
   if (causal >= 1) flags.push(`因果词 ${causal} 处`);
   if (dash >= 4) flags.push(`破折号 ${dash} 处`);
   if (flags.length) {
-    warn(`${label} 有 AI 腔特征：${flags.join('；')}。可按当前文风保留或调整；这些是单样本偏好，不判断质量或作者身份`);
+    warn(`${label} 有 AI 腔特征：${flags.join('；')}。这是可选笔记体提示，可按当前文风保留或调整，不判断质量或作者身份`);
   }
   return flags.length;
 }

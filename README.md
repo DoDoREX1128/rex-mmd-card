@@ -6,7 +6,7 @@
 
 支持 **新版沙盒卡、旧版同层卡、旧版原生卡**，不处理酒馆或其他平台。
 
-**2.1.0** 新增“交付 / 工程”工作区和三份可回写审阅稿：用户直接修改正文，Agent 负责同步、构建和冲突处理。详见[项目工作区与审阅交付](references/02-项目工作区与审阅交付.md)。
+提供“交付 / 工程”工作区和三份可回写审阅稿：用户直接修改正文，Agent 负责同步、构建和冲突处理。详见[项目工作区与审阅交付](references/02-项目工作区与审阅交付.md)。
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
@@ -251,22 +251,15 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 | E4 目标站 | 当前目标 MMD 页面的相关行为已验证 |
 | E5 实体设备 | 在实际设备上完成了相关测试 |
 
-2.0.0 在 2026-10-30 的本地验收记录：**60 项脚本自测、21 项合同测试、14 项 Chrome 浏览器检查通过**。真实 MMD 与实体手机未在该次修订中执行，不能由本地通过推定。详见 [修订验收记录](references/57-修订验收.md)。
+按修改范围选择检查：
 
 ```bash
 node scripts/test.mjs
-node --test scripts/test-contracts.mjs
-node --test scripts/test-project.mjs
+node --test scripts/test-contracts.mjs scripts/test-authoring.mjs scripts/test-project.mjs
 node scripts/gen-facts.mjs --check
 ```
 
-2.1.0 的工作区合同测试 **12/12 通过**，覆盖三路线的实际构建、审阅稿回写、世界书元数据保留、双改冲突、待处理意见及失败保护；原有 60 项脚本检查和 31 项合同检查也通过。这些结果不代替真实 MMD 或实体设备验证。
-
-## 2.0.1：恢复详细制作方法
-
-本版补回入口阶段说明、完整资料路由，以及被过度删减的操作方法、扩展示例和验收模板。三路线分开、人设可自定义、统一 `[status]` 与此前代码修复继续保留；旧规则有误的地方按实际契约纠正。逐篇恢复、迁移与不原样恢复的原因见[内容恢复映射](references/58-内容恢复与验收.md)。
-
-新增 `node --test scripts/test-authoring.mjs` 覆盖创建开关、字段校验、草稿失败、原始导出和文档扩展示例；`node scripts/e2e-authoring.mjs` 在本地 Chrome/Edge 中点击四种开局组合、校验表单与输入失败回退。代码测试只证明被测场景，不能证明所有创作任务和真实目标部署。
+test-project验证三路线构建、审阅稿回写、世界书元数据和冲突保护；test-authoring验证创建流程、导出与扩展示例。浏览器回归使用e2e.mjs与e2e-authoring.mjs；本地通过不代替真实MMD或实体设备验证。
 
 ## 目录
 
@@ -280,7 +273,7 @@ rex-mmd-card/
 │   ├── 20–25                平台分流、事实表与 SDK 速查
 │   ├── 30–33                状态、世界书、人设、存档与续档
 │   ├── 40–47                界面、视觉、可选捏人、外链与宿主边界
-│   ├── 50–58                拆解、验收、交付、裁决与修订记录
+│   ├── 50–56                拆解、验收、交付与能力边界
 │   ├── fields/              可选字段候选库
 │   └── errors/              带版本与证据的历史错题本
 ├── assets/

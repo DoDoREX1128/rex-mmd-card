@@ -15,7 +15,7 @@ host.js是旧版DOM适配与Host-only存储；frame.html是sandbox=allow-scripts
 
 ## 文件与启动顺序
 
-Host在旧版页面内适配消息、输入与原生面板；Frame是独立界面。默认打包器把所有独立标记放进beginning，执行顺序为载荷初始化/Host片/Frame片/launcher；Host创建隔离iframe，定向传MessagePort，Frame核验parent后握手，后续通过专用port与session请求，不再按旧稿使用全局任意来源invoke。
+Host在旧版页面内适配消息、输入与原生面板；Frame是独立界面。默认打包器把所有独立标记放进beginning，执行顺序为载荷初始化/Host片/Frame片/launcher；Host创建隔离iframe，定向传MessagePort，Frame核验parent后握手，后续通过专用port与session请求。
 
 ## 扩展一个动作
 
