@@ -21,6 +21,8 @@ export const F = JSON.parse(fs.readFileSync(factsPath, 'utf8'));
 export const VERSION_KEYS = { sandbox: 'sandbox', legacy: 'legacy' };
 
 export function platformOf(chatVersion) {
+  /* 旧版独立正则 JSON 恰好四键，本来就不带 chatVersion；缺省即旧版（洛璃口径） */
+  if (chatVersion == null || chatVersion === '') return 'legacy';
   const n = Number(chatVersion);
   if (n === 1) return 'sandbox';
   if (n === 0) return 'legacy';
@@ -53,6 +55,30 @@ export const NAMESPACES = new Set(F.capabilityNamespaces);
 export const EVENTS = F.events;
 export const EVENTS_SET = new Set(EVENTS);
 export const ABSENT = new Set(F.absentCapabilities);
+
+/* 已确认存在、但公开契约未公布的能力与事件：判 WARN，不判「不存在」 */
+export const PENDING = new Set([
+  ...(F.pendingCapabilities?.caps || []),
+  ...(F.pendingCapabilities?.events || [])
+]);
+
+/* ---------- 内容协议标记 ---------- */
+export const CONTENT_PROTOCOL = {
+  open: F.markers.content.open || '[',
+  close: F.markers.content.close || ']',
+  block: F.markers.content.block || '[rex-status]',
+  closeBlock: F.markers.content.closeBlock || '[/rex-status]',
+  mustConsume: F.markers.content.mustConsume !== false
+};
+
+/* ---------- 句式禁令（人设 / 世界书 / 开场白三处同受约束） ---------- */
+export const SENTENCE_BANS = F.sentenceBans;
+
+/* ---------- 执行时机（脚本先于 DOM、回调参数、消息 id） ---------- */
+export const TIMING = F.executionTiming;
+
+/* ---------- 宿主表面边界 ---------- */
+export const HOST = F.hostSurfaces;
 
 /* ---------- 标记 ---------- */
 const M = F.markers.ignition;

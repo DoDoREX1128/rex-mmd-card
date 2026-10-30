@@ -1,11 +1,11 @@
 ---
 name: rex-mmd-card
-description: 为 MMD 制作角色卡的方法论与工具链，覆盖新版沙盒卡（chatVersion:1）、旧版原生增强卡、旧版同层卡（chatVersion:0）三条互不通用的路线。首次使用先定版本与路线，再按 S0 定位 → S1 方案 → S2 原型 → S3 模拟 → S4 真站 → S5 实机推进；平台事实以 facts.json 为唯一真源。当用户提出做卡、改卡、同层卡、HUD、状态栏、捏人、复刻某张卡时使用。不处理酒馆（SillyTavern）与其他平台。
+description: 为 MMD 制作角色卡的方法论与工具链，覆盖新版沙盒卡（chatVersion:1）、旧版原生增强卡、旧版同层卡（chatVersion:0）三条互不通用的路线。首次使用先定版本与路线，再按 S0 定位 → S1 方案 → S2 原型 → S3 模拟 → S4 真站 → S5 实机推进；平台事实以 facts.json 为唯一真源。写人设、世界书或开场白时按四项句式禁令避坑（先否定再肯定 / A就是B / 术语腔 / 同段重复）。当用户提出做卡、改卡、同层卡、HUD、状态栏、捏人、复刻某张卡、写人设或世界书时使用。不处理酒馆（SillyTavern）与其他平台。
 license: MIT
 compatibility: 需要 Node.js 18+ 与 git；脚本无第三方依赖。
 metadata:
   author: DoDoREX1128
-  version: "1.0.0"
+  version: "1.4.0"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
 agent_created: true
 ---
@@ -37,7 +37,7 @@ agent_created: true
 |               | 新版（沙盒卡）                                                                         | 旧版（原生增强 / 同层卡）                                                                                |
 | ------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | `chatVersion` | **1**                                                                           | **0 或缺省**                                                                                     |
-| 导入顶层键         | `chatVersion / pageDepth / statusbar / beginning / personality / regex_scripts` | `pageDepth / statusbar / beginning / regex_scripts`（`personality`、`chatVersion:0` 可随包携带但不被读取） |
+| 导入顶层键         | `chatVersion / pageDepth / statusbar / beginning / personality / regex_scripts`（`personality` 可省） | `pageDepth / statusbar / beginning / regex_scripts`（**恰好四键**；带 `chatVersion` 或 `personality` 判 ERROR） |
 | 能力面           | SDK 30 能力 / 12 事件、`[data-chat]` / `[data-slot]`、`sdk.stage`、`sdk.save`          | 原生 DOM、`img onerror` 点火、同层卡可调 61 项原生动作                                                        |
 | 明确没有          | iframe、原生动作、跨源父页面 DOM                                                           | `sdk.*`、稳定选择器、舞台、跨设备存档                                                                        |
 
@@ -49,7 +49,7 @@ agent_created: true
 | ---- | --------------------------- | ------------------------------- | ------------------------- |
 | 做法   | 换肤 + 自建场景层，`img onerror` 点火 | iframe 全屏接管 + 原生桥接              | 官方 SDK：CSS 变量 + 稳定钩子 + 舞台 |
 | 能力上限 | 换肤、气泡增强、封面/捏人/百科            | A 的全部 + 61 项原生动作（删消息/回溯/会话/人设等） | 30 项 SDK、跨设备存档、全屏舞台       |
-| 主要代价 | 需跟随平台 class                 | 需维护上百个选择器；平台改版风险最高              | 受 SDK 边界限制，不能操作宿主弹窗内部     |
+| 主要代价 | 需跟随平台 class                 | 需维护上百个选择器；平台改版风险最高              | 受 SDK 边界限制；宿主页面板（模型设置/对话设置/人设/总结）在跨源 iframe 外，卡片 CSS 打不到 |
 | 适用   | 保留原生聊天手感、体积敏感               | 必须重做信息架构且需要原生动作                 | 长期维护、要跨设备存档               |
 | 不适合  | 需要删消息/回溯                    | 第一次做卡、单人快速交付                    | 需要原生动作或 iframe            |
 
@@ -114,7 +114,7 @@ agent_created: true
 
 ## 5. 文档路由
 
-23 篇文档，按「你正在做什么」查。状态标记：**✅ 本次按 facts.json 重写或实质改动** · **◐ 本次只同步编号 / 键数 / 标记** · **○ 本次未改正文，仅核对阈值**。
+28 篇文档，按「你正在做什么」查。状态标记：**✅ 本次按 facts.json 重写或实质改动** · **◐ 本次只同步编号 / 键数 / 标记** · **○ 本次未改正文，仅核对阈值**。
 
 | 文档                                         | 什么时候读                        | 状态 |
 | ------------------------------------------ | ---------------------------- | -- |
@@ -127,24 +127,29 @@ agent_created: true
 | [22-平台-同层卡架构](references/22-平台-同层卡架构.md)   | 做旧版同层卡：分片数学、Host/Frame、61 动作 | ◐  |
 | [23-平台-事实表](references/23-平台-事实表.md)       | 查任何数值、名单、选择器（生成文件）           | ✅  |
 | [24-平台-旧版事实](references/24-平台-旧版事实.md)     | 写旧版代码前：`onerror`、渲染、层级、同层边界  | ✅  |
+| [25-平台-SDK速查](references/25-平台-SDK速查.md)     | 写任何 `sdk.*` 前：签名、返回、瘦预览、六个坑   | ✅  |
 | [30-内容-状态与字段](references/30-内容-状态与字段.md)   | 设计状态字段、解析容错、存档结构             | ✅  |
+| [33-内容-存档与续档](references/33-内容-存档与续档.md)   | 多槽存档、读档后续档、回溯                 | ✅  |
 | [字段库](references/fields/README.md)         | 设计字段前查重与选型（118 条，持续生长）       | ✅  |
 | [31-内容-世界书](references/31-内容-世界书.md)       | 世界书：要不要建、蓝绿判据、预算、改造别人的       | ✅  |
 | [32-内容-人设与文风](references/32-内容-人设与文风.md)   | 人设格式（硬规则）与写法基线（可覆盖）          | ✅  |
-| [40-界面-卡架构](references/40-界面-卡架构.md)       | 新版骨架、模块拆分、注入顺序               | ◐  |
+| [40-界面-卡架构](references/40-界面-卡架构.md)       | 新版骨架、模块拆分、注入顺序               | ✅  |
 | [41-界面-基线](references/41-界面-基线.md)         | 三条基线（列表/仪表盘/单页流）+ 通用下限       | ✅  |
 | [42-界面-视觉](references/42-界面-视觉.md)         | 配色、主题变量映射、层级与动效              | ✅  |
 | [43-界面-封面与捏人](references/43-界面-封面与捏人.md)   | 参考实现：封面/捏人的结构、公式与替换方向        | ✅  |
 | [44-界面-捏人协议](references/44-界面-捏人协议.md)     | 开局三态、维度推导、提交协议、模型侧约束         | ✅  |
 | [45-界面-骨架与皮肉](references/45-界面-骨架与皮肉.md)   | 工程骨架 / 创作皮肉 / 交付下限的定义与验收     | ✅  |
+| [46-界面-外链与CSP](references/46-界面-外链与CSP.md)   | 外链库、媒体、CSP、Canvas 纹理、降级        | ✅  |
+| [47-界面-宿主与弹窗边界](references/47-界面-宿主与弹窗边界.md) | 宿主页弹窗能不能改、iframe 内哪些能改        | ✅  |
 | [50-验收-示例拆解](references/50-验收-示例拆解.md)     | 拆成品卡：字段、视觉、复现判据              | ◐  |
 | [51-验收-复刻验收](references/51-验收-复刻验收.md)     | 复刻的验收口径与证据                   | ◐  |
 | [52-验收-静态与冒烟](references/52-验收-静态与冒烟.md)   | 每次交付前：ERROR/WARN 清单、模拟台、废卡症状 | ✅  |
 | [53-验收-真平台踩坑](references/53-验收-真平台踩坑.md)   | 排障顺序、什么不算验证、错题本入口            | ✅  |
+| [55-交付-发布前检查](references/55-交付-发布前检查.md)   | 交付形态、公开审核、发布前清单、证据分级        | ✅  |
 | [错题本](references/errors/README.md)         | ↑ 的附属库：30 条错题，按版本与层检索，可被复测推翻 | ✅  |
 | [54-验收-真实平台测试](references/54-验收-真实平台测试.md) | S4 真站取证：用例、命令、证据模板           | ◐  |
 
-23 篇正文均已完成至少一轮校准；`◐` 的 5 篇（22 / 40 / 50 / 51 / 54）只做了编号、键数、标记的机械同步，机制描述未逐条复验。
+28 篇正文均已完成至少一轮校准；`◐` 的 4 篇（22 / 50 / 51 / 54）只做了编号、键数、标记的机械同步，机制描述未逐条复验。
 
 ---
 
@@ -164,7 +169,7 @@ agent_created: true
 | `node scripts/worldbook-normalize.mjs`                               | 任意世界书 → `{ entries }`                          | 导入前     |
 | `node scripts/worldbook-pack.mjs`                                    | 世界书并入人设（仅入口不支持世界书时）                            | 降级交付    |
 | `node scripts/gen-facts.mjs`                                         | 由 facts.json 重生成 23 表                          | 改事实后    |
-| `node scripts/test.mjs`                                              | 脚本自测（47 项）                                     | 改脚本后    |
+| `node scripts/test.mjs`                                              | 脚本自测（60 项）                                     | 改脚本后    |
 | `node scripts/pack-skill.mjs`                                        | 生成不含 `work/` 的安装副本                             | 分发      |
 
 |                                                   |         |                                                        |
@@ -174,6 +179,8 @@ agent_created: true
 ---
 
 ## 7. 交付
+
+先定**交付形态**（三选一，用户没指定就问一次）：内嵌正则的整卡 PNG / 内嵌正则的整卡 JSON / 分离式（卡 + 正则 json + 人设 txt + 世界书 json）。形态差异与公开审核门槛见 [55](references/55-交付-发布前检查.md)。
 
 ```
 卡名：
@@ -196,29 +203,32 @@ agent_created: true
 ### 8.1 通用
 
 - 注入标记用 `【rex-xxx】`，写在 `beginning` / `statusbar` / `findRegex`；可见 HTML 的标记必须接进 `beginning`、`statusbar` 或前序替换结果，否则界面永不出现。
-- 内容协议标记用 `<rex-status>`，只出现在模型正文与解析脚本里，不进 `findRegex`。
+- 内容协议标记用 `[rex-status]…[/rex-status]`（方括号），并且**必须被一条规则消耗**：`findRegex: /\[rex-status\][\s\S]*?\[\/rex-status\]/`，`replaceString` 渲染成紧凑卡或空串。不消耗就原样显示 JSON。
 - 只放 `<style>` / `<script>` 的规则，匹配式不需要被命中（装卡即抽出）。
 - 匹配式写 `/pattern/flags`；写成 `/…/` 但语法错会整条静默丢弃。字面量匹配式不得重复。
 - `replaceString` 按编辑器上限 20000 字规划，超限表现为整条改动不保存。
 - 可见 HTML 不缩进四空格（会被 Markdown 当代码块）；不写全局选择器 `* / html / body / :root`；不写自写 `data-*`。
 - 作者层 z-index：气泡内装饰 1–999；页面级浮层 3500–7999（新版，避开舞台 2000/3000 与平台 8000+ 浮层）。旧版按 24 文档层级表。
 - 不自动发送；选项只写输入框或舞台输入框，玩家确认后才发送。
+- **四项句式禁令 + 六条 AI 腔禁令**写死在 `<约束规则>`：先否定再肯定 / 「A 就是 B」式生硬比喻 / 术语腔（外显、建制、成正比、位移、闭环、赋能、维度、底层逻辑）/ 同段重复；再加三段排比、对偶金句、因果解释、过渡词、每字段写满、升华收尾。人设、世界书、开场白三处同受约束。**只报 WARN，不阻断交付**；格式由 Agent 按 [32](references/32-内容-人设与文风.md) §4 自查。
+- **人设是笔记，不是文章**：一行一件事，行末不必加句号；平均每行 ≤40 字、长句 ≤8%、句号密度 ≤18‰。量化依据是从人写稿与 AI 稿的实测差反推的，见 [32](references/32-内容-人设与文风.md) §0。
+- **脚本先于 DOM 执行**：顶层 `document.getElementById` 恒为 `null`，任何 DOM 读写必须放进事件回调。`msg.id` 跨重载会变，持久化只用 `serverId`；回调只传 1 个实参。
 
 ### 8.2 新版沙盒卡
 
 - `chatVersion: 1` 必写；顶层恰好 6 键；`regex_scripts` 每条恰好 4 键，`id` 为负数。
-- SDK 能力名与事件名逐字正确（30 / 12）；不存在 `sdk.once`、`sdk.off`、`sdk.vars`。
+- SDK 能力名与事件名逐字正确（30 / 12）；不存在 `sdk.once`、`sdk.off`、`sdk.theme.set`、`sdk.memory`。`sdk.vars` / `vars:change` **存在但契约未公布**：可以讲行为边界，不能编造签名，也不能说平台不支持。
 - `sdk.on` 写在脚本体；气泡内按钮绑在 `message:mount` 回调里；`message:mount` 里不读 `message-body` 当正文（那是「消息生成中」占位）。
 - 跟字用 `message:stream` 的 `msg.content`，收尾用 `message:done`；`ready` 最后到且不补发。
-- 长期面板与 WebGL 挂 `sdk.stage`；不挂气泡（气泡滚出即销毁）。  
-  |  |  |  
-  | --- | --- |
+- 长期面板与 WebGL 挂 `sdk.stage`；不挂气泡（气泡滚出即销毁）。
 - 换肤只改 `--chat-*`（29 个），覆盖写 `[data-chat="root"][data-theme="dark|light"]`；别名变量保持 `var()` 引用，不写死色值。
-- `sdk.save` 只在需要跨设备时使用；游客存档退出即失，登录不迁移。
+- **宿主页面板改不动**：模型设置、对话设置、用户人设、剧情总结等在跨源 iframe 外，卡片 CSS 打不到。只改 iframe 内的浮层与槽位，宿主面板如实说明做不到，详见 [47](references/47-界面-宿主与弹窗边界.md)。
+- `sdk.save` 只在需要跨设备时使用；游客存档退出即失，登录不迁移。长线游戏用**一个键装 `auto` + `slots`**，手动档带名称/时间/摘要；读档要生成 `<resume_context>` 随下一次确认发送，详见 [33](references/33-内容-存档与续档.md)。
 
 ### 8.3 旧版
 
-- 顶层 4 键必填；规则 `id` 固定 -1 或负数。
+- 顶层**恰好 4 键**：`pageDepth` / `statusbar` / `beginning` / `regex_scripts`。**不要带 `chatVersion` 与 `personality`**（旧版独立正则 JSON 里出现会判 ERROR）。
+- 规则 `id` **固定 `-1`**；写 `-2` 会被判错。
 - `img onerror` 点火器必须在容器闭合标签之前；属性用单引号包裹，内部字符串统一单引号；配置序列化不得产生裸双引号。
 - 同一父文档内的元素 ID 带时间戳后缀，同模块内一致；跨模块不复用。
 - 旧版气泡容器带 `white-space:pre-line`：注入 HTML 标签间不留换行，或在自己容器上写 `white-space:normal`。

@@ -4,7 +4,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { LIMIT, marker, findIgnitionMarkers, F } from './lib/facts.mjs';
+import { LIMIT, marker, findIgnitionMarkers, F, SENTENCE_BANS } from './lib/facts.mjs';
 
 const MODULES = [
   { name: 'rex-boot', file: 'core.js', kind: 'js' },       // 状态 / 适配 / 槽位 / 舞台
@@ -109,6 +109,16 @@ const pingBody = readIf(PING.file);
 if (pingBody == null) errs.push('缺模块文件: ping.js');
 else rules.push({ id: -(++idx), scriptName: PING.name, findRegex: `/${marker(PING.name)}/`, replaceString: wrap('js', pingBody, PING.name) });
 
+/* 内容协议消耗：模型每轮吐的 [rex-status] 原文必须被替换掉，否则玩家会看到 JSON。
+   脚本从 message:done 的 msg.content（未经替换的原文）解析，不依赖这条规则的产物。
+   这条规则不推入 tags——它不需要被注入标记命中。 */
+rules.push({
+  id: -(++idx),
+  scriptName: 'status-hide',
+  findRegex: '/\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/',
+  replaceString: ''
+});
+
 for (const r of rules) {
   if (r.scriptName.length > LIMIT.scriptName) errs.push(`scriptName 超长: ${r.scriptName}`);
   if (r.findRegex.length > LIMIT.findRegex) errs.push(`findRegex 超长: ${r.scriptName}`);
@@ -132,11 +142,69 @@ if (statusbar.length > LIMIT.statusbar) errs.push('statusbar 超长');
 
 let persona = readIf('persona.txt');
 if (persona == null) {
-  persona = `<世界观>\n${(content.world && content.world.era) || ''}\n</世界观>\n\n<角色设定 名字：${(content.meta && content.meta.title) || '角色'}>\n<基本信息>\n- 待填写\n</基本信息>\n</角色设定>`;
+  const nm = (content.meta && content.meta.title) || '角色';
+  persona = [
+    '<前提：AI担任说书人，负责推演世界、扮演所有NPC、判定事件结果；{{user}}扮演这个世界芸芸众生中的一员，所有行动与对话由玩家决定>',
+    '',
+    '<主题>',
+    '[核心玩法]【待填写：玩法类型与核心循环，不写具体地点】',
+    '[世界观]定性：【待填写】。秩序：【待填写】。稀缺：【待填写】。代价：【待填写】。',
+    '[视角]第三人称限知，跟着{{user}}的所见。不写{{user}}的内心判断。',
+    '[风格]',
+    '-基调：【待填写】',
+    '-节奏：短句为主；紧张处一句一段，平缓处可到三行',
+    '-禁止：空转模糊词、八股微表情、语气声线描写、极端情绪词、替{{user}}发言',
+    '</主题>',
+    '',
+    '<主要角色>',
+    `-<主角：${nm}>`,
+    '[基础信息]【待填写：性别、年龄】',
+    '[身份]【待填写：职业、社会位置】',
+    '[性格]【待填写：写行为，不写形容词】',
+    '[长线记忆]',
+    '-【待填写：不随剧情改变、必须一直记得的事实】',
+    '-</主角>',
+    '</主要角色>',
+    '',
+    '<约束规则>',
+    '[对话禁忌]禁止跳出角色说话、禁止自称AI、禁止向玩家解释设定',
+    '[句式禁忌]',
+    '-禁止「不是…是…」这类先否定再肯定的句式（含「不是…而是…」「与其说…不如说…」）',
+    '-禁止「A等于B」「A就是B」式生硬比喻',
+    '-禁止术语腔与抽象词堆叠：外显、建制、成正比、位移、闭环、赋能、维度、底层逻辑',
+    '-禁止同一句信息在两处原样重复；同一段里意思重复的句子只留一句',
+    '-禁止三段式排比（先…再…最后）、对偶金句（X很A，Y很B）、因果解释（因为…所以…）、升华收尾',
+    '[视角]【待填写：人称与聚焦；明确写出不写什么】',
+    '[风格校准]',
+    '-基调：【待填写：类型＋情绪底色】',
+    '-对话：占比【待填写】。台词推进关系，不解释设定；单句不超过三行',
+    '-描写侧重：动作与环境细节为主，心理只写身体反应',
+    '</约束规则>',
+    '',
+    '<开局场景>',
+    '[场景描述]【待填写：时间、地点、空间细节，写到能听见看见】',
+    '[开局状态]',
+    '-【待填写：玩家在哪、身体状态、正在发生什么】',
+    '[随身物品]【待填写；确实没有就写「无」并说明为什么】',
+    '</开局场景>'
+  ].join('\n');
   warn.push('未找到 persona.txt，使用占位人设（必须在交付前替换）');
 }
 if (persona.length > LIMIT.personality) errs.push(`persona ${persona.length} 字，超过 ${LIMIT.personality}`);
 if (/<script|<style|sdk\./.test(persona)) errs.push('persona 里出现了 HTML / 脚本 / sdk 调用');
+if (!/\[句式禁忌\]/.test(persona)) {
+  warn.push('persona 的 <约束规则> 缺 [句式禁忌]：应把四项禁令（先否定再肯定 / 生硬比喻 / 术语腔 / 同段重复）逐条写进去');
+} else {
+  const bans = SENTENCE_BANS.items || [];
+  const missing = bans.filter((b) => {
+    if (b.id === 'neg-first') return !/不是[^，。；！？\n]{0,14}?[，,]?(?:而是|是)/.test(persona) && !/先否定再肯定|不是…是…/.test(persona);
+    if (b.id === 'flat-metaphor') return !/等于|就是/.test(persona);
+    if (b.id === 'jargon') return !/外显|建制|成正比|位移|闭环|赋能|维度|底层逻辑/.test(persona);
+    if (b.id === 'repeat') return !/重复/.test(persona);
+    return false;
+  });
+  if (missing.length) warn.push('persona 的 [句式禁忌] 缺条目: ' + missing.map((b) => b.label).join('、'));
+}
 
 let worldbook = null;
 const wbRaw = readIf('worldbook.json');

@@ -50,7 +50,7 @@ function fail(msg, code = 1) {
 
 const target = (arg('target', '') || '').toLowerCase();
 if (!target) {
-  console.error('用法: node scripts/install.mjs --target workbuddy|codex|claude [--scope user|project] [--dir 路径] [--force] [--dry-run]');
+  console.error('用法: node scripts/install.mjs --target workbuddy|codex|claude [--scope user|project] [--dir 路径] [--name 目录名] [--force] [--dry-run]');
   process.exit(2);
 }
 if (!TARGETS[target]) fail(`未知 --target: ${target}（可选 workbuddy / codex / claude）`);
@@ -67,7 +67,11 @@ function baseDir() {
 
 const base = baseDir();
 const skillsRoot = path.join(base, ...cfg.user);
-const dest = path.join(skillsRoot, SKILL_NAME);
+
+/* 目录名默认与 SKILL.md 的 name 一致；允许用 --name 起中文名（WorkBuddy 认，严格宿主可能不认） */
+const dirName = arg('name', SKILL_NAME);
+if (/[\\/:*?"<>|]/.test(dirName)) fail(`--name 里不能有路径分隔符或非法字符: ${dirName}`);
+const dest = path.join(skillsRoot, dirName);
 
 /* 自装检测: 从已安装目录里再装一次会自我递归 */
 const rel = path.relative(root, dest);
@@ -91,6 +95,11 @@ console.log('Rex-MMD角色卡 · 安装');
 console.log('  宿主    ' + cfg.label);
 console.log('  作用域  ' + scope + (scope === 'project' ? '（' + base + '）' : ''));
 console.log('  目标    ' + dest);
+if (dirName !== declaredName) {
+  console.log('  命名    目录名「' + dirName + '」≠ SKILL.md 的 name「' + declaredName + '」');
+  console.log('          WorkBuddy 按目录识别，可以用中文名；');
+  console.log('          Codex / Claude Code 按规范校验同名，可能跳过这个技能。');
+}
 
 if (has('dry-run')) {
   console.log('\n[dry-run] 未写入任何文件。去掉 --dry-run 即可安装。');
@@ -146,15 +155,15 @@ console.log('  文件    ' + files + ' 个 / ' + (bytes / 1024).toFixed(0) + ' K
 
 const next = {
   workbuddy: [
-    '重开一个会话，在侧栏「技能」里应能看到 ' + SKILL_NAME,
+    '重开一个会话，在侧栏「技能」里应能看到 ' + dirName,
     '试一句：「帮我做一张 MMD 角色卡，先告诉我该选哪条路线」',
   ],
   codex: [
-    '输入 /skills 应能看到 ' + SKILL_NAME,
-    '显式调用：$' + SKILL_NAME + '；或直接描述任务让它自动匹配',
+    '输入 /skills 应能看到 ' + dirName,
+    '显式调用：$' + declaredName + '；或直接描述任务让它自动匹配',
   ],
   claude: [
-    '新会话里询问可用技能，应能看到 ' + SKILL_NAME,
+    '新会话里询问可用技能，应能看到 ' + dirName,
     '直接描述任务即可，按 description 自动匹配',
   ],
 }[target];

@@ -59,6 +59,46 @@ p();
 p(`公开发布口径（仅新版，\`validate --publish\`）：固定传输 ${F.limits.sandbox.publish.transmissionChars.join('–')} 字，beginning ≥ ${F.limits.sandbox.publish.beginningMin} 字。`);
 p();
 
+/* ---------- 运行时行为 ---------- */
+if (F.runtimeBehavior) {
+  const rb = F.runtimeBehavior;
+  p('## 2.2 运行时行为（什么时候发生什么）');
+  p();
+  if (rb.statusbar) {
+    p(`**功能栏静态**（${rb.statusbar.versions.join('/')}）\`${rb.statusbar.evidence}\`：${rb.statusbar.fact}。`);
+    p();
+    p(`后果：${rb.statusbar.consequence}。`);
+    p();
+    if (rb.statusbar.note) { p(`> ${rb.statusbar.note}`); p(); }
+  }
+  if (rb.stateCarriers) {
+    p('**状态的三种载体**（同一数值只能有一个真值来源）：');
+    p();
+    p('| 载体 | 寿命 | 可用 |');
+    p('|---|---|---|');
+    for (const it of rb.stateCarriers.items) {
+      p(`| ${it.name} | ${it.life} | ${it.usable ? '✅' : '⛔ ' + (it.why || '')} |`);
+    }
+    p();
+    p(`${rb.stateCarriers.rule}`);
+    p();
+  }
+}
+
+/* ---------- 世界书 ---------- */
+if (F.worldbook) {
+  p('## 2.1 世界书条目');
+  p();
+  p(`**排序**：${F.worldbook.order.rule}。${F.worldbook.order.common}。`);
+  p();
+  p('| 字段 | 说明 |');
+  p('|---|---|');
+  for (const f of F.worldbook.fields) p(`| \`${f.name}\` | ${f.desc} |`);
+  p();
+  p(`证据：${F.worldbook.order.evidence}${F.worldbook.order.note ? '（' + F.worldbook.order.note + '）' : ''}。`);
+  p();
+}
+
 /* ---------- SDK ---------- */
 p('## 3. SDK 能力与事件');
 p();
@@ -82,6 +122,24 @@ p(`冷启动到达顺序：${F.eventOrder.coldStart.join(' → ')}；补发：${
 p();
 p(`不存在的能力：${F.absentCapabilities.join(' / ')}。`);
 p();
+if (F.pendingCapabilities) {
+  p('**契约未补齐（存在，但没公布参数）**');
+  p();
+  p(`能力：${F.pendingCapabilities.caps.join(' / ')}；事件：${F.pendingCapabilities.events.join(' / ')}。`);
+  p();
+  p(F.pendingCapabilities.note);
+  p();
+}
+if (F.capabilityNotes) {
+  p('**实现细节**');
+  p();
+  p('| 项 | 事实 |');
+  p('|---|---|');
+  Object.entries(F.capabilityNotes)
+    .filter(([k]) => k !== 'source' && k !== 'evidence')
+    .forEach(([k, v]) => p(`| ${k} | ${v} |`));
+  p();
+}
 
 /* ---------- 选择器 ---------- */
 p('## 4. 选择器与槽位');
@@ -194,6 +252,51 @@ p('## 11. 静默失败清单');
 p();
 F.silentFailures.forEach((s, i) => p(`${i + 1}. ${s}`));
 p();
+
+/* ---------- 执行时机 / 宿主边界 / 句式禁令 ---------- */
+p('## 11.1 执行时机');
+p();
+if (F.executionTiming) {
+  p(`- **脚本先于 DOM**：${F.executionTiming.scriptBeforeDom}`);
+  p(`- **回调参数**：${F.executionTiming.callbackArgs} 个（${F.executionTiming.callbackNote}）`);
+  p(`- **消息 id**：${F.executionTiming.messageId}`);
+  p(`- **serverId 判空**：${F.executionTiming.serverIdNull}`);
+}
+p();
+
+p('## 11.2 宿主表面边界');
+p();
+if (F.hostSurfaces) {
+  p(`- iframe 内可改：${F.hostSurfaces.iframeInside.targets.join('；')}`);
+  p(`- 宿主页：${F.hostSurfaces.hostPage.note}`);
+  p(`- 已见根名：${F.hostSurfaces.hostPage.rootsSeen.join(' / ')}`);
+  p(`- 关于 \`[data-host]\`：${F.hostSurfaces.hostPage.noteOnDataHost}`);
+}
+p();
+
+p('## 11.3 句式禁令（人设 / 世界书 / 开场白）');
+p();
+if (F.sentenceBans) {
+  p('| 项 | 规则 | 改法 |');
+  p('|---|---|---|');
+  F.sentenceBans.items.forEach((b) => p(`| ${b.label} | ${b.rule} | ${b.fix} |`));
+  p();
+  p(F.sentenceBans.scope);
+  p();
+}
+
+p('## 11.4 AI 腔信号（全部 WARN）');
+p();
+if (F.aiTone) {
+  p(F.aiTone.baseline);
+  p();
+  p('| 信号 | 判定 | 改法 |');
+  p('|---|---|---|');
+  F.aiTone.signals.forEach((s) => p(`| ${s.label} | ${s.rule} | ${s.fix} |`));
+  p();
+  p(F.aiTone.note);
+  p();
+}
 
 /* ---------- 证据等级 ---------- */
 p('## 12. 证据等级');

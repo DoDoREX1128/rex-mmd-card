@@ -1,12 +1,13 @@
 /* rex-status · 状态解析 / 白名单裁剪 / 接线
-   模型每轮在正文里吐一个 <rex-status>{…}</rex-status>，这里只认这个块，别的一概不猜。 */
+   模型每轮在正文里吐一个 [rex-status]{…}[/rex-status]，这里只认这个块，别的一概不猜。
+   原文由一条替换规则消耗（build 自动生成 status-hide），所以气泡里看不到 JSON。 */
 (function () {
   var REX = window.__REX__;
   if (!REX) { try { console.warn('[rex] kernel missing (status)'); } catch (e) {} return; }
   var C = function () { return window.__REX_CONTENT__ || {}; };
 
-  var TAG = 'rex-status';
-  var RE_BLOCK = new RegExp('<' + TAG + '>([\\s\\S]*?)<\\/' + TAG + '>');
+  var RE_BLOCK = /\[rex-status\]([\s\S]*?)\[\/rex-status\]/;
+  var RE_BLOCK_OLD = /<rex-status>([\s\S]*?)<\/rex-status>/;   // 旧卡兼容
 
   /* ---------- 三级容错：直读 → 修引号/裸键 → 正则捞关键字段 ---------- */
   function parse(raw) {
@@ -183,7 +184,7 @@
 
   REX.on('message:done', function (msg) {
     var text = (msg && (msg.content || msg.text)) || '';
-    var m = RE_BLOCK.exec(text);
+    var m = RE_BLOCK.exec(text) || RE_BLOCK_OLD.exec(text);
     if (m) { REX.applyStatus(m[1]); return; }
     scan();
   });

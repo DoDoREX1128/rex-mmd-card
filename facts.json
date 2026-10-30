@@ -1,7 +1,7 @@
 {
   "schema": "rex-facts/1",
-  "updated": "2026-10-28",
-  "note": "本文件是 Rex-MMD角色卡 的唯一平台事实真源。脚本从它读限额/能力/事件/选择器/变量/层级；references/23-平台-事实表.md 由 scripts/gen-facts.mjs 生成，不要手改。每条事实带 source 与 evidence：source 记录出处，evidence 取值 official|source|device|external|todo。",
+  "updated": "2026-10-29",
+  "note": "本文件是 Rex-MMD角色卡 的唯一平台事实真源。脚本从它读限额/能力/事件/选择器/变量/层级；references/23-平台-事实表.md 由 scripts/gen-facts.mjs 生成，不要手改。每条事实带 source 与 evidence：source 记录出处，evidence 取值 official|source|device|external|todo。裁决顺序：洛璃实测 > 官方手册 > 外部整理；两家冲突时以 references/56-裁决记录.md 为准。",
   "markers": {
     "ignition": {
       "open": "【",
@@ -11,10 +11,60 @@
       "evidence": "official"
     },
     "content": {
-      "block": "<rex-status>",
-      "note": "内容协议标记，只出现在模型正文与解析脚本里，不进 findRegex。带连字符的标签名不会被平台的标签剥离正则（字符类不含 -）命中，因此可存活；不要改成中文尖括号标签，中文标签会被整段剥掉。",
-      "evidence": "source"
+      "open": "[",
+      "close": "]",
+      "block": "[rex-status]",
+      "closeBlock": "[/rex-status]",
+      "mustConsume": true,
+      "note": "内容协议标记改用方括号（2026-10-29 裁决，以洛璃为准）。三条理由：① 模型输出的中文尖括号标签会在进正则前被剥壳正则整段删掉；② 连字符尖括号虽能存活，但会以未知元素留在气泡里，玩家直接看到 JSON；③ 方括号不参与 HTML 解析，不存在被净化或提前闭合的问题。代价是必须由一条规则显式消耗：findRegex 写 /\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/，replaceString 渲染成紧凑卡或空串。不消耗就原样显示。",
+      "evidence": "device"
     }
+  },
+  "sentenceBans": {
+    "items": [
+      {
+        "id": "neg-first",
+        "label": "先否定再肯定",
+        "rule": "禁止「不是…是…」「不是…而是…」「与其说…不如说…」这类句式",
+        "fix": "删掉否定那半句；删完不通就把后半句补成完整陈述，仍不写成对偶"
+      },
+      {
+        "id": "flat-metaphor",
+        "label": "生硬比喻",
+        "rule": "禁止「A等于B」「A就是B」式判断句冒充比喻",
+        "fix": "写 B 的具体特征，让读者自己得出 A 像 B；不要用系词直接等号"
+      },
+      {
+        "id": "jargon",
+        "label": "术语腔与抽象词堆叠",
+        "rule": "禁止外显、建制、成正比、位移、闭环、赋能、维度、底层逻辑这八个词，以及同类名词化抽象",
+        "fix": "换成可观察的动作、位置、数量、时间；写不出具体画面就删掉整句"
+      },
+      {
+        "id": "repeat",
+        "label": "同段重复",
+        "rule": "禁止同一句信息在两处原样重复；同一段里意思重复的句子只留一句",
+        "fix": "保留信息更具体的那句；另一句改成推进（代价、后果、例外），改不了就删"
+      }
+    ],
+    "scope": "人设 / 世界书 / 开场白三处同受约束；说明性文档（本 skill 的方法论文档）不受约束。",
+    "enforcement": "validate 对人设与世界书扫这四类，命中报 WARN（2026-10-29 起不做硬拦截）。Agent 撰写时必须先过这四条再落盘。",
+    "evidence": "author"
+  },
+  "aiTone": {
+    "baseline": "人写稿实测：平均每行 30.7 字、行末无标点 84%、句号密度 12.7‰、长句 5.6%、排比 1、对偶 0、因果 0、破折号 1。AI 稿：44.6 字、32%、27.6‰、11.1%、3、1、2、5。",
+    "signals": [
+      { "id": "long-line", "label": "平均每行过长", "rule": "平均每行 >40 字", "fix": "一行一件事，写完就停" },
+      { "id": "long-sentence", "label": "长句过多", "rule": "长句（>40 字）占比 >8%", "fix": "拆成两句，或改用分号" },
+      { "id": "period-heavy", "label": "句号偏多", "rule": "句号密度 >18‰", "fix": "字段行不必加句号；笔记体不是文章" },
+      { "id": "parallel", "label": "排比三连", "rule": "「；…；…」三段并列 ≥3 处", "fix": "保留两项，或拆成两句" },
+      { "id": "antithesis", "label": "对偶金句", "rule": "「X很A，Y很B」≥1 处", "fix": "拆开写，信息不变" },
+      { "id": "causal", "label": "因果解释", "rule": "因为 / 所以 / 因此 / 从而 / 于是 ≥1 处", "fix": "删连接词，两句并列" },
+      { "id": "dash", "label": "破折号过多", "rule": "—— ≥4 处", "fix": "改用括号，或另起一句" },
+      { "id": "fill", "label": "每字段写满", "rule": "一个字段 3 段以上且有起承转合", "fix": "删一半，看角色会不会变" }
+    ],
+    "note": "全部 WARN。阈值来自人写稿与 AI 稿的量化差（references/32 §0），题材不同会合理偏离，只提示不拦截。",
+    "evidence": "author"
   },
   "versions": {
     "sandbox": {
@@ -64,11 +114,9 @@
       "chatVersion": 0,
       "label": "旧版卡（旧聊天页）",
       "topKeys": [
-        "chatVersion",
         "pageDepth",
         "statusbar",
         "beginning",
-        "personality",
         "regex_scripts"
       ],
       "requiredTopKeys": [
@@ -77,11 +125,10 @@
         "beginning",
         "regex_scripts"
       ],
-      "optionalTopKeys": [
-        "personality",
-        "chatVersion"
-      ],
+      "optionalTopKeys": [],
       "forbiddenTopKeys": [
+        "chatVersion",
+        "personality",
         "role",
         "presentation",
         "worldbook",
@@ -98,9 +145,9 @@
         "findRegex",
         "replaceString"
       ],
-      "idRule": "-1 固定；导入时平台重编号",
+      "idRule": "固定 -1；导入时平台重编号",
       "pageDepth": 2,
-      "source": "洛璃 mmd.md 四键为必填；chatVersion:0 可随包携带（平台只在新建卡导入时读），personality 仅留档",
+      "source": "洛璃 mmd.md 四键为必填且恰好四键；chatVersion / personality 出现在旧版独立正则 JSON 里会被官方校验判 ERROR",
       "evidence": "device"
     }
   },
@@ -227,13 +274,88 @@
     "user",
     "debug"
   ],
+  "capabilityNotes": {
+    "version": "是值不是函数，恒为 '1'；写 sdk.version() 会抛错",
+    "save.remove": "真机坏死：就绪态也稳定抛 NETWORK，重试无效；删档用 save.set(key, null) 代替",
+    "save.get": "同步抛 SdkError，不是返回错误码；不 try/catch 会整段脚本失效",
+    "save.keys": "同步抛 SdkError，同上",
+    "stage.el": "关闭时也返回 DIV，不是 null；判断开关只能用 stage.visible",
+    "message.send": "上一次未结束时重复调用立即返回 BUSY，不排队、不是限频",
+    "message.edit": "serverId 为 null（开场白、未落库）时不可编辑",
+    "source": "洛璃 mmd-sandbox §4.1–§4.5（实机 2026-08-26/30）",
+    "evidence": "device"
+  },
   "absentCapabilities": [
     "once",
     "off",
-    "vars",
     "theme.set",
     "memory"
   ],
+  "pendingCapabilities": {
+    "caps": [
+      "vars.get",
+      "vars.set"
+    ],
+    "events": [
+      "vars:change"
+    ],
+    "note": "平台状态变量：业务规则已确认存在（仅新页可开、最多 6 层 80 键、快照随消息按楼层回溯、{{var}} 只替换本轮新组装内容、分享页与瘦预览可读不可写），但官方 contract.json 未收录参数、返回值与导入字段。结论只有一句：契约未公布，不是不存在。可以讲行为边界，不能编造签名；写代码前先要用户的导出样本。",
+    "source": "洛璃 mmd-sandbox §14（官方文档 + 待验证标注）",
+    "evidence": "official",
+    "verdict": "pending"
+  },
+  "executionTiming": {
+    "scriptBeforeDom": "作者脚本在平台挂载功能栏与消息 HTML 之前就执行完毕。顶层直接 document.getElementById 恒为 null；任何 DOM 读写都必须放进事件回调。",
+    "callbackArgs": 1,
+    "callbackNote": "SDK 回调只传 1 个实参（payload）。官方契约写的第二参 bubbleRoot 不是 SDK 提供的，不要依赖。",
+    "messageId": "msg.id 是本地自增或 h+serverId 派生，跨重载会变（l1 → h9512）；持久化与定位一律用 msg.serverId（等于 data-msg-id）。开场白 id 为 'greeting'、serverId 为 null、data-msg-id 为 -1。",
+    "serverIdNull": "serverId === null 表示服务端还不认得这条，不可 message.edit；调用前必须判空。",
+    "source": "洛璃 mmd-sandbox §2.6",
+    "evidence": "device"
+  },
+  "hostSurfaces": {
+    "iframeInside": {
+      "editable": true,
+      "targets": [
+        "[data-chat=\"more-panel\"] 与 button[data-action]",
+        "[data-chat=\"message-menu\"]",
+        "[data-chat=\"alert\"] / [data-chat=\"toast\"] / [data-chat=\"alert-ok\"]",
+        "[data-chat=\"snack\"]",
+        "[data-chat=\"share-bar\"] / share-pick-* / share-shot-*",
+        "[data-chat=\"instruction-bar\"] / instruction-back / instruction-chip",
+        "[data-chat=\"summary-bubble\"]",
+        "[data-chat=\"assistant-tip\"]",
+        "[data-slot=\"statusbar\"] / header-extra / left / right / toolbar / message-extra"
+      ]
+    },
+    "hostPage": {
+      "editable": false,
+      "note": "宿主页弹窗（模型设置 .model-setting-scope、对话设置 .conv-style-modal、模型切换 .model-switch-scope、用户人设 .role-profile-modal、总结 .summary-sheet、消息编辑 .msg-edit-scope 等）渲染在站点主域，卡片跑在跨源 iframe 里，卡片 CSS 打不到；在 iframe 内注入 --chat-modal-* 也不会传导过去。只换肤、不重画；需要改这些面板时如实说明做不到。",
+      "rootsSeen": [
+        ".model-setting-scope",
+        ".conv-style-modal",
+        ".model-switch-scope",
+        ".role-profile-modal",
+        ".summary-sheet",
+        ".msg-edit-scope",
+        ".conversation-list-scope",
+        ".share-popup",
+        ".alert-scope"
+      ],
+      "noteOnDataHost": "官方另有一条「平台抽取并过滤后注入 [data-host=…] CSS」的通道，属资料级、未实测注入。本 skill 不据此承诺可换肤；要试必须在目标站实际打开面板确认根命中与计算样式，再报证据。"
+    },
+    "source": "洛璃 mmd-sandbox §6.3b（2026-08-29/09-06 实机）+ 官方 host-popup.md（资料级）",
+    "evidence": "device",
+    "verdict": "洛璃优先"
+  },
+  "csp": {
+    "externalScript": "地址必须 https://；http:// 直接跳过；域名还要在平台白名单里，自建域名先问平台。",
+    "failure": "加载失败不中断整张卡，只在调试面板留一行；核心文字玩法必须在依赖加载失败时仍可用。",
+    "media": "图片/音频/视频的跨域、CSP connect-src、纹理像素读取要分别验；不能用本地预览通过代替目标站。",
+    "source": "官方 frameworks-and-effects.md + 洛璃 mmd-sandbox §13",
+    "evidence": "official",
+    "note": "本机未做目标站响应头与 meta 交集的实测；交付时标未验证。"
+  },
   "events": [
     "ready",
     "message:new",
@@ -662,7 +784,7 @@
       "role"
     ],
     "keptEventAttrs": "HTML 元素上的 on* 保留；SVG 内的 on* 被删",
-    "stripRule": "非白名单标签按正则剥壳，只删标签保留文字；标签名字符类不含连字符，故 <rex-status> 存活、<状态> 被整段剥掉",
+    "stripRule": "非白名单标签按正则剥壳，只删标签保留文字；标签名字符类不含连字符，故 <rex-status> 会存活、<状态> 被整段剥掉。2026-10-29 起内容协议改用方括号 [rex-status]，不再依赖这条存活性；尖括号写法仅作旧卡兼容。",
     "source": "洛璃 mmd-sandbox §5.2",
     "evidence": "source"
   },
@@ -676,7 +798,10 @@
     "z-index 落在 1000–3499：被舞台（2000/3000）压住",
     "替换产物超输出预算：整条规则回滚，仅调试面板可见",
     "sdk.on 写进 message:mount 回调：每挂一条气泡多订一份",
-    "在 message:mount 里读 message-body 当正文：读到「消息生成中」占位"
+    "在 message:mount 里读 message-body 当正文：读到「消息生成中」占位",
+    "内容协议标记 [rex-status] 没有规则消耗：模型每轮吐的 JSON 会原样显示在气泡里",
+    "顶层直接读写 DOM：脚本在 Vue 挂载之前执行完，元素恒为 null，无报错",
+    "把状态挂到 msg.id 上：重载后 id 从 l1 变成 h9512，旧数据全部失联"
   ],
   "evidenceLevels": [
     {
@@ -704,5 +829,99 @@
       "label": "待验证",
       "meaning": "有线索但缺复现证据，不得当结论引用"
     }
-  ]
+  ],
+  "worldbook": {
+    "order": {
+      "rule": "数字越大越靠前、越优先读取；不按 uid / id 排序",
+      "common": "整数，常用 1–9999；同一张卡内部相对大小才有意义",
+      "evidence": "manual",
+      "note": "作者确认，本机未实测",
+      "uidNote": "调整 order 后顺手把 uid 按新顺序重排成 0..N-1；uid 不参与排序，重排只为可读性"
+    },
+    "fields": [
+      {
+        "name": "comment",
+        "desc": "条目标题，≤20 字，超长被截断"
+      },
+      {
+        "name": "content",
+        "desc": "正文，单条 ≤3000 字"
+      },
+      {
+        "name": "constant",
+        "desc": "true=蓝灯每轮注入；false=绿灯按 key 触发"
+      },
+      {
+        "name": "key",
+        "desc": "触发词，JSON 编码后的字符串（如 \"[\\\"雨天\\\"]\"），不是裸数组"
+      },
+      {
+        "name": "keysecondary",
+        "desc": "次级触发词，同上"
+      },
+      {
+        "name": "order",
+        "desc": "注入顺序权重，越大越靠前"
+      },
+      {
+        "name": "position",
+        "desc": "插入位置枚举"
+      },
+      {
+        "name": "depth",
+        "desc": "插入深度"
+      },
+      {
+        "name": "probability",
+        "desc": "触发概率，两位小数字符串 \"100.00\""
+      },
+      {
+        "name": "disable",
+        "desc": "true 时该条不参与注入"
+      },
+      {
+        "name": "uid",
+        "desc": "条目区分号，不参与排序"
+      }
+    ]
+  },
+  "runtimeBehavior": {
+    "statusbar": {
+      "versions": [
+        "v1"
+      ],
+      "fact": "statusbar 字段只在装载时渲染一次：渲染函数 h_() 没有重渲染路径，且它的正则输入是 statusbar 字段自身，不是消息内容",
+      "consequence": "AI 每轮输出新状态不会让功能栏变化。动态状态必须由作者 JS 改 DOM（message:done 里改已有节点的文字/class/内联 style）",
+      "evidence": "source",
+      "note": "旧版不适用：旧版状态栏是逐消息渲染，每条消息各自点火，机制完全不同"
+    },
+    "stateCarriers": {
+      "versions": [
+        "v1"
+      ],
+      "items": [
+        {
+          "name": "平台状态变量",
+          "api": "sdk.vars.get/set / vars:change",
+          "life": "本轮进提示词；快照随 AI 消息保存；回溯与重生成按楼层恢复",
+          "usable": "pending",
+          "why": "业务规则已确认存在（6 层 80 键、按楼层回溯），但公开契约未给出参数、返回值与导入字段。可以说存在、讲边界，不能编造签名，也不能说平台不支持。"
+        },
+        {
+          "name": "sdk.save",
+          "api": "sdk.save.get/set",
+          "life": "服务端持久化、跨设备；不会自动进上下文；不能改宿主聊天历史",
+          "usable": true
+        },
+        {
+          "name": "sdk.cache",
+          "api": "sdk.cache.get/set",
+          "life": "会话内临时；刷新即失",
+          "usable": true
+        }
+      ],
+      "rule": "同一剧情数值只能有一个真值来源。平台状态变量与 sdk.save 不得各维护一份，否则回溯/读档/重生成后会出现两份真值。",
+      "evidence": "source"
+    }
+  }
 }

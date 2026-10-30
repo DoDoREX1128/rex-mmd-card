@@ -29,17 +29,42 @@ function run(script, args) {
 }
 
 /* ---------- 基础卡：一条可见规则 + 一条样式 + 一条脚本 ---------- */
-const PERSONA = `<角色设定 名字：禾安>
-<基本信息>
-- 身份：种子铺守护人
-</基本信息>
-<与{{user}}的关系>
-禾安与{{user}}认识很久，习惯把伞往{{user}}那边偏。
-</与{{user}}的关系>
-<说话方式>
-禾安说话短，不爱解释。
-</说话方式>
-</角色设定>`;
+const PERSONA = `<前提：AI担任说书人，负责推演世界与扮演所有NPC；{{user}}扮演这个世界芸芸众生中的一员，所有行动由玩家决定>
+
+<主题>
+[核心玩法]开放探索型。玩家自由移动、与NPC交互，核心循环是探索→遭遇→取舍。
+[世界观]定性：低魔东方，术法靠外物驱动。秩序：渡口由船帮维持。稀缺：水与盐。代价：术法折寿。
+[视角]第三人称限知，跟着{{user}}的所见，不写其内心判断。
+[风格]
+-基调：克制写实，不煽情
+-节奏：短句为主
+-禁止：空转模糊词、八股微表情、替{{user}}发言
+</主题>
+
+<主要角色>
+-<主角：禾安>
+[基础信息]性别男；年龄二十九
+[身份]种子铺守护人，替人看东西的方士
+[性格]先做再说，被追问时用动作代替回答
+[长线记忆]
+-左手腕的旧伤阴雨天会疼
+-</主角>
+</主要角色>
+
+<约束规则>
+[对话禁忌]禁止跳出角色说话、禁止自称AI
+[句式禁忌]
+-禁止「不是…是…」这类先否定再肯定的句式
+-禁止「A等于B」「A就是B」式生硬比喻
+-禁止术语腔：外显、建制、成正比、位移、闭环、赋能、维度、底层逻辑
+-禁止同一句信息在两处原样重复
+</约束规则>
+
+<开局场景>
+[场景描述]酉时，下着雨，铺子还没关
+[开局状态]{{user}}站在门口，身上是湿的
+[随身物品]半袋炒米
+</开局场景>`;
 
 function card(over = {}) {
   return {
@@ -204,6 +229,13 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   ok('旧版卡写 chatVersion:1 被拦截', bad.code === 1 && has(bad, 'errorList', /不能是 1/));
   const extra = validate(writeCard('legacy-extra', { ...legacy, entries: {} }), ['--platform', 'legacy']);
   ok('旧版卡混入 entries 被拦截', extra.code === 1 && has(extra, 'errorList', /禁用键/));
+  const withPersona = validate(writeCard('legacy-persona', { ...legacy, personality: 'x' }), ['--platform', 'legacy']);
+  ok('旧版带 personality 被拦截', withPersona.code === 1 && has(withPersona, 'errorList', /禁用键/));
+  const badId = validate(writeCard('legacy-id', {
+    ...legacy,
+    regex_scripts: [{ id: -2, scriptName: 'x', findRegex: '/【RexHUD 001】/', replaceString: '<div>a</div>' }]
+  }), ['--platform', 'legacy']);
+  ok('旧版 id 不是 -1 被拦截', badId.code === 1 && has(badId, 'errorList', /固定 -1/));
 }
 
 /* ---------- 10. 人设 ---------- */
@@ -211,13 +243,78 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   const c = card();
   c.personality = '禾安是种子铺守护人。';
   const res = validate(writeCard('persona-bad', c));
-  ok('人设缺标签被拦截', res.code === 1 && has(res, 'errorList', /缺 <角色设定/));
+  ok('人设缺骨架只告警', res.code === 0 && has(res, 'warnList', /既没有 <角色设定>/));
 }
 {
   const c = card();
   c.personality = `<世界观>\n雨多年不停。\n</世界观>\n\n${PERSONA}`;
   const res = validate(writeCard('persona-world', c));
-  ok('世界观在前的写法只告警', res.code === 0 && has(res, 'warnList', /人设首块/));
+  ok('非标准首块只告警', res.code === 0 && has(res, 'warnList', /人设首块/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace(/\[句式禁忌\][\s\S]*?(?=\n\[|\n<\/约束规则>)/, '');
+  const res = validate(writeCard('persona-no-syntax', c));
+  ok('人设缺 [句式禁忌] 只告警', res.code === 0 && has(res, 'warnList', /缺 \[句式禁忌\]/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他不是本地人，是七年前来的货郎');
+  const res = validate(writeCard('persona-neg-first', c));
+  ok('先否定再肯定的句式被告警', res.code === 0 && has(res, 'warnList', /先否定再肯定/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace('-基调：克制写实，不煽情', '-基调：克制写实\n-禁止：不是…而是…句式');
+  const res = validate(writeCard('persona-neg-decl', c));
+  ok('禁用声明行引用句式不误报', res.code === 0, (res.json && res.json.errorList || []).join(' | '));
+}
+
+/* ---------- 10.1 四项禁令与内容协议 ---------- */
+{
+  const res = validate(writeCard('bans-ok', card()));
+  ok('四项禁令齐全不误报', res.code === 0 && !has(res, 'warnList', /命中句式禁令/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他的武力可以直接对抗建制');
+  const res = validate(writeCard('ban-jargon', c));
+  ok('术语腔被告警', res.code === 0 && has(res, 'warnList', /术语腔/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-称号就是权限');
+  const res = validate(writeCard('ban-flat', c));
+  ok('生硬比喻被告警', res.code === 0 && has(res, 'warnList', /生硬比喻/));
+}
+{
+  const c = card();
+  c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他不识字，看不懂任何告示与书信。\n-他不识字，看不懂任何告示与书信。');
+  const res = validate(writeCard('ban-repeat', c));
+  ok('同段重复被告警', res.code === 0 && has(res, 'warnList', /同段重复/));
+}
+{
+  const c = card();
+  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[rex-status]{"turn":1}[/rex-status]\n</字段与输出>';
+  const res = validate(writeCard('protocol-missing', c));
+  ok('协议未被消耗被告警', res.code === 0 && has(res, 'warnList', /规则消耗/));
+}
+{
+  const c = card();
+  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[rex-status]{"turn":1}[/rex-status]\n</字段与输出>';
+  c.regex_scripts = c.regex_scripts.concat([
+    { id: -9, scriptName: 'status-hide', findRegex: '/\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/', replaceString: '' }
+  ]);
+  const res = validate(writeCard('protocol-ok', c));
+  ok('协议被消耗不误报', res.code === 0 && !has(res, 'warnList', /规则消耗/));
+}
+{
+  const c = card();
+  c.regex_scripts = c.regex_scripts.concat([
+    { id: -9, scriptName: 'vars', findRegex: '/【rex-vars】/', replaceString: '<script>sdk.vars.get("hp"); sdk.on("vars:change", function(){});<\\/script>' }
+  ]);
+  const res = validate(writeCard('vars-pending', c));
+  ok('sdk.vars 判 WARN 不判不存在', res.code === 0 && has(res, 'warnList', /契约未补齐/) && !has(res, 'errorList', /不存在/));
 }
 
 /* ---------- 11. 世界书 ---------- */
@@ -234,6 +331,14 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   } }), 'utf8');
   const res = validate(writeCard('with-wb-ok', card()), ['--worldbook', wb]);
   ok('合法世界书通过', res.code === 0, (res.json && res.json.errorList || []).join(' | '));
+}
+{
+  const wb = path.join(tmp, 'wb-neg.json');
+  fs.writeFileSync(wb, JSON.stringify({ entries: {
+    0: { uid: 0, key: '["雨"]', comment: '天气', content: '雨多年不停。这不是雨，是天上在倒水。', constant: true, probability: '100.00' }
+  } }), 'utf8');
+  const res = validate(writeCard('with-wb-neg', card()), ['--worldbook', wb]);
+  ok('世界书里的先否定后肯定被告警', res.code === 0 && has(res, 'warnList', /命中句式禁令「先否定再肯定」/));
 }
 
 /* ---------- 12. 事实表一致性 ---------- */
