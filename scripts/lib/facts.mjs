@@ -66,8 +66,8 @@ export const PENDING = new Set([
 export const CONTENT_PROTOCOL = {
   open: F.markers.content.open || '[',
   close: F.markers.content.close || ']',
-  block: F.markers.content.block || '[rex-status]',
-  closeBlock: F.markers.content.closeBlock || '[/rex-status]',
+  block: F.markers.content.block || '[status]',
+  closeBlock: F.markers.content.closeBlock || '[/status]',
   mustConsume: F.markers.content.mustConsume !== false
 };
 

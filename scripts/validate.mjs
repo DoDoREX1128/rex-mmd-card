@@ -132,8 +132,8 @@ else {
     if (/<rex-[a-z0-9-]+>/.test(fr)) {
       warn(`${tag} findRegex 用了 <rex-…> 尖括号标记，建议改为 ${marker('rex-x')} 形态，避免创卡页对 HTML 标签的文案禁令`);
     }
-    if (/<rex-status>/.test(rs)) {
-      warn(`${tag} replaceString 用了尖括号 <rex-status>；内容协议已改为方括号 ${CONTENT_PROTOCOL.block}，尖括号写法仅作旧卡兼容`);
+    if (/<status>/.test(rs)) {
+      warn(`${tag} replaceString 用了尖括号 <status>；内容协议已改为方括号 ${CONTENT_PROTOCOL.block}，尖括号写法仅作旧卡兼容`);
     }
     if (/<script|<style/i.test(fr)) err(`${tag} findRegex 含 <script>/<style> 标签`);
 
@@ -363,10 +363,10 @@ if (personaText) {
   }
   reportBans('人设', personaText);
   reportAiTone('人设', personaText);
-  if (/\[rex-status\]/.test(personaText)) {
-    const consumed = (rules || []).some((r) => String(r.findRegex || '').includes('rex-status'));
+  if (/\[status\]/.test(personaText)) {
+    const consumed = (rules || []).some((r) => String(r.findRegex || '').includes('status'));
     if (!consumed) {
-      warn(`人设声明了 ${CONTENT_PROTOCOL.block} 内容协议，但没有任何规则消耗它；模型每轮吐的 JSON 会原样显示在气泡里。加一条 findRegex: /\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/，replaceString 渲染成紧凑卡或空串`);
+      warn(`人设声明了 ${CONTENT_PROTOCOL.block} 内容协议，但没有任何规则消耗它；模型每轮吐的 JSON 会原样显示在气泡里。加一条 findRegex: /\\[status\\][\\s\\S]*?\\[\\/status\\]/，replaceString 渲染成紧凑卡或空串`);
     }
   } else if (/<status>|<状态>/.test(personaText)) {
     warn(`人设里的内容协议仍是尖括号（<status> / <状态>）：中文标签会被平台剥壳整段删掉，连字符标签也会以未知元素留在气泡里。改用 ${CONTENT_PROTOCOL.block} … ${CONTENT_PROTOCOL.closeBlock}，并加一条规则消耗它`);

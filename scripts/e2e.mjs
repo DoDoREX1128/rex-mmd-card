@@ -146,7 +146,7 @@ f.addEventListener('load', function () {
 
     /* ---------- 坏状态兜底 ---------- */
     var kept = (R().data.status || {}).hp;
-    R().applyStatus('<rex-status>{"loc":"别处"}</rex-status>', true);
+    R().applyStatus('<status>{"loc":"别处"}</status>', true);
     await sleep(160);
     ok('残缺状态不清零旧值', (R().data.status || {}).hp === kept, 'hp ' + kept + ' -> ' + (R().data.status || {}).hp);
     ok('残缺状态仍能换地点', (R().data.status || {}).loc === '别处', (R().data.status || {}).loc);

@@ -86,9 +86,9 @@ const isLegacy = Number(card.chatVersion) !== 1;
 const visible = text.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
 const leftoverCn = [...new Set(visible.match(/【(?:rex-[a-z0-9-]+|[^】]{0,40}?\d{1,4})】/g) || [])];
 const leftoverTag = [...new Set(visible.match(/<(?!\/?(?:div|span|p|br|img|strong|em|b|i|small|button|input|textarea|select|option|ul|ol|li|h[1-6]|section|article|header|footer|nav|canvas|svg|path|g|main|aside|figure|figcaption|table|thead|tbody|tr|td|th|style|script|link|meta|rex-)\b)[a-z][a-z0-9-]{2,}>/gi) || [])];
-/* 内容协议：[rex-status] 必须被某条规则消耗；尖括号写法是旧协议 */
-const protocolLeft = [...new Set(visible.match(/\[rex-status\][\s\S]*?\[\/rex-status\]/g) || [])];
-const protocolAngle = [...new Set(visible.match(/<\/?(?:rex-status|status|状态)>/gi) || [])];
+/* 内容协议：[status] 必须被某条规则消耗；尖括号写法是旧协议 */
+const protocolLeft = [...new Set(visible.match(/\[status\][\s\S]*?\[\/status\]/g) || [])];
+const protocolAngle = [...new Set(visible.match(/<\/?(?:status|status|状态)>/gi) || [])];
 
 const outFile = opt('out', null);
 if (outFile) { fs.mkdirSync(path.dirname(path.resolve(outFile)), { recursive: true }); fs.writeFileSync(outFile, text, 'utf8'); }
@@ -104,7 +104,7 @@ console.log('语法错丢弃', broken.length ? broken.join(' | ') : '无');
 console.log('产物长度  ', text.length, '| script 块', scriptCount);
 console.log('残留标记  ', leftoverCn.length ? leftoverCn.join(',') : '无');
 console.log('残留标签  ', leftoverTag.length ? leftoverTag.slice(0, 8).join(',') : '无');
-console.log('内容协议  ', protocolLeft.length ? `[rex-status] 未被消耗 ${protocolLeft.length} 段，玩家会看到 JSON` : protocolAngle.length ? '仍在用尖括号 <status> / <状态>，会被剥壳或原样显示' : '已消耗 / 未使用');
+console.log('内容协议  ', protocolLeft.length ? `[status] 未被消耗 ${protocolLeft.length} 段，玩家会看到 JSON` : protocolAngle.length ? '仍在用尖括号 <status> / <状态>，会被剥壳或原样显示' : '已消耗 / 未使用');
 if (outFile) console.log('已写出    ', path.resolve(outFile));
 
 const fatal = leftoverCn.length > 0 || broken.length > 0 || protocolLeft.length > 0 || protocolAngle.length > 0;

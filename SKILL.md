@@ -1,6 +1,6 @@
 ---
 name: rex-mmd-card
-description: 为 MMD 制作角色卡的方法论与工具链，覆盖新版沙盒卡（chatVersion:1）、旧版原生增强卡、旧版同层卡（chatVersion:0）三条互不通用的路线。首次使用先定版本与路线，再按 S0 定位 → S1 方案 → S2 原型 → S3 模拟 → S4 真站 → S5 实机推进；平台事实以 facts.json 为唯一真源。写人设、世界书或开场白时按四项句式禁令避坑（先否定再肯定 / A就是B / 术语腔 / 同段重复）。当用户提出做卡、改卡、同层卡、HUD、状态栏、捏人、复刻某张卡、写人设或世界书时使用。不处理酒馆（SillyTavern）与其他平台。
+description: 为 MMD 制作角色卡：三条路线分流（新版沙盒 / 旧版原生增强 / 旧版同层）、六阶段推进、构建与校验工具链。当用户要做卡、改卡、加 HUD 或状态栏、做捏人、复刻某张卡、写人设或世界书时使用。不处理酒馆（SillyTavern）与其他平台。
 license: MIT
 compatibility: 需要 Node.js 18+ 与 git；脚本无第三方依赖。
 metadata:
@@ -114,7 +114,7 @@ agent_created: true
 
 ## 5. 文档路由
 
-28 篇文档，按「你正在做什么」查。状态标记：**✅ 本次按 facts.json 重写或实质改动** · **◐ 本次只同步编号 / 键数 / 标记** · **○ 本次未改正文，仅核对阈值**。
+28 篇正文 + 2 个附属库（字段库 / 错题本），按「你正在做什么」查。状态标记：**✅ 本次按 facts.json 重写或实质改动** · **◐ 本次只同步编号 / 键数 / 标记** · **○ 本次未改正文，仅核对阈值**。
 
 | 文档                                         | 什么时候读                        | 状态 |
 | ------------------------------------------ | ---------------------------- | -- |
@@ -129,10 +129,10 @@ agent_created: true
 | [24-平台-旧版事实](references/24-平台-旧版事实.md)     | 写旧版代码前：`onerror`、渲染、层级、同层边界  | ✅  |
 | [25-平台-SDK速查](references/25-平台-SDK速查.md)     | 写任何 `sdk.*` 前：签名、返回、瘦预览、六个坑   | ✅  |
 | [30-内容-状态与字段](references/30-内容-状态与字段.md)   | 设计状态字段、解析容错、存档结构             | ✅  |
-| [33-内容-存档与续档](references/33-内容-存档与续档.md)   | 多槽存档、读档后续档、回溯                 | ✅  |
-| [字段库](references/fields/README.md)         | 设计字段前查重与选型（118 条，持续生长）       | ✅  |
 | [31-内容-世界书](references/31-内容-世界书.md)       | 世界书：要不要建、蓝绿判据、预算、改造别人的       | ✅  |
 | [32-内容-人设与文风](references/32-内容-人设与文风.md)   | 人设格式（硬规则）与写法基线（可覆盖）          | ✅  |
+| [33-内容-存档与续档](references/33-内容-存档与续档.md)   | 多槽存档、读档后续档、回溯                 | ✅  |
+| [字段库](references/fields/README.md)         | 设计字段前查重与选型（118 条，持续生长）       | ✅  |
 | [40-界面-卡架构](references/40-界面-卡架构.md)       | 新版骨架、模块拆分、注入顺序               | ✅  |
 | [41-界面-基线](references/41-界面-基线.md)         | 三条基线（列表/仪表盘/单页流）+ 通用下限       | ✅  |
 | [42-界面-视觉](references/42-界面-视觉.md)         | 配色、主题变量映射、层级与动效              | ✅  |
@@ -155,26 +155,32 @@ agent_created: true
 
 ## 6. 工具链
 
-| 命令                                                                   | 作用                                             | 何时用     |
-| -------------------------------------------------------------------- | ---------------------------------------------- | ------- |
-| `node scripts/init.mjs`                                              | 工程骨架就位（assets/skeleton → work/src）             | S3 开始   |
-| `node scripts/build.mjs --src work/src --out work/out --name <slug>` | 模块 → 6 键导入包 + 人设 + 世界书 + v2 整卡 JSON            | S3 每次改动 |
-| `node scripts/card-png.mjs --card <v2.json> --out <png>`             | v2 整卡封进 PNG 的 `chara` 块（MMD 只认 PNG 整卡）         | 交付      |
-| `node scripts/validate.mjs <json> --platform sandbox\|legacy`        | 交付门禁（结构 / 限额 / 正则 / 标记 / SDK / CSS / 人设 / 世界书） | 每次构建    |
-| `node scripts/replay.mjs <json>`                                     | 按平台替换算法重放，查残留与断链                               | 每次构建    |
-| `node scripts/preview.mjs --card <json>`                             | 仿平台外壳 + 能力精度 + 模型沙盒                            | S3      |
-| `node scripts/e2e.mjs`                                               | 无头交互回归                                         | S3 收尾   |
-| `node scripts/analyze.mjs <json>`                                    | 拆卡：架构 / 载荷 / 动作 / 协议                           | 复刻、体检   |
-| `node scripts/check-skin.mjs --tokens t.json`                        | 皮肉原创性（色距 / 字体 / 质感）                            | 复刻、换皮   |
-| `node scripts/worldbook-normalize.mjs`                               | 任意世界书 → `{ entries }`                          | 导入前     |
-| `node scripts/worldbook-pack.mjs`                                    | 世界书并入人设（仅入口不支持世界书时）                            | 降级交付    |
-| `node scripts/gen-facts.mjs`                                         | 由 facts.json 重生成 23 表                          | 改事实后    |
-| `node scripts/test.mjs`                                              | 脚本自测（60 项）                                     | 改脚本后    |
-| `node scripts/pack-skill.mjs`                                        | 生成不含 `work/` 的安装副本                             | 分发      |
+| 命令                                                                          | 作用                                    | 何时用    |
+| --------------------------------------------------------------------------- | ------------------------------------- | ------ |
+| `init.mjs`                                                                  | 工程骨架就位（assets/skeleton → work/src）    | S3 开始  |
+| `build.mjs --src work/src --out work/out --name <slug>`                     | 模块 → 6 键包 + 人设 + 世界书 + v2 整卡 JSON     | S3 每次改 |
+| `card-png.mjs --card <v2.json> --out <png>`                                 | v2 整卡封进 PNG 的 `chara` 块（MMD 只认 PNG 整卡） | 交付     |
+| `validate.mjs <json> [--platform auto\|sandbox\|legacy\|same] [--persona f] [--worldbook f] [--publish]` | 交付门禁（结构 / 限额 / 正则 / 标记 / SDK / CSS / 人设 / 世界书） | 每次构建 |
+| `replay.mjs <json>`                                                         | 按平台替换算法重放，查残留与断链                      | 每次构建 |
+| `preview.mjs --card <json>`                                                 | 仿平台外壳 + 能力精度 + 模型沙盒                    | S3     |
+| `e2e.mjs`                                                                   | 无头交互回归                                | S3 收尾  |
+| `analyze.mjs <json>`                                                        | 拆卡：架构 / 载荷 / 动作 / 协议                  | 复刻、体检  |
+| `check-skin.mjs --tokens t.json`                                            | 皮肉原创性（色距 / 字体 / 质感）                   | 复刻、换皮  |
+| `pack-samelayer.mjs --host f --frame f --out d --name n`                    | Host / Frame → 同层卡分片链                 | 同层卡交付  |
+| `preview-samelayer.mjs --host f --frame f`                                  | 同层卡仿平台壳                               | 同层卡 S3 |
+| `worldbook-normalize.mjs`                                                   | 任意世界书 → `{ entries }`                 | 导入前    |
+| `worldbook-pack.mjs`                                                        | 世界书并入人设（仅入口不支持世界书时）                   | 降级交付   |
+| `export-raw.mjs`                                                            | 平台原始数据 → 可导入 JSON                     | 迁移旧卡   |
+| `gen-facts.mjs`                                                             | facts.json → 23 表；`--check` 校验一致性     | 改事实后   |
+| `gen-fields.mjs`                                                            | fields.json → 字段索引                    | 改字段后   |
+| `gen-errors.mjs`                                                            | errors.json → 错题索引                    | 改错题后   |
+| `field-add.mjs`                                                             | 字段库登记：先 `--find` 查重再新增               | 加字段    |
+| `error-log.mjs`                                                             | 错题本：`--find` / `--show` / `--add` / `--hit` / `--set` / `--retire` | 记/改错题  |
+| `test.mjs`                                                                  | 脚本自测（60 项）                            | 改脚本后   |
+| `pack-skill.mjs`                                                            | 生成不含 `work/` 的分发副本                    | 分发     |
+| `install.mjs --target workbuddy\|codex\|claude`                             | 装到宿主的 skills 目录                       | 安装     |
 
-|                                                   |         |                                                        |
-| ------------------------------------------------- | ------- | ------------------------------------------------------ |
-| 预览参数：`?profile=thin` 按瘦预览矩阵降级能力；\`?preset=badjson | missing | empty` 模拟坏输出；`?dev=1` 打开开发条与诊断面板；`?cold=1\` 补发冷启动事件序列。 |
+预览参数：`?profile=thin` 按瘦预览矩阵降级能力；`?preset=badjson|missing|empty` 模拟坏输出；`?dev=1` 打开开发条与诊断面板；`?cold=1` 补发冷启动事件序列。
 
 ---
 
@@ -203,7 +209,7 @@ agent_created: true
 ### 8.1 通用
 
 - 注入标记用 `【rex-xxx】`，写在 `beginning` / `statusbar` / `findRegex`；可见 HTML 的标记必须接进 `beginning`、`statusbar` 或前序替换结果，否则界面永不出现。
-- 内容协议标记用 `[rex-status]…[/rex-status]`（方括号），并且**必须被一条规则消耗**：`findRegex: /\[rex-status\][\s\S]*?\[\/rex-status\]/`，`replaceString` 渲染成紧凑卡或空串。不消耗就原样显示 JSON。
+- 内容协议标记用 `[status]…[/status]`（方括号），并且**必须被一条规则消耗**：`findRegex: /\[status\][\s\S]*?\[\/status\]/`，`replaceString` 渲染成紧凑卡或空串。不消耗就原样显示 JSON。
 - 只放 `<style>` / `<script>` 的规则，匹配式不需要被命中（装卡即抽出）。
 - 匹配式写 `/pattern/flags`；写成 `/…/` 但语法错会整条静默丢弃。字面量匹配式不得重复。
 - `replaceString` 按编辑器上限 20000 字规划，超限表现为整条改动不保存。
@@ -216,7 +222,7 @@ agent_created: true
 
 ### 8.2 新版沙盒卡
 
-- `chatVersion: 1` 必写；顶层恰好 6 键；`regex_scripts` 每条恰好 4 键，`id` 为负数。
+- `chatVersion: 1` 必写；顶层 5 键必填（`chatVersion` / `pageDepth` / `statusbar` / `beginning` / `regex_scripts`），`personality` 可选但建议留档（导入正则不读它，人设仍需另贴）；`regex_scripts` 每条恰好 4 键，`id` 为负数。
 - SDK 能力名与事件名逐字正确（30 / 12）；不存在 `sdk.once`、`sdk.off`、`sdk.theme.set`、`sdk.memory`。`sdk.vars` / `vars:change` **存在但契约未公布**：可以讲行为边界，不能编造签名，也不能说平台不支持。
 - `sdk.on` 写在脚本体；气泡内按钮绑在 `message:mount` 回调里；`message:mount` 里不读 `message-body` 当正文（那是「消息生成中」占位）。
 - 跟字用 `message:stream` 的 `msg.content`，收尾用 `message:done`；`ready` 最后到且不补发。

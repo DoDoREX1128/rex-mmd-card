@@ -5,13 +5,12 @@
 给 MMD 做角色卡的方法论与工具链：三条路线、六个阶段、一套事实库。  
 你回答几个问题、点一次头、说哪里不对；方案、代码、校验、封包它来。
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
-![Node](https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg)
-
-![Docs](https://img.shields.io/badge/docs-28%20files-informational.svg)
-
-![Self-test](https://img.shields.io/badge/self--test-60%20passed-success.svg)
+<p align="center">
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://nodejs.org"><img alt="node" src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg"></a>
+  <a href="references/00-总览与阅读路径.md"><img alt="docs" src="https://img.shields.io/badge/docs-28%20files-informational.svg"></a>
+  <img alt="self-test" src="https://img.shields.io/badge/self--test-60%20passed-success.svg">
+</p>
 
 [装](#装) · [用](#用) · [三条路线](#三条路线) · [目录](#目录)
 

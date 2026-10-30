@@ -174,10 +174,10 @@ const MOCK = `
   }
   function replyOf(preset){
     var body = '他把水牌推过来，指尖在牌面上按了一下。\\n\\n「你要的水在你手里。」他说，「但我不卖水，我卖路。」';
-    if (preset === 'badjson') return body + '\\n\\n<rex-status>{"loc":"别处",</rex-status>';
-    if (preset === 'missing') return body + '\\n\\n<rex-status>{"loc":"别处"}</rex-status>';
+    if (preset === 'badjson') return body + '\\n\\n<status>{"loc":"别处",</status>';
+    if (preset === 'missing') return body + '\\n\\n<status>{"loc":"别处"}</status>';
     if (preset === 'empty') return '';
-    return body + '\\n\\n<rex-status>' + JSON.stringify(statusOf()) + '</rex-status>';
+    return body + '\\n\\n<status>' + JSON.stringify(statusOf()) + '</status>';
   }
   function bubble(text){
     var l = list(); if (!l) return;
@@ -185,7 +185,7 @@ const MOCK = `
     var m = D.createElement('div'); m.setAttribute('data-chat', 'message');
     m.setAttribute('data-from', 'ai'); m.setAttribute('data-state', 'done');
     var b = D.createElement('div'); b.setAttribute('data-chat', 'message-body');
-    b.textContent = String(text).replace(/<rex-status>[\\s\\S]*?<\\/rex-status>/g, '').trim();
+    b.textContent = String(text).replace(/<status>[\\s\\S]*?<\\/status>/g, '').trim();
     m.appendChild(b); f.appendChild(m); l.appendChild(f);
     var msgs = D.querySelector('[data-chat="messages"]'); if (msgs) msgs.scrollTop = msgs.scrollHeight;
   }

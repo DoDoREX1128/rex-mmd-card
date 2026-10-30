@@ -17,7 +17,7 @@ const MODULES = [
   { name: 'rex-figdata', file: 'figdata.js', kind: 'js' },
   { name: 'rex-figure', file: 'figure.js', kind: 'js' },
   { name: 'rex-dossier', file: 'dossier.js', kind: 'js' },
-  { name: 'rex-status', file: 'status.js', kind: 'js' },
+  { name: 'status', file: 'status.js', kind: 'js' },
   { name: 'rex-scene', file: 'scenes.js', kind: 'js' }
 ];
 const PING = { name: 'rex-ping', file: 'ping.js' };
@@ -109,13 +109,13 @@ const pingBody = readIf(PING.file);
 if (pingBody == null) errs.push('缺模块文件: ping.js');
 else rules.push({ id: -(++idx), scriptName: PING.name, findRegex: `/${marker(PING.name)}/`, replaceString: wrap('js', pingBody, PING.name) });
 
-/* 内容协议消耗：模型每轮吐的 [rex-status] 原文必须被替换掉，否则玩家会看到 JSON。
+/* 内容协议消耗：模型每轮吐的 [status] 原文必须被替换掉，否则玩家会看到 JSON。
    脚本从 message:done 的 msg.content（未经替换的原文）解析，不依赖这条规则的产物。
    这条规则不推入 tags——它不需要被注入标记命中。 */
 rules.push({
   id: -(++idx),
   scriptName: 'status-hide',
-  findRegex: '/\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/',
+  findRegex: '/\\[status\\][\\s\\S]*?\\[\\/status\\]/',
   replaceString: ''
 });
 

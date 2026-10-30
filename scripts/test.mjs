@@ -295,15 +295,15 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
 }
 {
   const c = card();
-  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[rex-status]{"turn":1}[/rex-status]\n</字段与输出>';
+  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[status]{"turn":1}[/status]\n</字段与输出>';
   const res = validate(writeCard('protocol-missing', c));
   ok('协议未被消耗被告警', res.code === 0 && has(res, 'warnList', /规则消耗/));
 }
 {
   const c = card();
-  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[rex-status]{"turn":1}[/rex-status]\n</字段与输出>';
+  c.personality = PERSONA + '\n\n<字段与输出>\n[状态块]每轮输出[status]{"turn":1}[/status]\n</字段与输出>';
   c.regex_scripts = c.regex_scripts.concat([
-    { id: -9, scriptName: 'status-hide', findRegex: '/\\[rex-status\\][\\s\\S]*?\\[\\/rex-status\\]/', replaceString: '' }
+    { id: -9, scriptName: 'status-hide', findRegex: '/\\[status\\][\\s\\S]*?\\[\\/status\\]/', replaceString: '' }
   ]);
   const res = validate(writeCard('protocol-ok', c));
   ok('协议被消耗不误报', res.code === 0 && !has(res, 'warnList', /规则消耗/));
