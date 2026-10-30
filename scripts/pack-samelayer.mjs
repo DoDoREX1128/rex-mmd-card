@@ -5,7 +5,7 @@
  *        --out work/out --name my-card [--theme mytheme] [--opening 开场.txt] \
  *        [--persona 人设.txt] [--worldbook 世界书.json] [--limit 19000]
  * 产出:
- *   <out>/<name>-regex.json     5 键，chatVersion:0
+ *   <out>/<name>-regex.json     旧版四键，不带 chatVersion
  *   <out>/<name>-manifest.json  规则数 / 最大条 / 分片 / sha
  *   <out>/<name>-persona.txt    可选
  *   <out>/<name>-worldbook.json 可选
@@ -22,6 +22,7 @@ const outDir = path.resolve(opt('out', 'work/out'));
 const name = opt('name', 'card');
 const theme = opt('theme', name);
 const LIMIT = Number(opt('limit', 19000));
+if (!Number.isInteger(LIMIT) || LIMIT < 32 || LIMIT > 19000) throw Error('limit 必须是 32–19000 的整数');
 const MAX_RULE = 20000;
 
 const STATE = 'REXHUDSTATE';
@@ -61,7 +62,8 @@ if (!host.trim() || !frame.trim()) { console.error('host / frame 不能为空');
 
 const hChunks = sliceByEscapedBudget(host, LIMIT);
 const fChunks = sliceByEscapedBudget(frame, LIMIT);
-const ignite = opt('ignite', 'independent'); // independent | chain
+const ignite = opt('ignite', 'independent');
+if (!['independent', 'chain'].includes(ignite)) throw Error('ignite 必须是 independent 或 chain'); // independent | chain
 const marker = (n) => `【${MARK} ${String(n).padStart(3, '0')}】`;
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -74,14 +76,14 @@ codes.push(`<script>(()=>{const s=globalThis.${STATE}=Object.create(null);${acc(
 for (let i = 1; i < hChunks.length; i++) codes.push(wrap(acc('h', escapeJs(hChunks[i]))));
 for (let i = 0; i < fChunks.length; i++) codes.push(wrap(acc('f', escapeJs(fChunks[i]))));
 
-const launcher = `<script>(()=>{const s=globalThis.${STATE};if(!s||!s.h)throw new Error('REX HUD 载荷不完整');globalThis.${CONFIG}={theme:${JSON.stringify(theme)},frameScriptSource:s.f||''};const e=document.createElement('script');e.dataset.rexHud=${JSON.stringify(name)};e.textContent=s.h;(document.head||document.documentElement).appendChild(e);})()</script>`;
+const launcher = `<script>(()=>{const s=globalThis.${STATE};if(!s||!s.h||!s.f)throw new Error('REX HUD 载荷不完整');globalThis.${CONFIG}={theme:${JSON.stringify(theme)},frameScriptSource:s.f||''};const e=document.createElement('script');e.dataset.rexHud=${JSON.stringify(name)};e.textContent=s.h;(document.head||document.documentElement).appendChild(e);})()</script>`;
 codes.push(launcher);
 
 const rules = codes.map((code, i) => {
   const isLast = i === codes.length - 1;
   const tail = ignite === 'chain' && !isLast ? marker(i + 2) : '';
   return {
-    id: -(i + 1),
+    id: -1,
     scriptName: i === 0 ? 'hud-init'
       : i === codes.length - 1 ? 'hud-launch'
         : (i <= hChunks.length - 1 ? `hud-host-${String(i + 1).padStart(2, '0')}` : `hud-frame-${String(i - hChunks.length + 1).padStart(2, '0')}`),
@@ -91,13 +93,12 @@ const rules = codes.map((code, i) => {
 });
 
 const openingPath = opt('opening');
-const opening = openingPath ? read(openingPath) : '游戏页面已准备。顶部可返回原生聊天。';
+const opening = openingPath ? read(openingPath) : '页面已准备，可通过返回 MMD 入口使用原生聊天。';
 const allMarkers = rules.map((_, i) => marker(i + 1)).join('');
 const beginning = ignite === 'independent' ? opening + allMarkers : opening;
 const statusbar = ignite === 'independent' ? 'Rex HUD' : marker(1);
 
 const card = {
-  chatVersion: 0,
   pageDepth: 2,
   statusbar,
   beginning,

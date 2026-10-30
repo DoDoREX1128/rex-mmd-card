@@ -82,8 +82,8 @@ const html = `<!doctype html>
   document.getElementById('ico_chat_set_1').onclick = function () { alert('原生更多菜单（仿）'); };
   document.getElementById('ico_persona_1').onclick = function () { document.getElementById('dlg').classList.add('on'); };
   document.querySelector('.confirm-btn').onclick = function () { document.getElementById('dlg').classList.remove('on'); };
-  document.getElementById('reenter').onclick = function () { if (window.__REX_HUD_HOST__) window.__REX_HUD_HOST__.reenter(); };
-  document.getElementById('destroy').onclick = function () { if (window.__REX_HUD_HOST__) window.__REX_HUD_HOST__.destroy(); };
+  document.getElementById('reenter').onclick = function () { if (window.REXHUDHOST) window.REXHUDHOST.reenter(); };
+  document.getElementById('destroy').onclick = function () { if (window.REXHUDHOST) window.REXHUDHOST.destroy(); };
 </script>
 <script>
 ${host}

@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { LIMIT, parseArgs, fail } from './lib/facts.mjs';
+import { validateWorldbook } from './lib/worldbook.mjs';
 
 const { positional, opts } = parseArgs(process.argv);
 const input = positional[0];
@@ -38,7 +39,7 @@ if (Array.isArray(raw)) {
 }
 
 if (!entries || typeof entries !== 'object') fail('entries 不是对象或数组', 1);
-if (droppedRoot.length) note.push('根对象多余键已丢弃（平台只认 entries）: ' + droppedRoot.join(', '));
+if (droppedRoot.length) note.push('根元数据保留在输入文件；指定 --out 时另写 -source.json，导入文件仅含 entries: ' + droppedRoot.join(', '));
 
 const isArr = Array.isArray(entries);
 const list = isArr ? entries.map((e, i) => [String(i), e]) : Object.entries(entries);
@@ -109,12 +110,15 @@ list.forEach(([k, e], i) => {
 });
 
 const result = { entries: out };
+const checked = validateWorldbook(result);
+if (checked.errors.length) fail('规范化后仍不合法，未写输出：\n' + checked.errors.join('\n'), 1);
 const text = JSON.stringify(result, null, 2);
 
 if (opts.out) {
   const p = path.resolve(opts.out);
   fs.mkdirSync(path.dirname(p), { recursive: true });
   fs.writeFileSync(p, text, 'utf8');
+  if (droppedRoot.length) fs.writeFileSync(p.replace(/\.json$/i, '') + '-source.json', JSON.stringify(raw, null, 2), 'utf8');
 }
 
 if (!opts.quiet) {

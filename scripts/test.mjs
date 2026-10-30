@@ -243,24 +243,24 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   const c = card();
   c.personality = '禾安是种子铺守护人。';
   const res = validate(writeCard('persona-bad', c));
-  ok('人设缺骨架只告警', res.code === 0 && has(res, 'warnList', /既没有 <角色设定>/));
+  ok('自由正文不要求骨架', res.code === 0 && !has(res, 'warnList', /骨架/));
 }
 {
   const c = card();
   c.personality = `<世界观>\n雨多年不停。\n</世界观>\n\n${PERSONA}`;
   const res = validate(writeCard('persona-world', c));
-  ok('非标准首块只告警', res.code === 0 && has(res, 'warnList', /人设首块/));
+  ok('自定义首块不被施加模板', res.code === 0 && !has(res, 'warnList', /人设首块/));
 }
 {
   const c = card();
   c.personality = PERSONA.replace(/\[句式禁忌\][\s\S]*?(?=\n\[|\n<\/约束规则>)/, '');
   const res = validate(writeCard('persona-no-syntax', c));
-  ok('人设缺 [句式禁忌] 只告警', res.code === 0 && has(res, 'warnList', /缺 \[句式禁忌\]/));
+  ok('人设无需禁令清单', res.code === 0 && !has(res, 'warnList', /缺 \[句式禁忌\]/));
 }
 {
   const c = card();
   c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他不是本地人，是七年前来的货郎');
-  const res = validate(writeCard('persona-neg-first', c));
+  const res = validate(writeCard('persona-neg-first', c), ['--style-lint']);
   ok('先否定再肯定的句式被告警', res.code === 0 && has(res, 'warnList', /先否定再肯定/));
 }
 {
@@ -278,19 +278,19 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
 {
   const c = card();
   c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他的武力可以直接对抗建制');
-  const res = validate(writeCard('ban-jargon', c));
+  const res = validate(writeCard('ban-jargon', c), ['--style-lint']);
   ok('术语腔被告警', res.code === 0 && has(res, 'warnList', /术语腔/));
 }
 {
   const c = card();
   c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-称号就是权限');
-  const res = validate(writeCard('ban-flat', c));
+  const res = validate(writeCard('ban-flat', c), ['--style-lint']);
   ok('生硬比喻被告警', res.code === 0 && has(res, 'warnList', /生硬比喻/));
 }
 {
   const c = card();
   c.personality = PERSONA.replace('-左手腕的旧伤阴雨天会疼', '-他不识字，看不懂任何告示与书信。\n-他不识字，看不懂任何告示与书信。');
-  const res = validate(writeCard('ban-repeat', c));
+  const res = validate(writeCard('ban-repeat', c), ['--style-lint']);
   ok('同段重复被告警', res.code === 0 && has(res, 'warnList', /同段重复/));
 }
 {
@@ -322,7 +322,7 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   const wb = path.join(tmp, 'wb-bad.json');
   fs.writeFileSync(wb, JSON.stringify({ entries: [] }), 'utf8');
   const res = validate(writeCard('with-wb', card()), ['--worldbook', wb]);
-  ok('世界书 entries 为数组被拦截', res.code === 1 && has(res, 'errorList', /必须是对象/));
+  ok('世界书 entries 为数组被拦截', res.code === 1 && res.json.errors > 0);
 }
 {
   const wb = path.join(tmp, 'wb-ok.json');
@@ -337,7 +337,7 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   fs.writeFileSync(wb, JSON.stringify({ entries: {
     0: { uid: 0, key: '["雨"]', comment: '天气', content: '雨多年不停。这不是雨，是天上在倒水。', constant: true, probability: '100.00' }
   } }), 'utf8');
-  const res = validate(writeCard('with-wb-neg', card()), ['--worldbook', wb]);
+  const res = validate(writeCard('with-wb-neg', card()), ['--worldbook', wb, '--style-lint']);
   ok('世界书里的先否定后肯定被告警', res.code === 0 && has(res, 'warnList', /命中句式禁令「先否定再肯定」/));
 }
 

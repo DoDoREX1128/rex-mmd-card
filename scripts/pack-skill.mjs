@@ -14,7 +14,7 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ?
 const out = path.resolve(arg('out', path.join(root, 'dist', 'rex-mmd-skill')));
 const force = process.argv.includes('--force');
 
-const SHIP = ['SKILL.md', 'README.md', 'facts.json', 'references', 'scripts', 'assets', 'examples'];
+const SHIP = ['SKILL.md', 'README.md', 'LICENSE', 'facts.json', 'references', 'scripts', 'assets', 'examples'];
 const SKIP_DIR = new Set(['work', 'test', 'dist', 'node_modules', '.git', '.idea', '.vscode']);
 const SKIP_FILE = /\.(tmp\.html|log)$/i;
 

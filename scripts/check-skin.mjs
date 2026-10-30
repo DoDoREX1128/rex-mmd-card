@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* check-skin.mjs · 皮肉原创性检查
+/* check-skin.mjs · 视觉相似度提示（不证明原创或授权）
  * 用法: node check-skin.mjs --tokens assets/skin/tokens.json
  * 退出码: 0 通过（可能有 warn）；1 有 error；2 用法错误
  */
@@ -57,7 +57,7 @@ for (const [key, ex] of Object.entries(examples)) {
 
 for (const [k, c] of Object.entries(parsed)) {
   const exactHit = exColors.find((e) => e.hex.toLowerCase() === String(colors[k]).toLowerCase());
-  if (exactHit) { err(`colors.${k} 与示例 ${exactHit.name} 的 ${exactHit.hex} 完全相同`); continue; }
+  if (exactHit) { warn(`colors.${k} 与示例 ${exactHit.name} 的 ${exactHit.hex} 完全相同`); continue; }
   // 深色底/面天然接近，不参与"雷同"判定
   if (lum(c) < 0.12) continue;
   const near = exColors
@@ -74,14 +74,14 @@ for (const [k, c] of Object.entries(parsed)) {
 const brightClose = Object.entries(parsed).filter(([, c]) => lum(c) >= 0.12).filter(([k, c]) =>
   exColors.some((e) => dist(c, e.rgb) < 30 && e.hex.toLowerCase() !== String(colors[k]).toLowerCase())
 );
-if (brightClose.length >= 2) err(`有 ${brightClose.length} 个主色与示例过近（${brightClose.map(([k]) => k).join(',')}），换一套配色`);
+if (brightClose.length >= 2) warn(`有 ${brightClose.length} 个主色与示例过近（${brightClose.map(([k]) => k).join(',')}），换一套配色`);
 
 /* 字体 */
 if (tokens.fonts) {
   const mine = norm(tokens.fonts.display) + ' ' + norm(tokens.fonts.body) + ' ' + norm(tokens.fonts.num || '');
   for (const [key, ex] of Object.entries(examples)) {
     for (const f of ex.fonts || []) {
-      if (mine.includes(norm(f))) err(`字体直接用了示例 ${ex.name} 的 ${f}`);
+      if (mine.includes(norm(f))) warn(`字体直接用了示例 ${ex.name} 的 ${f}`);
     }
   }
 }
@@ -104,5 +104,5 @@ console.log(tokensPath);
 console.log(`颜色 ${Object.keys(colors).length} 个 · 字体 ${tokens.fonts ? Object.keys(tokens.fonts).length : 0} 个 · 质感 ${tokens.texture || '-'}`);
 E.forEach((m) => console.log('  ERROR ' + m));
 W.forEach((m) => console.log('  WARN  ' + m));
-if (E.length) { console.log('\n结论: 皮肉不够原创（先改配色/字体再交付）'); process.exit(1); }
-console.log('\n结论: 皮肉检查通过（人工再看一遍灰模同构、彩模异质）');
+if (E.length) { console.log('\n结论: 检测到相似度信号，需按用户参考意图人工判断；不作为原创性结论'); process.exit(1); }
+console.log('\n结论: 未触发当前相似度阈值，不证明原创或授权');

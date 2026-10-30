@@ -104,7 +104,9 @@
       });
     },
     detail: function (R, key) {
-      return REX.dossierHTML ? REX.dossierHTML(R, key) : U.empty('档案模块未加载');
+      if (REX.dossierHTML) return REX.dossierHTML(R,key);
+      var n=R.npcByKey(key);
+      return n ? U.card(n.name, U.prose(n.title || '') + U.prose(n.thought || '') + (n.surface || []).map(function(x){return U.row(x[0],x[1]);}).join('')) : U.empty('暂无人物资料');
     },
     after: function (R, host, key) {
       if (REX.bindDossier) REX.bindDossier(R, host, key);
@@ -262,7 +264,7 @@
   };
 
   REX.actions.export = function (R, el) {
-    var txt = JSON.stringify({ v: 2, data: R.data, nav: R.state.nav, key: R.state.key });
+    var txt = R.exportSave();
     R.fillInput('【进度存档】\n' + txt);
     R.toast('已写入输入框，复制保存即可');
   };
@@ -273,7 +275,7 @@
   };
   REX.actions.wipe2 = function (R) {
     var p = R.data.player || {};
-    R.reset();
+    R.reset(true);
     if (p.name) R.data.player = {};
     R.toast('进度已清除');
     R.go('cover');

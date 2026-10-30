@@ -1,0 +1,11 @@
+{
+  "beginning": "雨停了。守船人抬头看向 {{user}}，等候回应。",
+  "statusbar": "",
+  "regex_scripts": [
+    {
+      "scriptName": "native-status",
+      "findRegex": "/\\[status\\]hp::(\\d{1,3});;loc::([^<>\\[\\]\\n]{0,40})\\[\\/status\\]/g",
+      "replaceString": "<div class=\"rex-native-status\">体力 $1 · 地点 $2</div>"
+    }
+  ]
+}

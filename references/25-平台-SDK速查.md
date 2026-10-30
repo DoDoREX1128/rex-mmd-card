@@ -34,7 +34,7 @@
 | `cache.remove` | `key` | `void` | sync | 可用 | |
 | `save.get` | `key` | `unknown` | sync | **同步抛 SdkError** | 必须 `try/catch` |
 | `save.set` | `key`, `value` | `Promise<void>` | async | NOT_SUPPORTED | 20 次/60s |
-| `save.remove` | `key` | `Promise<void>` | async | NOT_SUPPORTED | **真机坏死**，见 §3.1 |
+| `save.remove` | `key` | `Promise<void>` | async | NOT_SUPPORTED | **历史目标探针故障**，见 §3.1 |
 | `save.keys` | — | `string[]` | sync | **同步抛 SdkError** | 必须 `try/catch` |
 | `stage.open` | `'content' \| 'full'` | `void` | sync | 可用 | |
 | `stage.close` | — | `void` | sync | 可用 | 不自发 `stage:close` |
@@ -72,9 +72,9 @@ input:change  conversation:switch  theme:change  back  stage:close  dispose
 
 ## 3. 六个必记的坑
 
-### 3.1 `save.remove` 真机坏死
+### 3.1 `save.remove` 历史目标探针故障
 
-就绪态也稳定抛 `NETWORK`，重试无效。删档改用 `save.set(key, null)`，读的时候把 `null` 当"无存档"。
+历史样本就绪态抛 `NETWORK`，该样本重试无效，当前部署需复验。删档改用 `save.set(key, null)`，读的时候把 `null` 当"无存档"。
 
 ```js
 async function dropSave(key) {

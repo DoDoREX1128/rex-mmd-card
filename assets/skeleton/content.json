@@ -1,113 +1,53 @@
 {
-  "_note": "骨架自带的空模板，不是案例。所有字段都要按题材重写；改完再跑 build。字段含义见 references/02-卡架构.md 第 6 节。",
   "meta": {
     "name": "template",
-    "title": "卡名",
-    "subtitle": "一句话副标题（写世界观，不写玩法）",
-    "version": "1.0",
-    "adult": true,
-    "defaultName": "无名客",
-    "opening": "（开场第一段：一个正在发生的动作或环境细节，不写世界史。）\n\n（第二段：主角在场但还没被点名，第二人称。）\n\n（第三段：留一个钩子 —— 一句没说完的话、一个正在靠近的人、一件缺的东西。）"
+    "title": "旅人手册",
+    "subtitle": "从一段对话开始",
+    "version": "2.0",
+    "defaultName": "旅人",
+    "adult": false,
+    "opening": "渡口的灯刚亮。守船人把一封没有署名的信递给 {{user}}。"
   },
-  "theme": {
-    "bg": "#0d0b0a",
-    "surface": "#171310",
-    "surface2": "#1e1a16",
-    "line": "#2b2520",
-    "text": "#f2ece0",
-    "dim": "#9a8f80",
-    "accent": "#c9a227",
-    "accent2": "#7a1f1f"
+  "features": {
+    "cover": false,
+    "forge": false,
+    "bodyDossier": false
+  },
+  "storage": {
+    "key": "rex:template",
+    "maxSlots": 8
   },
   "world": {
-    "era": "（时代与地点，一句）",
-    "rule": "（世界规则：力量或资源的来源与代价，一句）",
-    "cost": "（玩家每轮要付的成本，一句）",
-    "forbidden": "（这个世界里绝对不能做的事，一句）"
+    "era": "河畔小镇",
+    "rule": "人物只知道自己接触到的信息"
   },
   "player": {
-    "fields": [
-      { "key": "name", "label": "姓名", "type": "text", "max": 12 },
-      { "key": "gender", "label": "性别", "type": "choice", "options": ["男", "女"] },
-      { "key": "race", "label": "出身", "type": "choice", "options": ["（出身一）", "（出身二）", "（出身三）"] },
-      { "key": "trait", "label": "倾向", "type": "choice", "options": ["（倾向一）", "（倾向二）", "（倾向三）"] },
-      { "key": "power", "label": "战力", "type": "choice", "options": ["（弱）", "（中）", "（强）"] },
-      { "key": "origin", "label": "初始所在地", "type": "choice", "source": "map.nodes" },
-      { "key": "background", "label": "背景补充", "type": "text", "multiline": true, "optional": true }
-    ]
+    "fields": []
   },
   "status": {
     "fields": [
-      { "key": "hp", "label": "体力", "type": "bar", "max": 100 },
-      { "key": "desire", "label": "欲望", "type": "bar", "max": 100 },
-      { "key": "intimacy", "label": "亲密", "type": "bar", "max": 100 },
-      { "key": "loc", "label": "所在", "type": "text" },
-      { "key": "region", "label": "区域", "type": "text" },
-      { "key": "t", "label": "时", "type": "text" },
-      { "key": "flags", "label": "记号", "type": "tags" }
+      {
+        "key": "hp",
+        "label": "体力",
+        "type": "bar",
+        "max": 100
+      },
+      {
+        "key": "loc",
+        "label": "地点",
+        "type": "text"
+      },
+      {
+        "key": "flags",
+        "label": "状态",
+        "type": "tag"
+      }
     ]
   },
   "map": {
-    "nodes": [
-      { "id": "n1", "name": "（地点一）", "x": 22, "y": 68, "links": ["n2"], "note": "（一句话描述）" },
-      { "id": "n2", "name": "（地点二）", "x": 52, "y": 44, "links": ["n1", "n3"], "note": "（一句话描述）" },
-      { "id": "n3", "name": "（地点三）", "x": 78, "y": 24, "links": ["n2"], "note": "（一句话描述）" }
-    ]
+    "nodes": []
   },
-  "npcs": [
-    {
-      "key": "npc1",
-      "name": "（角色甲）",
-      "sex": "f",
-      "title": "（身份）",
-      "faction": "（立场）",
-      "rank": "",
-      "surface": [
-        ["性别", "女"],
-        ["年龄", "（年龄）"],
-        ["身份", "（身份）"],
-        ["立场", "（立场）"],
-        ["忌讳", "（不能碰的话题）"]
-      ],
-      "hooks": ["（一句话印象，写成观察，不写成设定）"],
-      "thought": "（此刻心里在想什么。一句话，写成没说出口的话。）",
-      "priv": {
-        "口腔": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" },
-        "乳房": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" },
-        "子宫": {
-          "st": "", "ml": 0, "fixed": "（不会变的事实）", "rt": "—",
-          "spec": [["是否处女", "（是/否）"], ["受精几率", "（0–100%）"], ["生理周期", "（周期）"], ["受精状态", "（是/否）"], ["妊娠时间", "（天数）"]]
-        },
-        "阴部": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" },
-        "后庭": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" }
-      }
-    },
-    {
-      "key": "npc2",
-      "name": "（角色乙）",
-      "sex": "m",
-      "title": "（身份）",
-      "faction": "（立场）",
-      "rank": "",
-      "surface": [
-        ["性别", "男"],
-        ["年龄", "（年龄）"],
-        ["身份", "（身份）"],
-        ["特征", "（一处身体特征）"],
-        ["立场", "（立场）"]
-      ],
-      "hooks": ["（一句话印象）"],
-      "thought": "（此刻心里在想什么。一句话，写成没说出口的话。）",
-      "priv": {
-        "阴茎": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" },
-        "阴囊": { "st": "干净", "ml": 0, "fixed": "（不会变的事实）", "rt": "—" }
-      }
-    }
-  ],
-  "codex": [
-    { "id": "c1", "title": "（词条一）", "content": "（两句话能说清才写，说不清就砍）", "unlock": "start" }
-  ],
-  "bag": [
-    { "id": "i1", "name": "（物件）", "type": "（类型）", "n": 1, "desc": "（一句话）" }
-  ]
+  "npcs": [],
+  "codex": [],
+  "bag": []
 }

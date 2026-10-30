@@ -222,7 +222,7 @@
 
   REX.fillInput = function (text) {
     var r = this.tryCall('input.set', [text]);
-    if (r.ok) { this.tryCall('input.focus', []); return true; }
+    if (r.ok) { Promise.resolve(r.val).catch(function(){REX.toast('输入框写入失败，草稿已保留');}); this.tryCall('input.focus', []); return true; }
     var s = this.slots();
     if (s.input) {
       try {
@@ -236,47 +236,7 @@
     return false;
   };
 
-  /* ================= 存档 ================= */
-
-  REX.saveGet = function (k) {
-    var r = this.tryCall('save.get', [k]);
-    if (r.ok) return r.val;
-    try { return JSON.parse(W.localStorage.getItem('rex:' + k) || 'null'); } catch (e) { return null; }
-  };
-  REX.saveSet = function (k, v) {
-    var r = this.tryCall('save.set', [k, v]);
-    if (r.ok) return;
-    try { W.localStorage.setItem('rex:' + k, JSON.stringify(v)); } catch (e) { this.log('save fail'); }
-  };
-
-  REX.persist = function (now) {
-    var self = this;
-    var run = function () {
-      self.saveSet('rex', { v: 2, data: self.data, nav: self.state.nav, key: self.state.key });
-    };
-    clearTimeout(this._saveH);
-    if (now) { run(); return; }
-    this._saveH = setTimeout(run, 300);
-  };
-
-  REX.applySave = function (saved) {
-    if (!saved || saved.v !== 2) return false;
-    var d = saved.data || {}, keys = ['player', 'status', 'world', 'npcs', 'codex', 'bag', 'log', 'flags', 'opt', 'map'];
-    for (var i = 0; i < keys.length; i++) if (d[keys[i]] != null) this.data[keys[i]] = d[keys[i]];
-    if (saved.nav && this.sections[saved.nav]) this.state.nav = saved.nav;
-    if (saved.key) this.state.key = saved.key;
-    this.state.hasSave = !!(this.data.player && this.data.player.name);
-    return this.state.hasSave;
-  };
-
-  REX.reset = function () {
-    this.data = { player: {}, status: {}, world: {}, npcs: {}, codex: {}, bag: [], log: [], flags: [], opt: [], map: {} };
-    this.state.hasSave = false;
-    this.state.nav = this.order[0] || '';
-    this.state.key = null;
-    this.saveSet('rex', null);
-    this.refresh();
-  };
+  /* Persistence lives in store.js; keep one runtime authority. */
 
   /* ================= 装配 ================= */
 
@@ -291,8 +251,8 @@
 
     /* 左：导航 + 简要信息；右：全部信息。优先用平台槽，没有就自建同层 dock */
     if (this.state.mode === 'wide') {
-      var dl = s.left || s.dockL || this.mkDock('L');
-      var dr = s.right || s.dockR || this.mkDock('R');
+      var dl = s.dockL || this.mkDock('L');
+      var dr = s.dockR || this.mkDock('R');
       s.dockL = dl; s.dockR = dr;
       dl.className = 'rex-dockL'; dr.className = 'rex-dockR';
       dl.innerHTML = '<div class="rex-rail"><nav class="rex-nav"></nav>' +
@@ -315,7 +275,7 @@
 
     if (!s.root._rexBound) {
       s.root._rexBound = 1;
-      s.root.addEventListener('click', function (e) {
+      this.listen(s.root, 'click', function (e) {
         var t = e.target, hit;
         if ((hit = t.closest && t.closest('[data-nav]'))) { self.nav(hit.getAttribute('data-nav')); return; }
         if ((hit = t.closest && t.closest('[data-key]'))) { self.pick(hit.getAttribute('data-key')); return; }
@@ -342,8 +302,8 @@
         }
         self.metrics();
       };
-      W.addEventListener('resize', onSize);
-      W.addEventListener('orientationchange', onSize);
+      this.listen(W,'resize',onSize);
+      this.listen(W,'orientationchange',onSize);
     }
     return true;
   };
@@ -352,6 +312,7 @@
     var self = this;
     var tries = 0;
     var tick = function () {
+      if (self.disposed) return;
       var s = self.slots(true);
       var ready = s.root && (s.msgs || s.comp || s.left || s.hdr);
       if (!ready && tries++ < 40) { setTimeout(tick, 120); return; }
@@ -364,9 +325,9 @@
       if (has) {
         self.refresh();
         if (self.stageVisible()) self.stageClose();
-      } else {
+      } else if ((self.content().features || {}).cover) {
         self.go('cover');
-      }
+      } else { self.refresh(); }
       self.log('boot', self.state.mode, has ? 'resume' : 'new');
     };
     tick();

@@ -6,6 +6,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { validateWorldbook } from './lib/worldbook.mjs';
+import { inspectHostCss } from './lib/host-css.mjs';
 import {
   LIMIT, F, CAPS_SET, NAMESPACES, EVENTS_SET, ABSENT, PENDING,
   SENTENCE_BANS, CONTENT_PROTOCOL,
@@ -35,6 +37,10 @@ try {
   process.exit(1);
 }
 ran('BOM 与 JSON 语法');
+if (!card || typeof card !== 'object' || Array.isArray(card)) fail('角色导入包必须是 JSON 对象', 1);
+for (const key of ['statusbar', 'beginning']) if (typeof card[key] !== 'string') err(`${key} 必须是字符串`);
+if ('personality' in card && typeof card.personality !== 'string') err('personality 必须是字符串');
+if (!Number.isInteger(card.pageDepth)) err('pageDepth 必须是整数');
 
 /* ---------- 平台判定 ---------- */
 const raw = String(opts.platform || 'auto').toLowerCase();
@@ -45,7 +51,7 @@ if (!platform || !F.versions[platform]) fail(`无法判定平台：chatVersion=$
 const V = spec(platform);
 const isSandbox = platform === 'sandbox';
 
-if (isSandbox && Number(card.chatVersion) !== 1) {
+if (isSandbox && card.chatVersion !== 1) {
   err(`新版沙盒卡 chatVersion 必须是 1，当前 ${JSON.stringify(card.chatVersion)}；写 0 会落到旧页，sdk.* 与 [data-chat] 全部不存在且无报错`);
 }
 if (!isSandbox && Number(card.chatVersion) === 1) {
@@ -68,8 +74,8 @@ ran('顶层键白名单');
 if (card.pageDepth !== V.pageDepth) warn(`pageDepth 建议为 ${V.pageDepth}，当前 ${JSON.stringify(card.pageDepth)}`);
 
 const sbLen = String(card.statusbar || '').length;
-if (!String(card.statusbar || '').trim()) err('statusbar 为空');
-else if (sbLen > LIMIT.statusbar) err(`statusbar ${sbLen} 字，超过 ${LIMIT.statusbar}`);
+// An empty statusbar is valid for prose-only and theme-only cards.
+if (sbLen > LIMIT.statusbar) err(`statusbar ${sbLen} 字，超过 ${LIMIT.statusbar}`);
 
 const begLen = String(card.beginning || '').length;
 if (!String(card.beginning || '').trim()) err('beginning 为空');
@@ -103,12 +109,13 @@ else {
     if (ex.length) err(`${tag} 多出键: ${ex.join(',')}`);
     if (mi.length) err(`${tag} 缺键: ${mi.join(',')}`);
 
-    if (typeof r.id !== 'number' || r.id >= 0) err(`${tag} id 必须是负数`);
+    if (!Number.isInteger(r.id) || r.id >= 0) err(`${tag} id 必须是负数`);
     if (!isSandbox && r.id !== -1) err(`${tag} 旧版规则 id 必须固定 -1，当前 ${r.id}；旧版导入按 -1 识别规则`);
     if ((r.scriptName || '').length > LIMIT.scriptName) err(`${tag} scriptName 超过 ${LIMIT.scriptName} 字`);
 
     const fr = String(r.findRegex ?? '');
     const rs = String(r.replaceString ?? '');
+    for (const k of ['scriptName', 'findRegex', 'replaceString']) if (typeof r[k] !== 'string') err(`${tag} ${k} 必须是字符串`);
     if (fr.length > LIMIT.findRegex) err(`${tag} findRegex ${fr.length} 字，超过 ${LIMIT.findRegex}`);
     if (rs.length > LIMIT.replaceString) {
       err(`${tag} replaceString ${rs.length} 字，超过编辑器上限 ${LIMIT.replaceString}（超限表现为整条改动不保存，不是截断）`);
@@ -141,7 +148,7 @@ else {
     const mk = /^\/(?:【|<)(rex-[a-z0-9-]+)(?:】|>)\/$/.exec(trimmed);
     if (mk) {
       const name = mk[1];
-      const visible = !isScriptFirst(rs) && /<(div|button|span|section|svg|ul|table|canvas)\b/i.test(rs);
+      const visible = /<(div|button|span|section|svg|ul|table|canvas)\b/i.test(visiblePart(rs));
       if (visible) {
         const src = String(card.beginning || '') + '\n' + String(card.statusbar || '');
         if (!src.includes(marker(name)) && !src.includes(`<${name}>`)) {
@@ -153,7 +160,8 @@ else {
     /* CSS：全局选择器、z-index、主题变量 */
     styleBlocks(rs).forEach((css) => {
       const bare = stripStringsAndComments(css);
-      if (/(^|\n)\s*(?:html|body|\*|:root)\s*\{/i.test(bare)) {
+      if (isSandbox) inspectHostCss(css).forEach(m => err(`${tag} ${m}`));
+      if (isSandbox && /(^|\n)\s*(?:html|body|\*|:root)\s*\{/i.test(bare)) {
         err(`${tag} <style> 里出现全局选择器（* / html / body / :root），应改为 [data-chat="root"] 作用域`);
       }
       for (const m of bare.matchAll(/z-index\s*:\s*(-?\d+)/gi)) {
@@ -174,23 +182,22 @@ else {
 
     /* 净化与 Markdown */
     const visible = visiblePart(rs);
-    if (/\b(?:iframe|link|meta|base|form|object|embed)\b/i.test(visible)) {
+    if (isSandbox && /<(?:iframe|link|meta|base|form|object|embed)\b/i.test(visible)) {
       warn(`${tag} 可见 HTML 里出现白名单外标签（iframe/link/meta/base/form/object/embed），会被净化删除`);
     }
-    if (/\n {4,}</.test(visible)) warn(`${tag} 可见 HTML 有四空格缩进，Markdown 会当成代码块`);
-    if (/\bdata-[a-z][\w-]*=/.test(visible)) {
-      const allowed = /data-(?:rex|chat|slot|host)[\w-]*=/.test(visible);
-      if (!allowed) warn(`${tag} 静态标记里出现自写 data-* 属性，会被净化删除；改用 class/id`);
-    }
+    if (/\n {4,}</.test(visible)) warn(`${tag} 建议 HTML 顶格；四空格的实际处理依目标版本，不作为必然故障判断`);
+    if (isSandbox && /\bdata-[a-z][\w-]*=/.test(visible)) warn(`${tag} 静态标记里出现自写 data-* 属性，会被净化删除；改用 class/id`);
+    if (isSandbox && /<img\b[^>]*\bonerror\s*=/i.test(visible)) err(`${tag} 新版不能使用 img onerror 点火器；使用 script 与 SDK 生命周期`);
 
     /* SDK：先剥字符串与注释，避免把日志文案当调用 */
     if (isSandbox) {
       const code = stripStringsAndComments(rs);
-      for (const m of code.matchAll(/\bsdk\.([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?)/g)) {
+      for (const m of code.matchAll(/\bsdk\.([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)/g)) {
         const name = m[1];
         sdkNames.push(name);
         const head = name.split('.')[0];
-        if (CAPS_SET.has(name) || CAPS_SET.has(head) || NAMESPACES.has(head)) continue;
+        if (CAPS_SET.has(name)) continue;
+        if (name === head && NAMESPACES.has(head) && !/^\s*\(/.test(code.slice(m.index + m[0].length))) continue;
         /* 平台状态变量：已确认存在、契约未公布。讲边界可以，判「不存在」不行 */
         if (PENDING.has(name) || PENDING.has(head) || head === 'vars') {
           warn(`${tag} sdk.${name} 属平台状态变量：业务规则已确认存在（仅新页、最多 6 层 80 键、按楼层回溯），但官方 contract.json 未公布参数与返回值。可以讲边界，不能编造签名；本项按「契约未补齐」处理，不判不存在`);
@@ -213,8 +220,8 @@ else {
       }
       if (/message:mount[\s\S]{0,600}?sdk\.on\s*\(/.test(code)) warn(`${tag} 疑似把 sdk.on 写进 message:mount 回调，每挂一条气泡会多订一份订阅`);
       if (/message:mount[\s\S]{0,600}?message-body/.test(code)) warn(`${tag} 在 message:mount 里读 message-body 当正文，会读到「消息生成中」占位`);
-    } else if (/sdk\.[a-zA-Z]+\s*\(/.test(rs)) {
-      warn(`${tag} 旧版卡里调用了 sdk.*（只有新页存在这些接口）`);
+    } else if (/\bsdk\.[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*\(/.test(stripStringsAndComments(rs))) {
+      err(`${tag} 旧版卡里调用了 sdk.*（只有新页存在这些接口）`);
     }
   });
 
@@ -245,7 +252,7 @@ if (leftovers.length) err('这些注入标记没有规则匹配，会原样显�
 ran('标记点火覆盖');
 
 /* ---------- 人设 ---------- */
-/* 句式禁令四项（facts.sentenceBans）：人设 / 世界书 / 开场白三处同受约束。
+/* 句式禁令四项（facts.sentenceBans）：仅在显式 --style-lint 时给笔记体偏好提示。
    2026-10-29 起全部只报 WARN，不做硬拦截——格式交给 Agent 自查，门禁只管平台会坏的东西。 */
 const declLine = (line) => /句式禁忌|禁止|禁忌|禁用|反例|✗/.test(line);
 const JARGON = ['外显', '建制', '成正比', '位移', '闭环', '赋能', '维度', '底层逻辑'];
@@ -322,7 +329,7 @@ function reportAiTone(label, text) {
   if (causal >= 1) flags.push(`因果词 ${causal} 处`);
   if (dash >= 4) flags.push(`破折号 ${dash} 处`);
   if (flags.length) {
-    warn(`${label} 有 AI 腔特征：${flags.join('；')}。人设是笔记不是文章，见 32 §0 / §4`);
+    warn(`${label} 有 AI 腔特征：${flags.join('；')}。可按当前文风保留或调整；这些是单样本偏好，不判断质量或作者身份`);
   }
   return flags.length;
 }
@@ -336,33 +343,8 @@ if (opts.persona) {
 if (personaText) {
   if (/<script|<style|sdk\./i.test(personaText)) err('人设里出现 HTML / 脚本 / sdk 调用（人设只放自然语言）');
   if (/\{\{char\}\}|\$#char#\$|\$#user#\$/.test(personaText)) err('人设用了 {{char}} / $#char#$ / $#user#$，应写真实角色名 + {{user}}');
-  /* 两种骨架都接受：旧式子（<角色设定 名字：X>）与 v2 六块（<前提> + <主要角色>）。
-     2026-10-29 起结构问题一律 WARN，不阻断交付（用户裁决：人设格式不做硬拦截）。 */
-  const hasLegacyBox = /<\/?角色设定/.test(personaText);
-  const hasV2 = /<前提[\s：指]/.test(personaText) && /<主要角色/.test(personaText);
-  if (!hasLegacyBox && !hasV2) {
-    warn('人设既没有 <角色设定> 块，也没有 v2 骨架（<前提> + <主要角色>），确认是否有意为之');
-  }
-  if (hasLegacyBox && hasV2) warn('人设同时出现旧式 <角色设定> 与 v2 六块，确认是否有意混用');
-
-  const mc = personaText.match(/<主要角色>([\s\S]*?)<\/主要角色>/);
-  if (mc && !/-<主角[:：]/.test(mc[1])) warn('<主要角色> 里缺 -<主角：姓名> 子块');
-  if (personaText.includes('<主要角色>') && !mc) warn('<主要角色> 没有闭合');
-
-  /* 约束规则：v2 建议写 [句式禁忌] 并把四项禁令逐条列出；缺项只提示，不拦 */
-  const constrain = personaText.match(/<约束规则>([\s\S]*?)<\/约束规则>/);
-  if (hasV2 && !constrain) warn('v2 人设缺 <约束规则>：建议写入 [对话禁忌] 与四项 [句式禁忌]');
-  if (constrain && !/\[句式禁忌\]/.test(constrain[1])) {
-    /* 允许两种写法：单开 [句式禁忌]，或把四项并进 [对话禁忌]。后者是作者亲修稿的写法 */
-    const inlineBans = /不是[^，。；！？\n]{0,14}?[，,]?(?:而是|是)/.test(constrain[1])
-      && /外显|建制|成正比|位移|闭环|赋能|维度|底层逻辑/.test(constrain[1])
-      && /重复/.test(constrain[1]);
-    if (!inlineBans) {
-      warn('<约束规则> 缺 [句式禁忌]：建议把四项禁令（先否定再肯定 / 生硬比喻 / 术语腔 / 同段重复）逐条写进去，或并进 [对话禁忌]');
-    }
-  }
-  reportBans('人设', personaText);
-  reportAiTone('人设', personaText);
+  if (opts['style-lint']) { reportBans('人设', personaText); reportAiTone('人设', personaText); }
+  if (/【待填写|\(待填写|（待填写/.test(personaText)) (opts.publish || opts.release ? err : warn)('人设仍有待填写占位内容');
   if (/\[status\]/.test(personaText)) {
     const consumed = (rules || []).some((r) => String(r.findRegex || '').includes('status'));
     if (!consumed) {
@@ -375,33 +357,7 @@ if (personaText) {
   if (/[✅⭕]/.test(personaText)) warn('人设里残留 ✅ / ⭕ 选型标记，产出前应删掉');
   if (!/\{\{user\}\}/.test(personaText)) warn('人设里没有 {{user}}');
 
-  const stack = [];
-  const tags = personaText.match(/<\/?([\u4e00-\u9fffA-Za-z][\w\u4e00-\u9fff]*)(?:[\s：][^>]*)?>/g) || [];
-  let pairs = 0;
-  /* 单行块：<名字：内容> 自成一段，不闭合。新增单行块时加进这个集合 */
-  const SELF_CLOSING = new Set(['前提']);
-  tags.forEach((t) => {
-    const close = /^<\//.test(t);
-    const name = /^<\/?([^\s>：/]+)/.exec(t)[1];
-    if (!close && SELF_CLOSING.has(name)) return;
-    if (!close) stack.push(name);
-    else {
-      const top = stack.pop();
-      pairs++;
-      if (top !== name) warn(`人设标签交叉/不匹配：闭合 </${name}> 时栈顶是 <${top}>`);
-    }
-  });
-  if (stack.length) warn('人设标签未闭合: ' + stack.join(','));
-  if (pairs < 3) warn(`人设成对标签只有 ${pairs} 组（建议 ≥3）`);
-  if (/^【[^】]+】\s*$/m.test(personaText)) warn('人设里出现【章节】方括号标题，应改为成对标签');
-  if (/^#{1,6}\s/m.test(personaText)) warn('人设里出现 Markdown 标题');
-
-  /* <前提：…> 是全角冒号开头的单行块，取块名时要连同冒号一起截断，否则会把整句当成块名 */
-  const first = (personaText.trim().match(/^<([^\s>/：:]+)/) || [])[1];
-  const OK_FIRST = new Set(['角色设定', '角色设置', '前提']);
-  if (first && !OK_FIRST.has(first)) {
-    warn(`人设首块是 <${first}>：v2 用 <前提>，旧式用 <角色设定 名字：…>；两者都不是时请确认`);
-  }
+  // Plain text, Markdown, YAML, paired tags and the author's own structure are all accepted.
   ran('人设结构');
 }
 
@@ -412,26 +368,10 @@ if (wbPath) {
   try { wb = JSON.parse(fs.readFileSync(wbPath, 'utf8').replace(/^\uFEFF/, '')); }
   catch (e) { err('世界书 JSON 解析失败: ' + e.message); }
   if (wb) {
-    const ks = Object.keys(wb);
-    if (ks.length !== 1 || ks[0] !== 'entries') err('世界书根对象必须只含 entries，当前: ' + ks.join(','));
-    if (Array.isArray(wb.entries)) err('entries 必须是对象，不是数组');
-    else if (wb.entries) {
-      const uids = new Map();
-      let constantChars = 0;
-      Object.entries(wb.entries).forEach(([k, e]) => {
-        if (typeof e.key === 'string') { try { JSON.parse(e.key); } catch { err(`entries[${k}].key 不是合法 JSON 字符串数组`); } }
-        else err(`entries[${k}].key 必须是字符串（JSON 编码后的数组）`);
-        if (typeof e.probability === 'number') warn(`entries[${k}].probability 建议用两位小数字符串`);
-        if (e.uid != null) { if (uids.has(e.uid)) err(`uid 重复: ${e.uid}`); uids.set(e.uid, k); }
-        const len = (e.content || '').length;
-        if (len > LIMIT.worldbookEntryContent) err(`entries[${k}] content ${len} 字，超过 ${LIMIT.worldbookEntryContent}`);
-        if ((e.comment || '').length > LIMIT.worldbookComment) warn(`entries[${k}] comment 超过 ${LIMIT.worldbookComment} 字（平台截断）: ${e.comment}`);
-        if (/\{\{char\}\}|\$#char#\$/.test(e.content || '')) err(`entries[${k}] 用了 {{char}}，应写真实角色名`);
-        reportBans(`世界书 entries[${k}]`, e.content, 2);
-        if (e.constant && !e.disable && String(e.probability || '100.00') === '100.00') constantChars += len;
-      });
-      S.constantWorldbookChars = constantChars;
-    }
+    const result = validateWorldbook(wb);
+    result.errors.forEach(err); result.warnings.forEach(warn);
+    S.constantWorldbookChars = result.constantChars;
+    if (opts['style-lint']) Object.values(wb.entries || {}).forEach(e => reportBans('世界书', e.content));
   }
   ran('世界书结构');
 }

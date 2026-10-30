@@ -1,194 +1,105 @@
-/* rex-status · 状态解析 / 白名单裁剪 / 接线
-   模型每轮在正文里吐一个 [rex-status]{…}[/rex-status]，这里只认这个块，别的一概不猜。
-   原文由一条替换规则消耗（build 自动生成 status-hide），所以气泡里看不到 JSON。 */
+/* Model protocol: [status]{JSON}[/status]. Parse original message content. */
 (function () {
-  var REX = window.__REX__;
-  if (!REX) { try { console.warn('[rex] kernel missing (status)'); } catch (e) {} return; }
-  var C = function () { return window.__REX_CONTENT__ || {}; };
-
-  var RE_BLOCK = /\[rex-status\]([\s\S]*?)\[\/rex-status\]/;
-  var RE_BLOCK_OLD = /<rex-status>([\s\S]*?)<\/rex-status>/;   // 旧卡兼容
-
-  /* ---------- 三级容错：直读 → 修引号/裸键 → 正则捞关键字段 ---------- */
+  var R = window.__REX__;
+  if (!R) return;
+  var block = /\[status\]([\s\S]*?)\[\/status\]/;
+  var copy = function(v){return JSON.parse(JSON.stringify(v));};
+  var config = function(){return (window.__REX_CONTENT__ || {}).status || {};};
   function parse(raw) {
-    var s = String(raw || '').trim();
-    s = s.replace(/^```[a-z]*\s*/i, '').replace(/```$/g, '');
-    var a = s.indexOf('{');
-    if (a < 0) return null;
-    var b = s.lastIndexOf('}');
-    /* 括号不配对也要往下走 —— 那正是模型最常见的坏法，直接 return null 等于兜底永远不可达 */
-    s = b > a ? s.slice(a, b + 1) : s.slice(a);
-    try { return JSON.parse(s); } catch (e) {}
-    var f = s.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'")
-      .replace(/\uff0c/g, ',').replace(/\uff1a/g, ':')
-      .replace(/,\s*([}\]])/g, '$1')
-      .replace(/([{\[,]\s*)([A-Za-z_]\w*)(\s*:)/g, '$1"$2"$3');
-    try { return JSON.parse(f); } catch (e) {}
-    var out = {}, m;
-    if ((m = /"loc"\s*:\s*"([^"]{0,24})"/.exec(s))) out.loc = m[1];
-    if ((m = /"t"\s*:\s*"([^"]{0,24})"/.exec(s))) out.t = m[1];
-    if ((m = /"hp"\s*:\s*(\d{1,3})/.exec(s))) out.hp = Number(m[1]);
-    return Object.keys(out).length ? out : null;
-  }
-  REX.parseStatus = parse;
-
-  /* ---------- 白名单裁剪：绝不 Object.assign 整块 ---------- */
-  function clipStatus(obj) {
-    var fs = ((C().status || {}).fields) || [];
-    var out = {}, took = 0;
-    fs.forEach(function (f) {
-      var v = obj[f.key];
-      if (v === undefined || v === null) return;
-      if (f.type === 'bar') {
-        var n = Number(v);
-        if (!isFinite(n)) return;
-        out[f.key] = Math.max(0, Math.min(f.max || 100, Math.round(n)));
-      } else if (f.type === 'tag') {
-        if (!Array.isArray(v)) return;
-        out[f.key] = v.slice(0, 5).map(function (x) { return String(x).slice(0, 10); });
-      } else {
-        out[f.key] = String(v).slice(0, 40);
-      }
-      took++;
+    var text=String(raw || '').trim().replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'');
+    var a=text.indexOf('{'), b=text.lastIndexOf('}');
+    if(a<0) return null;
+    text=b>a?text.slice(a,b+1):text.slice(a);
+    var fixed=text.replace(/[“”]/g,'"').replace(/，/g,',').replace(/：/g,':')
+      .replace(/,\s*([}\]])/g,'$1').replace(/([{,]\s*)([A-Za-z_]\w*)(\s*:)/g,'$1"$2"$3');
+    for(var i=0;i<2;i++)try{
+      var obj=JSON.parse(i?fixed:text);
+      if(obj && typeof obj==='object' && !Array.isArray(obj))return obj;
+    }catch(e){}
+    var out={};
+    (config().fields || []).forEach(function(f){
+      if(f.type!=='text' || typeof f.key!=='string' || !/^[\p{L}_][\p{L}\p{N}_-]{0,63}$/u.test(f.key))return;
+      var m=new RegExp('"'+f.key+'"\\s*:\\s*"([^"\\n]{0,120})"').exec(text);
+      if(m)out[f.key]=m[1];
     });
-    if (Array.isArray(obj.opt)) {
-      out.opt = obj.opt.slice(0, 4).map(function (x) { return String(x).slice(0, 24); });
-    }
-    return { data: out, took: took };
+    return Object.keys(out).length?out:null;
   }
-
-  function clipPriv(p) {
-    if (!p || typeof p !== 'object') return null;
-    var out = {}, any = false;
-    Object.keys(p).forEach(function (k) {
-      var d = p[k];
-      if (!d || typeof d !== 'object') {
-        if (typeof d === 'string') { out[k] = { st: d.slice(0, 12) }; any = true; }
-        return;
-      }
-      var e = {};
-      if (d.st != null) { e.st = String(d.st).slice(0, 12); }
-      if (d.ml != null) { var ml = Number(d.ml); if (isFinite(ml)) e.ml = Math.max(0, Math.min(99, Math.round(ml))); }
-      if (d.fixed != null) { e.fixed = String(d.fixed).slice(0, 60); }
-      if (d.rt != null) { e.rt = String(d.rt).slice(0, 60); }
-      if (Array.isArray(d.spec)) {
-        e.spec = d.spec.slice(0, 6).map(function (x) {
-          return [String(x && x[0] != null ? x[0] : '').slice(0, 10), String(x && x[1] != null ? x[1] : '').slice(0, 14)];
-        });
-      }
-      if (Object.keys(e).length) { out[k] = e; any = true; }
+  R.parseStatus=parse;
+  function clip(obj) {
+    var out={};
+    (config().fields || []).forEach(function(f){
+      if(typeof f.key!=='string'||!/^[\p{L}_][\p{L}\p{N}_-]{0,63}$/u.test(f.key)||['constructor','prototype','__proto__'].indexOf(f.key)>=0)return;
+      var v=obj[f.key]; if(v===undefined || v===null)return;
+      if(f.type==='bar'||f.type==='num'){
+        if(typeof v!=='number' && typeof v!=='string' || String(v).trim()==='')return;
+        var n=Number(v);if(!isFinite(n))return;
+        var max=Number.isFinite(Number(f.max))?Number(f.max):(f.type==='bar'?100:1000000000);
+        var min=Number.isFinite(Number(f.min))?Number(f.min):(f.type==='bar'?0:-1000000000);
+        out[f.key]=Math.max(min,Math.min(max,Math.round(n)));
+      }else if(f.type==='tag'||f.type==='tags'){
+        if(Array.isArray(v))out[f.key]=v.slice(0,6).filter(function(x){return typeof x==='string';}).map(function(x){return x.slice(0,40);});
+      }else if(typeof v==='string')out[f.key]=v.slice(0,Number(f.maxLength)||120);
     });
-    return any ? out : null;
+    if(Array.isArray(obj.opt))out.opt=obj.opt.filter(function(v){return typeof v==='string';}).slice(0,4).map(function(v){return v.slice(0,120);});
+    return out;
   }
-
-  function clipNpcs(obj) {
-    if (!obj || typeof obj !== 'object') return null;
-    var known = { '__me': 1 };
-    ((C().npcs) || []).forEach(function (n) { known[n.key] = 1; });
-    var out = {}, any = false;
-    Object.keys(obj).forEach(function (k) {
-      if (!known[k]) return;
-      var s = obj[k];
-      if (!s || typeof s !== 'object') return;
-      var e = {};
-      if (s.rel != null) { var r = Number(s.rel); if (isFinite(r)) e.rel = Math.max(0, Math.min(100, Math.round(r))); }
-      if (Array.isArray(s.surface)) {
-        e.surface = s.surface.slice(0, 8).map(function (x) {
-          return [String(x && x[0] != null ? x[0] : '').slice(0, 10), String(x && x[1] != null ? x[1] : '').slice(0, 40)];
-        });
-      }
-      if (Array.isArray(s.hooks)) e.hooks = s.hooks.slice(0, 3).map(function (x) { return String(x).slice(0, 80); });
-      if (s.note != null) e.note = String(s.note).slice(0, 120);
-      var pv = clipPriv(s.priv);
-      if (pv) e.priv = pv;
-      if (Object.keys(e).length) { out[k] = e; any = true; }
-    });
-    return any ? out : null;
-  }
-
-  /* ---------- 应用 ---------- */
-
-  REX.applyStatus = function (raw, silent) {
-    var obj = parse(raw);
-    if (!obj) { if (!silent) REX.repairHint(); return false; }
-    var c = clipStatus(obj);
-    if (c.took) {
-      /* 缺字段不清零：只覆盖这轮真的给了的键 */
-      Object.keys(c.data).forEach(function (k) { REX.data.status[k] = c.data[k]; });
-    }
-    if (c.data.opt) REX.data.opt = c.data.opt;
-    if (c.data.flags) REX.data.flags = c.data.flags;
-
-    var loc = c.data.loc || obj.loc;
-    if (loc) {
-      var m = Object.assign({}, REX.data.map);
-      m.at = String(loc);
-      var v = (m.visited || []).slice();
-      if (v.indexOf(m.at) < 0) v.push(m.at);
-      m.visited = v.slice(-16);
-      REX.data.map = m;
-    }
-    var np = clipNpcs(obj.npcs);
-    if (np) {
-      REX.data.npcs = REX.data.npcs || {};
-      Object.keys(np).forEach(function (k) {
-        var old = REX.data.npcs[k] || {};
-        REX.data.npcs[k] = Object.assign({}, old, np[k]);
-        /* priv 按部位合并：这轮只写了一个部位，不该把别的部位清掉 */
-        if (old.priv && np[k].priv) REX.data.npcs[k].priv = Object.assign({}, old.priv, np[k].priv);
+  function applyNpcs(obj) {
+    if(!obj || typeof obj!=='object' || Array.isArray(obj))return;
+    var known=((window.__REX_CONTENT__ || {}).npcs || []).map(function(n){return n.key;});known.push('__me');
+    known.forEach(function(k){
+      if(['__proto__','constructor','prototype'].indexOf(k)>=0 || !Object.prototype.hasOwnProperty.call(obj,k))return;
+      var src=obj[k];if(!src||typeof src!=='object'||Array.isArray(src))return;
+      var next=R.data.npcs[k] || {}, allowed=['rel','fav','note','thought','surface','hooks'];
+      allowed.forEach(function(f){
+        var v=src[f];if(v===undefined)return;
+        if(f==='rel'||f==='fav'){if(typeof v==='number'&&isFinite(v))next[f]=Math.max(-100,Math.min(100,v));}
+        else if(typeof v==='string')next[f]=v.slice(0,200);
+        else if(Array.isArray(v))next[f]=v.slice(0,8).map(function(x){return Array.isArray(x)?x.slice(0,2).map(function(y){return String(y).slice(0,120);}):String(x).slice(0,120);});
       });
-    }
-    if (Array.isArray(obj.codex)) {
-      REX.data.codex = REX.data.codex || {};
-      var un = (REX.data.codex.unlocked || []).slice();
-      obj.codex.slice(0, 6).forEach(function (id) {
-        var s = String(id);
-        if (un.indexOf(s) < 0) un.push(s);
-      });
-      REX.data.codex.unlocked = un;
-    }
-    REX.data.log = REX.data.log || [];
-    if (c.took || np) REX.data.log.push(Date.now());
-
-    REX.refresh();
-    REX.persist(true);
-    return true;
-  };
-
-  /* ---------- 自修复提示 ---------- */
-  REX.repairHint = function () {
-    var s = REX.slots();
-    if (!s.root || REX.q('[data-rex-repair]', s.root)) return;
-    var d = document.createElement('div');
-    d.className = 'rex-repair';
-    d.setAttribute('data-rex-repair', '1');
-    d.innerHTML = '<span>这轮状态块没读到，已沿用上一轮。</span>' +
-      '<button class="rex-btn" type="button">知道了</button>';
-    s.root.appendChild(d);
-    d.querySelector('button').addEventListener('click', function () { d.remove(); });
-    REX.timer(function () { if (d.parentNode) d.remove(); }, 10000);
-  };
-
-  /* ---------- 接线 ---------- */
-
-  function scan() {
-    var s = REX.slots();
-    if (!s.root) return;
-    var els = REX.qa('[data-rex-json]', s.root);
-    if (!els.length) return;
-    var last = els[els.length - 1];
-    var txt = last.getAttribute('data-rex-json') || last.textContent || '';
-    if (txt && txt !== REX._lastJson) { REX._lastJson = txt; REX.applyStatus(txt); }
-    els.forEach(function (e) { e.style.display = 'none'; });
+      var privateFields=config().npcPrivateFields || [];
+      if(src.priv && privateFields.length){
+        next.priv=next.priv||{};
+        privateFields.forEach(function(p){if(typeof p==='string' && Object.prototype.hasOwnProperty.call(src.priv,p) && !/^(?:__proto__|constructor|prototype)$/.test(p))next.priv[p]=R.cleanData?R.cleanData({player:src.priv[p]}).player: {};});
+      }
+      R.data.npcs[k]=next;
+    });
   }
-
-  REX.on('message:done', function (msg) {
-    var text = (msg && (msg.content || msg.text)) || '';
-    var m = RE_BLOCK.exec(text) || RE_BLOCK_OLD.exec(text);
-    if (m) { REX.applyStatus(m[1]); return; }
-    scan();
+  R.applyStatus=function(raw, silent, message) {
+    var obj=parse(raw);if(!obj){if(!silent)R.repairHint();return false;}
+    var patch=clip(obj);
+    if(!Object.keys(patch).length && !obj.npcs)return false;
+    var turn=obj.turn===undefined?(R.turn||0)+1:Number(obj.turn);
+    if(!Number.isInteger(turn)||turn<0 || turn>10000000)return false;
+    if(turn<(R.turn||0))return false;
+    var history=R.statusHistory=R.statusHistory||[], prev=history[history.length-1];
+    var signature=JSON.stringify(obj);
+    if(prev && prev.turn===turn && prev.signature===signature)return true;
+    var before=prev&&prev.turn===turn?prev.before:copy(R.data);
+    if(prev&&prev.turn===turn){R.data=copy(before);history.pop();}
+    Object.keys(patch).forEach(function(k){R.data.status[k]=patch[k];});
+    if(patch.opt)R.data.opt=patch.opt;
+    if(patch.flags)R.data.flags=patch.flags;
+    if(patch.loc){R.data.map.at=patch.loc;var visited=(R.data.map.visited||[]).slice();if(visited.indexOf(patch.loc)<0)visited.push(patch.loc);R.data.map.visited=visited.slice(-100);}
+    applyNpcs(obj.npcs);
+    R.turn=turn;
+    R.data.log=(R.data.log||[]).filter(function(x){return !x||x.turn!==turn;});
+    R.data.log.push({turn:turn,at:Date.now()});R.data.log=R.data.log.slice(-100);
+    history.push({turn:turn,serverId:message&&message.serverId!=null?message.serverId:null,signature:signature,before:before,data:copy(R.data)});
+    if(history.length>40)history.splice(0,history.length-40);
+    R.refresh();R.persist(true);return true;
+  };
+  R.restoreTurn=function(turn){
+    var list=(R.statusHistory||[]).filter(function(s){return s.turn<=turn;});
+    var item=list[list.length-1];
+    if(!item){R.toast('没有可用快照，当前状态保留');return false;}
+    R.data=copy(item.data);R.turn=item.turn;R.statusHistory=list;
+    R.pendingResume=R.resumeContext?R.resumeContext():'';
+    R.toast(item.turn===turn?'已恢复游戏快照，旧聊天仍在':'仅恢复到第 '+item.turn+' 轮，可能不精确');
+    R.refresh();R.persist(true);return true;
+  };
+  R.repairHint=function(){ if(R.toast)R.toast('本轮状态未读到，保留上一份有效状态'); };
+  R.on('message:done',function(msg){
+    if(!msg || !msg.content || msg.role==='user' || msg.role==='human')return;
+    var m=block.exec(msg.content);if(m)R.applyStatus(m[1],false,msg);
   });
-  REX.on('message:mount', function () { REX.timer(scan, 120); });
-
-  REX.timer(function () { if (REX.state.booted) scan(); }, 1200);
 })();

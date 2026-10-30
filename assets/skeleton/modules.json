@@ -1,0 +1,57 @@
+[
+  {
+    "name": "rex-boot",
+    "file": "core.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-store",
+    "file": "store.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-ui",
+    "file": "ui.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-view",
+    "file": "view.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-content",
+    "file": "content.json",
+    "kind": "json"
+  },
+  {
+    "name": "rex-css",
+    "file": "base.css",
+    "kind": "css"
+  },
+  {
+    "name": "rex-skin",
+    "file": "skin.css",
+    "kind": "css"
+  },
+  {
+    "name": "rex-sections",
+    "file": "sections.js",
+    "kind": "js"
+  },
+  {
+    "name": "status",
+    "file": "status.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-scene",
+    "file": "scenes.js",
+    "kind": "js"
+  },
+  {
+    "name": "rex-saves",
+    "file": "saves.js",
+    "kind": "js"
+  }
+]

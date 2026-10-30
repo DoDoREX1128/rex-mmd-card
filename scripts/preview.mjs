@@ -50,7 +50,7 @@ const MOCK = `
   var W = window, D = document;
   var q = new URLSearchParams(W.location.search);
   var profile = q.get('profile') === 'thin' ? 'thin' : 'chat';
-  var store = {};
+  var store = {}, cache = {};
   try { var raw = W.localStorage.getItem('rexpreview'); if (raw) store = JSON.parse(raw); } catch (e) {}
   function flush(){ try { W.localStorage.setItem('rexpreview', JSON.stringify(store)); } catch (e) {} }
 
@@ -111,9 +111,9 @@ const MOCK = `
       return Promise.resolve({ ok: true });
     },
     'message.edit': function(){ return Promise.resolve({ ok: true }); },
-    'cache.get': function(k){ return store['c:' + k]; },
-    'cache.set': function(k, v){ store['c:' + k] = v; flush(); return Promise.resolve({ ok: true }); },
-    'cache.remove': function(k){ delete store['c:' + k]; flush(); return Promise.resolve({ ok: true }); },
+    'cache.get': function(k){ return cache[k]; },
+    'cache.set': function(k, v){ cache[k] = v; return Promise.resolve({ ok: true }); },
+    'cache.remove': function(k){ delete cache[k]; return Promise.resolve({ ok: true }); },
     'save.get': function(k){ return store[k] == null ? null : store[k]; },
     'save.set': function(k, v){ if (v == null) delete store[k]; else store[k] = v; flush(); return Promise.resolve({ ok: true }); },
     'save.remove': function(k){ delete store[k]; flush(); return Promise.resolve({ ok: true }); },
@@ -134,7 +134,7 @@ const MOCK = `
       __diag.calls.push({ name: name, profile: profile });
       if (profile === 'thin') {
         if (THIN.throws.indexOf(name) >= 0) throw serr('NOT_SUPPORTED', name + ' 在瘦预览同步抛 SdkError');
-        if (THIN.notSupported.indexOf(name) >= 0) return { ok: false, code: 'NOT_SUPPORTED', capability: name };
+        if (THIN.notSupported.indexOf(name) >= 0) return Promise.reject(serr('NOT_SUPPORTED', name));
         if (THIN.undef.indexOf(name) >= 0) return undefined;
         if (THIN.returns && name in THIN.returns) return THIN.returns[name];
       }
@@ -162,6 +162,7 @@ const MOCK = `
   };
 
   var FIELDS = W.__REX_FIELDS__ || [];
+  var modelTurn=0;
   function statusOf(){
     var st = { loc: '周家水号', t: '酉时', flags: ['口渴'] };
     for (var i = 0; i < FIELDS.length; i++) {
@@ -173,11 +174,11 @@ const MOCK = `
     return st;
   }
   function replyOf(preset){
-    var body = '他把水牌推过来，指尖在牌面上按了一下。\\n\\n「你要的水在你手里。」他说，「但我不卖水，我卖路。」';
-    if (preset === 'badjson') return body + '\\n\\n<status>{"loc":"别处",</status>';
-    if (preset === 'missing') return body + '\\n\\n<status>{"loc":"别处"}</status>';
+    var body = '测试回复：角色等待玩家的下一步行动。';
+    if (preset === 'badjson') return body + '\\n\\n[status]{"loc":"别处",[/status]';
+    if (preset === 'missing') return body + '\\n\\n[status]{"loc":"别处"}[/status]';
     if (preset === 'empty') return '';
-    return body + '\\n\\n<status>' + JSON.stringify(statusOf()) + '</status>';
+    return body + '\\n\\n[status]' + JSON.stringify(statusOf()) + '[/status]';
   }
   function bubble(text){
     var l = list(); if (!l) return;
@@ -185,7 +186,7 @@ const MOCK = `
     var m = D.createElement('div'); m.setAttribute('data-chat', 'message');
     m.setAttribute('data-from', 'ai'); m.setAttribute('data-state', 'done');
     var b = D.createElement('div'); b.setAttribute('data-chat', 'message-body');
-    b.textContent = String(text).replace(/<status>[\\s\\S]*?<\\/status>/g, '').trim();
+    b.textContent = String(text).replace(/\\[status\\][\\s\\S]*?\\[\\/status\\]/g, '').trim();
     m.appendChild(b); f.appendChild(m); l.appendChild(f);
     var msgs = D.querySelector('[data-chat="messages"]'); if (msgs) msgs.scrollTop = msgs.scrollHeight;
   }
@@ -242,14 +243,14 @@ const MOCK = `
   /* ---------- 场景与挂载参数（与原预览保持一致） ---------- */
   var scene = q.get('scene') || (W.location.hash || '').replace('#', '') || '';
   if (scene === 'main') {
-    store.rex = { v: 2, nav: 'people', key: 'zhou', data: {
+    store['rex:template'] = { v: 2, nav: 'people', key: 'zhou', data: {
       player: { name: '无名客', gender: '男', race: '流民', trait: '求索', power: '好手', origin: '南渡口' },
       status: { loc: '周家水号', t: '申时', hp: 66, water: 38, desire: 24, intimacy: 18, flags: ['口渴'] },
       map: { at: '周家水号', visited: ['南渡口', '周家水号'] }
     }};
     flush();
   } else if (scene) {
-    store.rex = null; flush();
+    store['rex:template'] = null; flush();
   }
 
   if (q.get('slots') === '0') {

@@ -1,11 +1,15 @@
 /* rex-core · 微内核：四区同层装配 / 导航-简要-详情 / 抽屉 / 存档 / 事件
-   改这里之前先读 references/02-卡架构.md。只此一份，后加载模块往 window.__REX__ 挂。 */
+   改这里之前先读 references/40-界面-卡架构.md。只此一份，后加载模块往 window.__REX__ 挂。 */
 (function () {
   var W = window, D = document;
-  if (W.__REX__ && W.__REX__.ver === 2) return;
+  if (W.__REX__ && W.__REX__.ver === 3 && !W.__REX__.disposed) return;
+  if (W.__REX__ && W.__REX__.destroy) W.__REX__.destroy();
 
   var REX = {
-    ver: 2,
+    ver: 3,
+    disposed: false,
+    _listeners: [],
+    _unsub: [],
     sdk: null,
     state: {
       booted: false,
@@ -43,17 +47,8 @@
   };
   REX.q = function (sel, root) { try { return (root || D).querySelector(sel); } catch (e) { return null; } };
   REX.qa = function (sel, root) { try { return [].slice.call((root || D).querySelectorAll(sel)); } catch (e) { return []; } };
-  /* ---------- 宿主适配：sdk 有就用，没有就退回 DOM / localStorage ----------
-     实测两张成品卡一次都没调用 sdk，说明它不能当前提。整条链路必须能自走。 */
-  REX.sdkGet = function () {
-    if (this.sdk) return this.sdk;
-    var cands = [W.sdk, W.SDK, W.__SDK__, W.roleSdk, W.chatSdk];
-    for (var i = 0; i < cands.length; i++) {
-      var c = cands[i];
-      if (c && (typeof c === 'object' || typeof c === 'function')) { this.sdk = c; return c; }
-    }
-    return null;
-  };
+  /* Sandbox route: use only the published SDK, never guessed globals. */
+  REX.sdkGet = function () { return W.sdk || null; };
   REX.tryCall = function (p, args) {
     var s = this.sdkGet();
     if (!s) return { ok: false };
@@ -86,11 +81,28 @@
     t._h = setTimeout(function () { t.classList.remove('is-on'); }, ms || 1600);
   };
 
-  /* 同一事件只绑一次：重开舞台不会叠加监听 */
-  REX.on = function (name, fn) {
-    if (this._ev[name]) return;
-    var r = this.tryCall('on', [name, fn]);
-    this._ev[name] = r.ok ? 1 : 0;
+  REX.on = function(name,fn) {
+    var self=this;
+    if(this._ev[name]) { this._ev[name].push(fn); return; }
+    this._ev[name]=[fn];
+    var sdk=this.sdkGet();
+    if(sdk && typeof sdk.on==='function') {
+      var off=sdk.on(name,function(payload){
+        if(self.disposed)return;
+        (self._ev[name]||[]).slice().forEach(function(f){try{f(payload);}catch(e){self.log('event',name,e.message);}});
+      });
+      if(typeof off==='function')this._unsub.push(off);
+    }
+  };
+  REX.listen=function(el,name,fn,options){el.addEventListener(name,fn,options);this._listeners.push(function(){el.removeEventListener(name,fn,options);});};
+  REX.destroy=function(){
+    if(this.disposed)return;this.disposed=true;
+    this._timers.forEach(clearTimeout);clearTimeout(this._saveH);
+    this._listeners.splice(0).forEach(function(f){f();});this._unsub.splice(0).forEach(function(f){f();});
+    this.qa('.rex-world,.rex-dockL,.rex-dockR,.rex-mnav,.rex-sheet,.rex-tool,.rex-toast').forEach(function(n){n.remove();});
+    if(this.stageVisible())this.stageClose();
+    if(this._slots && this._slots.root)delete this._slots.root._rexBound;
+    this._slots=null;
   };
   /* ================= 注册表 ================= */
 
@@ -117,9 +129,9 @@
       msgs: this.q('[data-chat="messages"]', root),
       comp: this.q('[data-chat="composer"]', root),
       input: this.q('[data-chat="input"]', root),
-      world: null,
-      dockL: null,
-      dockR: null
+      world: this.q('#rex-world', root),
+      dockL: this.q('.rex-dockL', root),
+      dockR: this.q('.rex-dockR', root)
     };
     this._slots = s;
     return s;
@@ -178,11 +190,7 @@
     if (s.stageEl && s.stageEl.parentNode) return s.stageEl;
     var r = this.tryCall('stage.el', []);
     var el = (r.ok && r.val) ? r.val : null;
-    if (!el) {
-      el = D.createElement('div');
-      el.className = 'rex-stage is-self';
-      s.root.appendChild(el);
-    }
+    if (!el) { this.log('舞台不可用'); return null; }
     s.stageEl = el;
     return el;
   };
@@ -224,7 +232,8 @@
   REX.closeStage = function () { this.stageClose(); };
 
   W.__REX__ = REX;
+  REX.on('dispose', function(){ REX.destroy(); });
 
   /* 自点火：正文里的内核先跑，不必等 statusbar 的 ping 先到 */
-  setTimeout(function () { try { if (REX.afterReady) REX.afterReady(); } catch (e) {} }, 0);
+  setTimeout(function () { try { if (!REX.disposed && REX.afterReady) REX.afterReady(); } catch (e) {} }, 0);
 })();

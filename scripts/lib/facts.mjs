@@ -71,7 +71,7 @@ export const CONTENT_PROTOCOL = {
   mustConsume: F.markers.content.mustConsume !== false
 };
 
-/* ---------- 句式禁令（人设 / 世界书 / 开场白三处同受约束） ---------- */
+/* ---------- 可选笔记体建议（--style-lint） ---------- */
 export const SENTENCE_BANS = F.sentenceBans;
 
 /* ---------- 执行时机（脚本先于 DOM、回调参数、消息 id） ---------- */
