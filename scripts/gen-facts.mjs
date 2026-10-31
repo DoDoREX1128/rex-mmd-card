@@ -298,8 +298,27 @@ if (F.aiTone) {
   p();
 }
 
+/* ---------- 测试入口与真实链路 ---------- */
+p('## 12. 测试入口与真实链路');
+p();
+if (F.liveTest) {
+  p(`入口必须由用户提供：\`${F.liveTest.entry.urlTemplate}\``);
+  p();
+  p(`可用域名：${F.liveTest.entry.hosts.join(' / ')}；必填参数：${F.liveTest.entry.requiredParams.join(', ')}。`);
+  p();
+  p(F.liveTest.entry.note);
+  p();
+  p('| 链路 | 驱动 | 边界 |');
+  p('|---|---|---|');
+  p(`| PC 目标站 | ${F.liveTest.pc.driver}，${F.liveTest.pc.transport} | ${F.liveTest.pc.coverage} |`);
+  p(`| 实体设备 | ${F.liveTest.mobile.primary}，备用 ${F.liveTest.mobile.fallback} | 不接受 ${F.liveTest.mobile.rejected}；${F.liveTest.mobile.coverageGap} |`);
+  p();
+  p(`${F.liveTest.pc.absentDriver}。${F.liveTest.mobile.loginPolicy}。`);
+  p();
+}
+
 /* ---------- 证据等级 ---------- */
-p('## 12. 证据等级');
+p('## 13. 证据等级');
 p();
 p('| 等级 | 含义 |');
 p('|---|---|');

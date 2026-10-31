@@ -454,6 +454,67 @@ const has = (res, kind, re) => ((res.json && res.json[kind]) || []).some((m) => 
   ok('缺 extensions 也能封装', r.code === 0 && fs.existsSync(png));
 }
 
+/* ---------- 目标站与实体设备入口 ---------- */
+{
+  const { parseEntryUrl, resolveEntry, probeExpr, entryHosts } = await import('./lib/live-probes.mjs');
+
+  const good = parseEntryUrl('https://meimoai15.com/#/pages/chat/chat?roleId=114739&prePath=1');
+  ok('测试入口接受聊天页 URL', good.ok && good.roleId === '114739');
+
+  const www = parseEntryUrl('https://www.meimoai15.com/#/pages/chat/chat?roleId=9&prePath=1');
+  ok('测试入口容忍 www 前缀', www.ok && www.host === 'meimoai15.com');
+
+  const create = parseEntryUrl('https://meimoai15.com/#/pages/role/create?id=81178&r=2');
+  ok('测试入口拒绝创卡页', !create.ok, create.reason);
+
+  const noId = parseEntryUrl('https://meimoai15.com/#/pages/chat/chat');
+  ok('测试入口拒绝缺 roleId', !noId.ok);
+
+  const insecure = parseEntryUrl('http://meimoai15.com/#/pages/chat/chat?roleId=1&prePath=1');
+  ok('测试入口拒绝非 https', !insecure.ok);
+
+  const unknown = parseEntryUrl('https://other.com/#/pages/chat/chat?roleId=7&prePath=1');
+  ok('未记录域名需显式放行', !unknown.ok && unknown.knownHost === false);
+  ok(
+    '显式放行后可用',
+    resolveEntry('https://other.com/#/pages/chat/chat?roleId=7&prePath=1', { assumeHost: true }).ok
+  );
+  ok('入口清单非空', entryHosts().length > 0, entryHosts().join(' / '));
+
+  const expr = probeExpr({ selectors: ['[data-chat="input"]'] });
+  let syntax = true;
+  try {
+    new Function('return ' + expr);
+  } catch {
+    syntax = false;
+  }
+  ok('只读探针表达式可解析', syntax && expr.includes('data-chat'));
+
+  const acting = await import('./lib/live-actions.mjs');
+  const steps = acting.normalizeActions(
+    '[{"click":"[data-chat=\\"send\\"]"},{"wait":300},{"shot":"02-after"},{"eval":"1+1"}]'
+  );
+  ok('动作序列可解析', steps.length === 4 && steps[0].kind === 'click', steps.map((s) => s.kind).join('>'));
+  ok('动作序列记录写操作', acting.mutating(steps).length === 1, `${acting.mutating(steps).length} 步`);
+  ok('动作步骤可读描述', acting.describeStep(steps[2]) === '截图 02-after');
+
+  const rejects = [
+    ['[{"click":"a","wait":1}]', '多动作键'],
+    ['[{"shot":"../x"}]', '越界截图名'],
+    ['[{"wait":999999}]', '超长等待'],
+    ['not json', '非 JSON']
+  ];
+  let caught = 0;
+  for (const [bad] of rejects) {
+    try {
+      acting.normalizeActions(bad);
+    } catch {
+      caught++;
+    }
+  }
+  ok('动作序列挡掉非法格式', caught === rejects.length, `${caught}/${rejects.length}`);
+}
+
 /* ---------- 汇总 ---------- */
 if (!keep) fs.rmSync(tmp, { recursive: true, force: true });
 console.log('\n' + '='.repeat(48));

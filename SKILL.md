@@ -1,10 +1,10 @@
 ---
 name: rex-mmd-card
-description: 为 MMD 创建、修改、检查角色人设、世界书、状态栏和界面，区分新版沙盒卡、旧版同层卡、旧版原生卡。支持自定义人设结构与文风、分路线构建和行为验收；不处理酒馆或其他平台。
+description: 为 MMD 创建、修改、检查角色人设、世界书、状态栏和界面，区分新版沙盒卡、旧版同层卡、旧版原生卡。支持自定义人设结构与文风、分路线构建、行为验收与目标站/实体设备实测；不处理酒馆或其他平台。
 license: MIT
 metadata:
   author: DoDoREX1128
-  version: "2.1.0"
+  version: "2.2.0"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
   compatibility: Node.js 18+；基础脚本无第三方依赖，浏览器回归需要 Chrome 或 Edge。
 ---
@@ -42,8 +42,8 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
 | S1方案 | 核心循环、信息架构、字段、权威源、存档和未知项 | 方案与必要线框，按[10](references/10-流程-三问与方案.md)检查衔接 |
 | S2原型 | 首屏、一个主功能和完整返回链 | 可点击假数据页，方向符合本次要求 |
 | S3本地 | 对应路线构建、协议、错误与重入 | 静态/行为结果和截图，失败项已处理或说明 |
-| S4目标站 | 实际平台净化、SDK/Host、输入、保存与布局 | 按[54](references/54-验收-真实平台测试.md)留可见步骤与证据 |
-| S5实体设备 | 触摸、软键盘、横屏、后台再进和多轮体验 | 设备与失败点，未运行不推定 |
+| S4目标站 | 先拿到用户给的聊天页 URL，再验证实际平台净化、SDK/Host、输入、保存与布局 | 跑 `live.mjs`，按[54](references/54-验收-真实平台测试.md)留可见步骤与证据 |
+| S5实体设备 | 实体 Android 设备上的触摸、软键盘、横屏、后台再进和多轮体验 | 跑 `live-mobile.mjs`；桌面视口模拟不计入 E5 |
 
 纯内容、小修、只读比较只执行适用部分；复杂项目也可合并阶段。缺真实站或设备时完成可做部分并列NOT RUN，不制造审批等待。
 
@@ -110,11 +110,18 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
 
 维护骨架的封面/创建流程时，另跑 `node scripts/e2e-authoring.mjs`，验证发布包的四种开局配置和真实按钮/输入行为；它不是每张纯文字卡的强制步骤。
 
+真实站与实体设备测试用 `live.mjs` / `live-mobile.mjs`。入口 URL 必须由用户提供，不接受创卡页、首页或相似卡：
+
+    node scripts/live.mjs --url "https://<MMD域名>/#/pages/chat/chat?roleId=<角色卡ID>&prePath=1" --strict
+    node scripts/live-mobile.mjs --url "<同一入口>" --rotate
+
+拿不到 URL、未装 bsk、没有 Android 设备，脚本落 NOT RUN 并退出 3，不降级成桌面模拟。
+
 旧版原生命令把 route 改为 native；旧版同层使用 pack-samelayer --host/--frame。世界书可独立 validate-worldbook；大型世界书使用 worldbook-project 的稳定源条目。整卡可由 build 生成 v2 JSON，再以 card-png 封装 PNG；PNG 封装成功不代替内部格式与导入验收。
 
 交付用户已选形态；未选时按本次使用场景推荐，不强制每次弹窗。MMD 整卡优先 PNG；JSON 的目标入口支持需确认。新版必须说明新建卡、首次保存前选新版聊天页，不能靠给旧卡导入正则升级。
 
-验证分开报告：E1 已生成 / E2 静态通过 / E3 本地行为通过 / E4 目标站通过 / E5 实体设备通过。未执行写 NOT RUN，不把静态、模拟或 PNG 回读当真站验证。发布检查见 [55](references/55-交付-发布前检查.md)。
+验证分开报告：E1 已生成 / E2 静态通过 / E3 本地行为通过 / E4 目标站通过 / E5 实体设备通过。E4 与 E5 只测用户给的聊天页 URL，手机视口模拟不计入 E5。未执行写 NOT RUN，不把静态、模拟或 PNG 回读当真站验证。发布检查见 [55](references/55-交付-发布前检查.md)。
 
 ### 按任务读取详细方法
 

@@ -679,6 +679,39 @@
       "evidence": "device"
     }
   },
+  "liveTest": {
+    "entry": {
+      "hosts": [
+        "sexyai.ai",
+        "meimoai15.com"
+      ],
+      "path": "#/pages/chat/chat",
+      "urlTemplate": "https://<host>/#/pages/chat/chat?roleId=<roleId>&prePath=1",
+      "requiredParams": [
+        "roleId"
+      ],
+      "requireAsk": true,
+      "note": "目标站与实体设备测试前向用户索取聊天页 URL。create 页、首页、相似卡都不算目标。host 不在白名单时先确认该域名是否本轮目标，确认后再测。",
+      "evidence": "author"
+    },
+    "pc": {
+      "driver": "bsk",
+      "transport": "浏览器扩展驱动用户已登录的 Chromium，真实内核与真实网络栈",
+      "tabPolicy": "默认自建标签；只在用户点名时借用已有标签，用后归还",
+      "absentDriver": "未安装时写 NOT RUN，不用无头渲染冒充目标站",
+      "coverage": "已连接的那一个浏览器；跨内核、干净首访、权限授予、弱网不在覆盖内",
+      "evidence": "author"
+    },
+    "mobile": {
+      "primary": "android-adb-cdp",
+      "fallback": "avd",
+      "rejected": "PC 内核的 viewport / UA / touch 覆盖",
+      "deviceRequired": "adb devices 出现 device 状态才能测；空列表即 NOT RUN",
+      "loginPolicy": "设备上未登录时停下，要求用户在该设备登录，不代填凭据",
+      "coverageGap": "iOS Safari 需云真机或实体 iPhone，adb 链路覆盖不到",
+      "evidence": "author"
+    }
+  },
   "preview": {
     "thin": {
       "throws": [

@@ -220,6 +220,32 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 
 初始化默认保留已有文件；要复制示例人设时显式加 `--with-persona`。不同项目请使用各自的源码与输出目录。
 
+### 真实站与实体设备
+
+入口 URL 必须由用户提供，不接受创卡页、首页或相似卡：
+
+```text
+https://<MMD域名>/#/pages/chat/chat?roleId=<角色卡ID>&prePath=1
+```
+
+```bash
+# 目标站（E4）：驱动已登录的 Chromium
+node scripts/live.mjs --url "https://meimoai15.com/#/pages/chat/chat?roleId=114739&prePath=1" --strict
+
+# 实体 Android 设备（E5）：adb + CDP，测真实触摸、软键盘与横屏
+node scripts/live-mobile.mjs --url "https://meimoai15.com/#/pages/chat/chat?roleId=114739&prePath=1" --rotate
+```
+
+产物落 `work/live/<链路>-<时间>/`，含 `report.json`、`report.md` 与 `shots/`。未装 bsk、没有 Android 设备或拿不到 URL 时写 NOT RUN 并退出 3，不用本地预览或桌面视口模拟代替。
+
+用例可脚本化成动作序列，两条链路语义一致：
+
+```bash
+node scripts/live.mjs --url "<入口>" --act '[{"click":"[data-chat=\"more-panel\"]"},{"wait":500},{"shot":"02-more"}]'
+```
+
+步骤键为 `click` / `fill` / `press` / `wait` / `shot` / `eval` / `scrollTo`，每步只带一个。完整说明见[真实平台测试](references/54-验收-真实平台测试.md)。
+
 其他常用工具：
 
 | 工具 | 用途 |
@@ -230,6 +256,8 @@ node scripts/preview-samelayer.mjs --host work/same/host.js --frame work/same/fr
 | `worldbook-project.mjs` | 中大型世界书的稳定源条目、重排、归档、构建与核对 |
 | `card-png.mjs` | 将 v2 整卡 JSON 封装进 PNG |
 | `check-skin.mjs` | 提示视觉相似度，供人工判断参考意图 |
+| `live.mjs` | 目标站真实环境测试，驱动已登录的 Chromium，落读数、截图与控制台证据 |
+| `live-mobile.mjs` | 实体 Android 设备测试，走 adb + CDP，覆盖真实触摸、软键盘与横屏 |
 | `gen-facts.mjs` | 由事实数据生成参考表，并用 `--check` 检查一致性 |
 | `pack-skill.mjs` | 生成不含工作现场、测试临时文件与版本库的分发副本 |
 
@@ -259,7 +287,7 @@ node --test scripts/test-contracts.mjs scripts/test-authoring.mjs scripts/test-p
 node scripts/gen-facts.mjs --check
 ```
 
-test-project验证三路线构建、审阅稿回写、世界书元数据和冲突保护；test-authoring验证创建流程、导出与扩展示例。浏览器回归使用e2e.mjs与e2e-authoring.mjs；本地通过不代替真实MMD或实体设备验证。
+test-project验证三路线构建、审阅稿回写、世界书元数据和冲突保护；test-authoring验证创建流程、导出与扩展示例。本地回归使用e2e.mjs与e2e-authoring.mjs；目标站与实体设备用live.mjs与live-mobile.mjs，本地通过不代替真实MMD或实体设备验证。
 
 ## 目录
 
