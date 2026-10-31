@@ -21,6 +21,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { copyTree } from './lib/fsx.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -124,15 +125,12 @@ if (fs.existsSync(dest)) {
 /* 复制 */
 let files = 0, bytes = 0;
 fs.mkdirSync(skillsRoot, { recursive: true });
-fs.cpSync(root, dest, {
-  recursive: true,
-  filter: (src) => {
-    const r = path.relative(root, src);
-    if (r === '') return true;
-    const top = r.split(path.sep)[0];
-    if (EXCLUDE_TOP.has(top)) return false;
-    if (/\.tmp\.html$/i.test(r)) return false;
-    return true;
+copyTree(root, dest, {
+  skip: (rel) => {
+    const top = rel.split(path.sep)[0];
+    if (EXCLUDE_TOP.has(top)) return true;
+    if (/\.tmp\.html$/i.test(rel)) return true;
+    return false;
   },
 });
 

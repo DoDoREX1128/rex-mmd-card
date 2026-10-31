@@ -7,13 +7,14 @@ import path from 'node:path';
 import vm from 'node:vm';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {copyTree} from './lib/fsx.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'rex-authoring-'));
 const run=(name,args)=>spawnSync(process.execPath,[path.join(root,'scripts',name),...args],{cwd:root,encoding:'utf8'});
 const fields=[{key:'name',label:'姓名',type:'text',maxLength:12},{key:'job',label:'身份',type:'choice',options:['船工',{v:'行商',d:'带着货物'}]},{key:'origin',label:'起点',type:'choice',source:'map.nodes'},{key:'note',label:'补充',type:'text',optional:true,maxLength:20}];
 // Build the actual published package first; the VM runs the emitted view/scenes modules.
 const src=path.join(temp,'src'),out=path.join(temp,'out');
-fs.cpSync(path.join(root,'assets/skeleton'),src,{recursive:true});
+copyTree(path.join(root,'assets/skeleton'),src);
 const config=JSON.parse(fs.readFileSync(path.join(src,'content.json'),'utf8'));
 config.meta.name='authoring';config.player.fields=fields;config.map.nodes=[{id:'dock',name:'渡口',x:18,y:62,links:[]}];
 fs.writeFileSync(path.join(src,'content.json'),JSON.stringify(config));
@@ -123,7 +124,7 @@ test('raw exports preserve order and localized opening and pass route validators
   }
 });
 test('custom module documentation example builds and exposes its configured content',()=>{
-  const custom=path.join(temp,'custom');fs.cpSync(src,custom,{recursive:true});
+  const custom=path.join(temp,'custom');copyTree(src,custom);
   const guide=fs.readFileSync(path.join(root,'references/40-界面-卡架构.md'),'utf8');
   const code=guide.match(/```js\n([\s\S]*?)\n```/)[1];fs.writeFileSync(path.join(custom,'quests.js'),code);
   const modules=JSON.parse(fs.readFileSync(path.join(custom,'modules.json')));modules.push({name:'rex-quests',file:'quests.js',kind:'js'});

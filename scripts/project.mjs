@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {parseArgs} from './lib/facts.mjs';
 import {validateWorldbook} from './lib/worldbook.mjs';
 import {REVIEW_FILES,normalize,renderWorldbook,parseWorldbook} from './lib/review.mjs';
+import {copyTree} from './lib/fsx.mjs';
 
 const skill=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const {positional,opts}=parseArgs(process.argv),command=positional[0];
@@ -134,7 +135,7 @@ function build(s){
   const beforeArtifacts=ARTIFACTS.map(f=>{const p=path.join(deliver,f);return fs.existsSync(p)?sha(fs.readFileSync(p)):null;});
   const run=stamp(),dir=at('工程','builds',run),stage=path.join(dir,'src'),out=path.join(dir,'out'),log=[];
   const guardHash=sha(JSON.stringify({source:treeHash(),review:Object.fromEntries(Object.entries(REVIEW_FILES).map(([k,f])=>[k,sha(text(path.join(deliver,f)))]))}));
-  fs.mkdirSync(dir,{recursive:true});fs.cpSync(src,stage,{recursive:true});
+  fs.mkdirSync(dir,{recursive:true});copyTree(src,stage);
   const opening=sourceValue('opening');
   try{
     if(s.route==='sandbox'){

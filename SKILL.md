@@ -4,7 +4,7 @@ description: 为 MMD 创建、修改、检查角色人设、世界书、状态�
 license: MIT
 metadata:
   author: DoDoREX1128
-  version: "2.2.0"
+  version: "2.2.1"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
   compatibility: Node.js 18+；基础脚本无第三方依赖，浏览器回归需要 Chrome 或 Edge。
 ---

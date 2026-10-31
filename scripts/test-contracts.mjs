@@ -8,6 +8,7 @@ import crypto from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {toCharacterBook,fromCharacterBook,validateWorldbook} from './lib/worldbook.mjs';
+import {copyTree} from './lib/fsx.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'rex-contract-'));
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
@@ -125,7 +126,7 @@ test('lorebook validates decoded keywords and round-trips embedded v2 fields',()
   for(const k of ['content','key','keysecondary','constant','disable','order','probability','position'])assert.equal(round.entries[0][k],book.entries[0][k],k);
 });
 test('actual v2 build converts independent lorebook instead of assigning it',()=>{
-  const src=path.join(temp,'with-book');fs.cpSync(path.join(root,'assets/skeleton'),src,{recursive:true});fs.writeFileSync(path.join(src,'worldbook.json'),JSON.stringify(book));
+  const src=path.join(temp,'with-book');copyTree(path.join(root,'assets/skeleton'),src);fs.writeFileSync(path.join(src,'worldbook.json'),JSON.stringify(book));
   const r=run('build.mjs',['--src',src,'--out',path.join(temp,'v2'),'--name','work']);assert.equal(r.status,0,r.stderr+r.stdout);
   const card=JSON.parse(fs.readFileSync(path.join(temp,'v2/work-card.json')));assert.ok(Array.isArray(card.data.character_book.entries));assert.deepEqual(card.data.character_book.entries[0].keys,['渡口']);
 });

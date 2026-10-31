@@ -4,13 +4,14 @@ import path from 'node:path';
 import os from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
+import {copyTree} from './lib/fsx.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const outIndex=process.argv.indexOf('--out');
 const out=outIndex>=0?path.resolve(process.argv[outIndex+1]):path.join(root,'work/authoring-browser');
 fs.mkdirSync(out,{recursive:true});
 function run(file,args){const r=spawnSync(process.execPath,[path.join(root,'scripts',file),...args],{cwd:root,encoding:'utf8'});if(r.status)throw Error(r.stderr+r.stdout);return r.stdout;}
 for(let i=0;i<4;i++){
-  const src=path.join(out,'src-'+i),dest=path.join(out,'case-'+i);fs.cpSync(path.join(root,'assets/skeleton'),src,{recursive:true});
+  const src=path.join(out,'src-'+i),dest=path.join(out,'case-'+i);copyTree(path.join(root,'assets/skeleton'),src);
   const c=JSON.parse(fs.readFileSync(path.join(src,'content.json')));c.meta.name='browser-'+i;
   c.features={cover:!!(i&2),forge:!!(i&1)};
   c.player.fields=[{key:'name',label:'姓名',type:'text',maxLength:12},{key:'job',label:'身份',type:'choice',options:['船工','行商']}];
