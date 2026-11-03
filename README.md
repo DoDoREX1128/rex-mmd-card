@@ -1,5 +1,7 @@
 # Rex-MMD角色卡
 
+[![AgentShield Security](https://merx.help/badge/A+.svg)](https://merx.help/shield)
+
 **说清楚要什么，一起把卡做出来。**
 
 给 MMD 做角色卡的方法论与工具链：从人设、世界书，到状态栏、捏人和独立界面，再到构建、检查与导入说明。你可以只给一个想法让 AI 补齐，也可以带着完整设定，逐项指定自己的结构、文风和视觉。
