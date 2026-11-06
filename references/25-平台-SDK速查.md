@@ -34,7 +34,7 @@
 | `cache.remove` | `key` | `void` | sync | 可用 | |
 | `save.get` | `key` | `unknown` | sync | **同步抛 SdkError** | 必须 `try/catch` |
 | `save.set` | `key`, `value` | `Promise<void>` | async | NOT_SUPPORTED | 20 次/60s |
-| `save.remove` | `key` | `Promise<void>` | async | NOT_SUPPORTED | **历史目标探针故障**，见 §3.1 |
+| `save.remove` | `key` | `Promise<void>` | async | NOT_SUPPORTED | 历史目标记录见错题 E-085 |
 | `save.keys` | — | `string[]` | sync | **同步抛 SdkError** | 必须 `try/catch` |
 | `stage.open` | `'content' \| 'full'` | `void` | sync | 可用 | |
 | `stage.close` | — | `void` | sync | 可用 | 不自发 `stage:close` |
@@ -70,66 +70,33 @@ input:change  conversation:switch  theme:change  back  stage:close  dispose
 
 **冷启动顺序**：`message:new → message:mount → message:done → ready`。首屏挂 `message:mount` / `message:done`，不要挂 `ready`。
 
-## 3. 六个必记的坑
+## 3. 调用陷阱索引
+
+症状、根因、修复示例与复测统一见错题本；这里保留签名相关定位。
 
 ### 3.1 `save.remove` 历史目标探针故障
 
-历史样本就绪态抛 `NETWORK`，该样本重试无效，当前部署需复验。删档改用 `save.set(key, null)`，读的时候把 `null` 当"无存档"。
-
-```js
-async function dropSave(key) {
-  try { await sdk.save.set(key, null); }
-  catch (e) { sdk.debug.log('drop fail', e && e.code); }
-}
-```
+[E-085](errors/cases.md#e-085)。
 
 ### 3.2 `save.get` / `save.keys` 是抛异常，不是返回错误码
 
-```js
-function loadState(key) {
-  try { return sdk.save.get(key) || null; }
-  catch (e) { sdk.debug.log('save unavailable', e && e.code); return null; }
-}
-```
-
-不包 `try/catch` 的后果：整段脚本失效，页面无提示。瘦预览打开就炸。
+[E-015](errors/cases.md#e-015)。
 
 ### 3.3 `version` 是值
 
-```js
-if (sdk.version !== '1') sdk.debug.log('unexpected sdk version', sdk.version);
-```
-
-写 `sdk.version()` 会抛 `TypeError`。
+[E-073](errors/cases.md#e-073)。
 
 ### 3.4 `stage.el()` 关闭时也返回 DIV
 
-```js
-sdk.stage.open('content');
-const el = sdk.stage.el();       // 关着也返回节点
-if (!sdk.stage.visible()) return; // 判断开关只能用它
-```
+[E-073](errors/cases.md#e-073)。
 
 ### 3.5 `message.send` 未结束再调返回 `BUSY`
 
-不排队、不是限频。发送锁自己加：
-
-```js
-var sending = false;
-async function send(text) {
-  if (sending) return;
-  sending = true;
-  try { await sdk.message.send(text); }
-  catch (e) { sdk.debug.log('send fail', e && e.code); }
-  finally { sending = false; }
-}
-```
-
-限频（60 秒窗口）：`save.set` 20 次；`message.send` 手势 3 次 / 自动 3 次；`message.edit` 10 次。
+[E-074](errors/cases.md#e-074)。
 
 ### 3.6 `message.edit` 需要 `serverId`
 
-`serverId === null` 表示服务端还不认得这条（开场白、刚发出未落库）。调用前判空，否则抛 `INVALID_ARGS`。
+[E-075](errors/cases.md#e-075)。
 
 ## 4. 安全模板
 

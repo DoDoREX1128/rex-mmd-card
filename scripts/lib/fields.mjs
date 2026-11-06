@@ -7,6 +7,26 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(here, '..', '..');
 export const DATA = path.join(ROOT, 'references', 'fields', 'fields.json');
+export const BLUEPRINTS = path.join(ROOT, 'references', 'fields', 'blueprints.json');
+export const loadBlueprints = () => JSON.parse(fs.readFileSync(BLUEPRINTS, 'utf8'));
+export function validateBlueprints(doc) {
+  const errors=[];
+  for(const [name,rows,key,required] of [
+    ['planning',doc.planning,'id',['label','meaning','writing','target']],
+    ['runtime',doc.runtime?.fields,'path',['label','shape','when','merge','writing','ui','authority','missing']]
+  ]) {
+    if(!Array.isArray(rows)||!rows.length){ errors.push(`${name} 必须有字段`); continue; }
+    const seen=new Set();
+    for(const row of rows){
+      if(!row[key] || seen.has(row[key]))errors.push(`${name} 重复或缺失 ${key}: ${row[key]}`);
+      seen.add(row[key]);
+      for(const k of required)if(typeof row[k]!=='string'||!row[k].trim())errors.push(`${row[key]} 缺少 ${k}`);
+      if(typeof row.required!=='boolean')errors.push(`${row[key]} 必须声明 required`);
+    }
+  }
+  if(doc.runtime?.route!=='same')errors.push('当前完整运行时蓝图仅适用same');
+  return errors;
+}
 
 export const CATS = [
   ['identity', '身份', '姓名、性别、年龄、出身、职业、外貌等不变或很少变的标签'],

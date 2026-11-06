@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   load, save, validateEntry, nextId,
-  LAYERS, VERDICTS, EVIDENCES, VERSIONS, SCOPES, DEAD, VERSION_LABEL
+  LAYERS, VERDICTS, EVIDENCES, VERSIONS, SCOPES, DEAD, VERSION_LABEL, ROUTES, ROUTE_LABEL, routesOf
 } from './lib/errors.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -62,6 +62,9 @@ function show(e) {
   console.log(`  症状: ${e.symptom}`);
   console.log(`  根因: ${e.cause}`);
   console.log(`  处置: ${e.fix}`);
+  console.log(`  路线: ${routesOf(e).map(r=>ROUTE_LABEL[r]).join(' / ')}`);
+  if (e.verification) console.log(`  复测: ${e.verification}`);
+  if (e.limits) console.log(`  边界: ${e.limits}`);
   if (e.instead) console.log(`  真错因: ${e.instead}`);
   if (e.fixedIn) console.log(`  修复于: ${e.fixedIn}`);
   if (e.note) console.log(`  备注: ${e.note}`);
@@ -71,13 +74,15 @@ function show(e) {
 /* ---------- 查 ---------- */
 const find = opt('find');
 const showId = opt('show');
-if (find || showId) {
+const route = opt('route');
+if (route && !ROUTES.includes(route)) { console.error('路线用 sandbox / same / native'); process.exit(2); }
+if (find || showId || route) {
   if (showId) {
     const e = all.find((x) => x.id.toLowerCase() === String(showId).toLowerCase());
     if (!e) { console.error('没有 ' + showId); process.exit(1); }
     show(e); process.exit(0);
   }
-  const q = String(find).toLowerCase();
+  const q = String(find || '').toLowerCase();
   const vf = parseVer(opt('ver'));
   const lf = opt('layer');
   const layerCn = (id) => (LAYERS.find(([x]) => x === id) || [])[1] || '';
@@ -85,8 +90,9 @@ if (find || showId) {
   const hits = all.filter((e) => {
     if (vf && !vf.some((v) => e.versions.includes(v))) return false;
     if (lf && e.layer !== lf) return false;
+    if (route && !routesOf(e).includes(route)) return false;
     const hay = [e.id, e.title, e.symptom, e.cause, e.fix, e.instead, e.note, e.source, e.layer, e.scope,
-      layerCn(e.layer), verdictCn(e.verdict), e.verdict]
+      e.verification, e.limits, layerCn(e.layer), verdictCn(e.verdict), e.verdict]
       .filter(Boolean).join(' ').toLowerCase();
     return hay.includes(q);
   });
@@ -121,6 +127,9 @@ if (has('add')) {
     fixedIn: opt('fixed-in', null),
     note: opt('note', ''),
     source: opt('source', ''),
+    routes: opt('routes') ? opt('routes').split(',').map(x=>x.trim()) : undefined,
+    verification: opt('verification', ''),
+    limits: opt('limits', ''),
     date: today()
   };
   const errs = validateEntry(e, all);
@@ -138,12 +147,13 @@ if (setId) {
   if (!e) { console.error('没有 ' + setId); process.exit(1); }
   const before = j(e);
   const patch = {};
-  for (const k of ['title', 'layer', 'scope', 'symptom', 'cause', 'fix', 'verdict', 'evidence', 'instead', 'note', 'source']) {
+  for (const k of ['title', 'layer', 'scope', 'symptom', 'cause', 'fix', 'verdict', 'evidence', 'instead', 'note', 'source', 'verification', 'limits']) {
     const v = opt(k);
     if (v !== null) patch[k] = v;
   }
   if (opt('checks') !== null) patch.checks = Number(opt('checks'));
   if (opt('ver') !== null) patch.versions = parseVer(opt('ver'));
+  if (opt('routes') !== null) patch.routes = opt('routes').split(',').map(x=>x.trim());
   if (opt('fixed-in') !== null) patch.fixedIn = opt('fixed-in');
   patch.date = today();
   Object.assign(e, patch);
@@ -224,7 +234,8 @@ if (restoreId) {
 
 /* ---------- 无参：打印清单帮助 ---------- */
 console.log('错题本工具');
-console.log('  查：  --find <关键词> [--ver v0|v1|both] [--layer css]');
+console.log('  查：  --find <关键词> [--ver v0|v1|both] [--route sandbox|same|native] [--layer css]');
+console.log('  路线：--route same（列出此路线全部条目）');
 console.log('  看：  --show E-002');
 console.log('  记：  --add --title "..." --ver v1 --layer css --scope platform \\');
 console.log('         --symptom "..." --cause "..." --fix "..." [--verdict suspected] [--evidence probe]');

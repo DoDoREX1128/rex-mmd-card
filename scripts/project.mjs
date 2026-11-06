@@ -124,7 +124,7 @@ function init(){
   for(const [f,body]of Object.entries(drafts)){atomic(path.join(deliver,f),body);s.artifacts[f]=sha(body);}
   fs.mkdirSync(at('工程','reports'),{recursive:true});fs.mkdirSync(at('工程','builds'),{recursive:true});fs.mkdirSync(at('工程','history'),{recursive:true});
   atomic(at('工程','工作说明.md'),`# Agent工程区\n\n路线：${s.route}；构建短名：${s.name}。用户只需要交付文件夹。\n\n- src是源码，persona.txt、opening.txt、worldbook.json对应三份审阅稿。开场白只在opening.txt维护；构建时投影到各路线入口。\n- 先运行project status，再sync，处理冲突/修改意见后build。同步状态在project.json，旧稿在history，构建与报告分别在builds/reports。\n- 不直接覆盖交付里的审阅稿，不把regex改动当作已改源码。不要复制skill目录成为项目工作区。\n- 用户已有文件默认保留；此工具的init只接受空目录。纯人设或局部修复不强制新建整卡工程。\n`);
-  atomic(at('工程','任务记录.md'),'# 任务与验收记录\n\n## 已确定\n\n## 待完成\n\n## 关键决策\n\n## 已验证与未验证\n\n- 已初始化工作区；未构建，未进行目标站或实机测试。\n');
+  atomic(at('工程','任务记录.md'),'# 任务与验收记录\n\n## 错题预检与字段契约\n\n开始或继续时，读取 rex-mmd-card 的 references/errors/README.md，按实际路线与模块查完整错题；字段设计读取 references/fields/blueprints.md。实施与交付前回查，不把索引摘要当完整解法。\n\n| 适用编号 | 本次采用的做法 | 复测结果/未验证项 |\n|---|---|---|\n\n## 已确定\n\n## 待完成\n\n## 关键决策\n\n## 已验证与未验证\n\n- 已初始化工作区；未构建，未进行目标站或实机测试。\n');
   saveState(s);atomic(path.join(deliver,'00-使用与验收.md'),readme(s,'初始草稿，等待创作。'));
   console.log(json({project:root,delivery:deliver,route:s.route,status:'initialized-draft'}));
 }

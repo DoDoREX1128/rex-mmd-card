@@ -76,14 +76,9 @@ el.appendChild(canvas);
 
 关闭时释放：`cancelAnimationFrame`、`renderer.dispose()`、解绑 `resize` / `visibilitychange`、清纹理与几何体。切会话与 `dispose` 事件也要清。
 
-## 5. 性能红线
+## 5. 外链与性能错题
 
-| 症状 | 常见原因 | 处理 |
-|---|---|---|
-| 滚动卡顿 | 大面积 `backdrop-filter`、持续动画 | 降到局部；低动效模式关掉 |
-| 流式输出卡 | `message:stream` 里全量重绘 / 读写布局 | 只更新变化节点；节流到 100ms |
-| 内存涨 | 每条消息都 `new` 引擎、监听不解绑 | 单例 + `message:unmount` / `dispose` 清理 |
-| 首屏慢 | 同步加载大库 | 延后到舞台打开时再加载 |
+加载/CSP/CORS/回退读 [E-078](errors/cases.md#e-078)，滤镜、流式绘制与生命周期读 [E-058](errors/cases.md#e-058) · [E-084](errors/cases.md#e-084)。故障解法与复测统一维护在错题本；依赖降级矩阵仍按下节逐项建立。
 
 ## 6. 降级矩阵
 

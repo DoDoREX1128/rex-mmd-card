@@ -125,7 +125,7 @@ test('raw exports preserve order and localized opening and pass route validators
 });
 test('custom module documentation example builds and exposes its configured content',()=>{
   const custom=path.join(temp,'custom');copyTree(src,custom);
-  const guide=fs.readFileSync(path.join(root,'references/40-界面-卡架构.md'),'utf8');
+  const guide=fs.readFileSync(path.join(root,'references/40-界面-卡架构.md'),'utf8').replace(/\r\n/g,'\n');
   const code=guide.match(/```js\n([\s\S]*?)\n```/)[1];fs.writeFileSync(path.join(custom,'quests.js'),code);
   const modules=JSON.parse(fs.readFileSync(path.join(custom,'modules.json')));modules.push({name:'rex-quests',file:'quests.js',kind:'js'});
   fs.writeFileSync(path.join(custom,'modules.json'),JSON.stringify(modules));

@@ -13,7 +13,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://nodejs.org"><img alt="Node.js 18 or newer" src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg"></a>
-  <a href="references/02-项目工作区与审阅交付.md"><img alt="Version 2.1.0" src="https://img.shields.io/badge/version-2.1.0-informational.svg"></a>
+  <a href="references/02-项目工作区与审阅交付.md"><img alt="Version 2.3.0" src="https://img.shields.io/badge/version-2.3.0-informational.svg"></a>
 </p>
 
 [这是什么](#这是什么) · [能做什么](#能做什么) · [安装](#安装) · [怎么用](#怎么用) · [三条路线](#三条路线) · [工具链](#工具链) · [目录](#目录)
@@ -45,7 +45,7 @@ MMD 做卡容易遇到的麻烦是：有些错误看起来没有报错，却让�
 
 ## 安装
 
-需要 **Node.js 18+**。基础脚本不需要安装第三方 npm 依赖；运行浏览器回归时需要本机 Chrome 或 Edge。命令行克隆仓库另需 Git。
+需要 **Node.js 18+**；完整旧版同层骨架构建另需 **Python 3.10+**。基础脚本不需要安装第三方 npm 依赖；运行浏览器回归时需要本机 Chrome 或 Edge。命令行克隆仓库另需 Git。
 
 ### 让助手安装
 
@@ -148,12 +148,12 @@ Windows 下 `~` 通常指用户主目录。不安装也可以在克隆的目录�
 | 呈现方式 | 官方 SDK、稳定钩子与舞台 | Host 适配原生页面，隔离 Frame 提供独立 UI | 保留原生聊天，按需加换肤、气泡与组件 |
 | 独立正则包 | 5 个必填键，`personality` 可选 | 恰好 4 键，不带 `chatVersion` / `personality` | 同左 |
 | 主要能力 | SDK 状态交互、舞台、作者存档 | 自定义信息架构、已实现的桥接动作、作用域本地存储 | 纯文字、轻量 KV、主题及按需逐消息引擎 |
-| 自带起点 | `assets/skeleton/` | `assets/samelayer/` | `assets/native/` |
+| 自带起点 | `assets/skeleton/` | 完整作品 `assets/samelayer-complete/`；最小演示 `assets/samelayer/` | `assets/native/` |
 | 主要代价 | 受公开 SDK 和宿主能力边界限制 | 需要维护 DOM 适配、通信和生命周期 | 样式与组件需要跟随旧版目标页面 |
 
 **新版/旧版决定执行环境，同层/原生决定呈现方式。** 旧版原生增强可以与轻量 Host 面板组合，但新版 SDK、旧版桥接、导入格式和选择器不能跨环境照搬。
 
-同层自带的是少量基础动作的开发起点，**没有实现参考上游全部 61 项动作**。编辑、删除和回溯等未实现项会明确返回 `not-implemented`，需要按作品接入并验收。
+完整同层骨架包含HUD、81项动作目录及适配、封面创建、阅读器、状态与LZ77打包。新卡先完整克隆，替换内容和视觉，沿用已实现的原生适配。最小同层基座只用于小型演示。完整复现的构建、动作校验与浏览器回归见[骨架说明](assets/samelayer-complete/README.md)。
 
 新版宿主换肤也按通道区分：角色 CSS 不能直接穿透跨源父页面；公开颜色桥和受控 `data-host` CSS 是否可用，需要按目标域名、日期和面板检查。详见 [平台分流](references/20-平台-分流.md) 与 [宿主弹窗边界](references/47-界面-宿主与弹窗边界.md)。
 
@@ -172,7 +172,7 @@ node scripts/project.mjs sync "<项目目录>"
 node scripts/project.mjs build "<项目目录>"
 ```
 
-把 route 改成 `native` 或 `same` 即选择另外两条路线，目录规范一致，底层构建分别处理。主项目仅分两区：
+把 route 改成 `native` 可制作旧版原生卡；`same` 只初始化最小同层演示。完整同层作品使用下方 Python 入口，目录同样分交付/工程，不能混用构建器。主项目仅分两区：
 
 ```text
 项目/
@@ -211,7 +211,21 @@ node scripts/init.mjs --route native --out work/native
 node scripts/build.mjs --route native --src work/native --out work/out --name example
 ```
 
-### 旧版同层卡
+### 完整旧版同层卡
+
+由 Agent 先准备内容目录（persona.txt、worldbook.json、opening.txt；也可从已有 regex.json 读取开场），再运行：
+
+```text
+python scripts/complete-samelayer.py init "<项目目录>" --content-dir "<内容目录>" --name river --title 渡口来信
+python scripts/complete-samelayer.py status "<项目目录>"
+python scripts/complete-samelayer.py sync "<项目目录>"
+python scripts/complete-samelayer.py build "<项目目录>"
+python scripts/complete-samelayer.py verify "<项目目录>"
+```
+
+构建会检查审阅稿、源和交付冲突；目录准备、面板与原生动作复用见[完整骨架](assets/samelayer-complete/README.md)。未另定文风时，先按[人设与文风](references/32-内容-人设与文风.md)组织新稿；亲修稿保持原有表达。
+
+### 最小旧版同层演示
 
 ```bash
 node scripts/init.mjs --route same --out work/same
@@ -252,6 +266,7 @@ node scripts/live.mjs --url "<入口>" --act '[{"click":"[data-chat=\"more-panel
 
 | 工具 | 用途 |
 |---|---|
+| `complete-samelayer.py` | 完整同层骨架的初始化、审阅同步、暂存构建与压缩回读校验 |
 | `project.mjs` | 初始化交付/工程区，双向同步审阅稿、检查冲突、调用对应路线构建 |
 | `analyze.mjs` / `replay.mjs` | 拆解已有卡、检查正则链与残留标记 |
 | `validate-worldbook.mjs` | 单独检查世界书结构与字段类型 |
@@ -287,6 +302,9 @@ node scripts/live.mjs --url "<入口>" --act '[{"click":"[data-chat=\"more-panel
 node scripts/test.mjs
 node --test scripts/test-contracts.mjs scripts/test-authoring.mjs scripts/test-project.mjs
 node scripts/gen-facts.mjs --check
+python scripts/test-complete-samelayer.py
+node scripts/check-complete-actions.mjs
+node scripts/e2e-complete-samelayer.mjs --project "<完整同层项目>" --out "<报告目录>"
 ```
 
 test-project验证三路线构建、审阅稿回写、世界书元数据和冲突保护；test-authoring验证创建流程、导出与扩展示例。本地回归使用e2e.mjs与e2e-authoring.mjs；目标站与实体设备用live.mjs与live-mobile.mjs，本地通过不代替真实MMD或实体设备验证。
@@ -317,6 +335,8 @@ rex-mmd-card/
 ```
 
 第一次使用可从 [总览与阅读路径](references/00-总览与阅读路径.md) 开始；完整执行说明见 [SKILL.md](SKILL.md)。字段库是候选池，错题本是可复验的历史记录，都不会替你决定作品必须有哪些内容。
+
+[错题本](references/errors/README.md)按新版沙盒、旧版同层、旧版原生和制作阶段提供读取入口；完整症状、根因、解决方案、复测和边界集中维护，实施前与交付前回查。[创作字段库](references/fields/README.md)提供人物/世界/玩法的设计维度、语义候选和完整同层实际嵌套路径，区分模型约定、代码支持与纯界面偏好。
 
 ## 范围与许可
 

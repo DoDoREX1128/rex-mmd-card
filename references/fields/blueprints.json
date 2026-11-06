@@ -1,0 +1,691 @@
+{
+  "schema": "rex-field-blueprints/1",
+  "updated": "2026-11-05",
+  "planning": [
+    {
+      "id": "premise",
+      "label": "叙事前提",
+      "meaning": "叙事者是谁、能写到哪里、玩家能决定什么",
+      "writing": "明确{{user}}的行动/心理由谁决定，避免强塞来历和人格",
+      "target": "persona前提",
+      "required": false
+    },
+    {
+      "id": "genre",
+      "label": "题材与基调",
+      "meaning": "时代、超常规则、叙事节奏和感官重点",
+      "writing": "按作者选择，不用禁词表替代具体表达",
+      "target": "persona主题",
+      "required": false
+    },
+    {
+      "id": "loop",
+      "label": "核心循环",
+      "meaning": "玩家反复做什么、得到什么反馈、承担什么代价",
+      "writing": "从一次可执行行动推演后果，纯故事不强加游戏系统",
+      "target": "方案/玩法规则",
+      "required": false
+    },
+    {
+      "id": "world-order",
+      "label": "世界秩序",
+      "meaning": "资源、权力、日常制度和可见代价",
+      "writing": "规则写触发条件、可做/不可做、代价与例外",
+      "target": "世界书常驻/触发",
+      "required": false
+    },
+    {
+      "id": "identity",
+      "label": "身份与处境",
+      "meaning": "角色职责、所处关系、可用资源",
+      "writing": "写能支配谁/受谁约束，避免很重要/深不可测",
+      "target": "persona/人物条",
+      "required": false
+    },
+    {
+      "id": "appearance",
+      "label": "外貌识别",
+      "meaning": "固定特征、衣物、动作习惯与场景痕迹",
+      "writing": "保留可辨识细节，不堆清冷绝美等空评价",
+      "target": "人物条/外貌候选",
+      "required": false
+    },
+    {
+      "id": "desire",
+      "label": "欲求与压力",
+      "meaning": "想取得什么、怕失去什么、当前阻力",
+      "writing": "让它能改变具体选择，不固定全卡欲望数量",
+      "target": "persona角色",
+      "required": false
+    },
+    {
+      "id": "behavior",
+      "label": "行为与例外",
+      "meaning": "遇到某事先做什么、何时改变惯例",
+      "writing": "以触发→动作→后果写可演行为，不只贴性格标签",
+      "target": "persona角色/习性",
+      "required": false
+    },
+    {
+      "id": "voice",
+      "label": "说话方式",
+      "meaning": "对不同对象的称呼、句式、回避与透露",
+      "writing": "给短语境例子，避免人人同一种金句腔",
+      "target": "persona角色",
+      "required": false
+    },
+    {
+      "id": "knowledge",
+      "label": "认知与信息边界",
+      "meaning": "已知、误信、未知、秘密与信息来源",
+      "writing": "角色不能因为世界书写了就全知；心声可读性另定",
+      "target": "persona约束/人物条",
+      "required": false
+    },
+    {
+      "id": "relationship",
+      "label": "关系与称谓",
+      "meaning": "关系事实、利益/旧事、称呼变化条件",
+      "writing": "rel/fav/信任分义；玩家关系不代替玩家意愿",
+      "target": "人物/关系条",
+      "required": false
+    },
+    {
+      "id": "ability",
+      "label": "能力与限制",
+      "meaning": "适用范围、资源消耗、失败与反制",
+      "writing": "等级不等于效果；稳定ID与可改名称分开",
+      "target": "能力条/运行时映射",
+      "required": false
+    },
+    {
+      "id": "memory",
+      "label": "长线记忆",
+      "meaning": "跨多轮仍须生效的事实与承诺",
+      "writing": "静态约束进人设/世界书，剧情变化进状态与可靠存档",
+      "target": "persona/世界书/存档",
+      "required": false
+    },
+    {
+      "id": "opening",
+      "label": "开局场景",
+      "meaning": "时间地点、在场者、眼前压力与可行动处",
+      "writing": "给真实初值，不把选项结果提前写成事实",
+      "target": "开场白/初始status",
+      "required": false
+    },
+    {
+      "id": "geography",
+      "label": "地理注册",
+      "meaning": "地区ID、地区名、视图标题、地点别名与房间",
+      "writing": "loc/where/near共享注册表；未知保留，不编距离",
+      "target": "世界书/地图数据",
+      "required": false
+    },
+    {
+      "id": "reference",
+      "label": "创建参考",
+      "meaning": "可选出身/相貌/能力/身份等候选与介绍",
+      "writing": "按题材选维度，名称或ID用于触发；UI偏好分流",
+      "target": "创建数据/触发世界书",
+      "required": false
+    },
+    {
+      "id": "option",
+      "label": "行动意图",
+      "meaning": "下一轮可采取的行动与侧重",
+      "writing": "动词起头、只写意图，不预设成功，随玩家回复习惯调整",
+      "target": "opt/可改草稿",
+      "required": false
+    },
+    {
+      "id": "archive",
+      "label": "档案与状态",
+      "meaning": "固定事实、当前状态、部位/装备、心声",
+      "writing": "不要把这些都塞备注；不同更新频率分层",
+      "target": "字段目录/人物页",
+      "required": false
+    },
+    {
+      "id": "worldbook",
+      "label": "条目设计",
+      "meaning": "分类、启用、常驻/关键词、优先级、单层包裹",
+      "writing": "稳定UID；正文规则与资料/创建参考分组；实际文本回放",
+      "target": "worldbook/审阅稿",
+      "required": false
+    },
+    {
+      "id": "style",
+      "label": "文风与事实密度",
+      "meaning": "动作、物件、声音、距离、代价和可用信息",
+      "writing": "抽象结论改成能表演的事实，保留作者修辞和章节自由",
+      "target": "persona/世界书",
+      "required": false
+    },
+    {
+      "id": "ui-prefs",
+      "label": "纯界面偏好",
+      "meaning": "主题/头像形态/字号/动效/阅读位置",
+      "writing": "仅本地UI则不喂模型；所选项仍须真实落到HUD与持久化",
+      "target": "偏好存储/创建桥接",
+      "required": false
+    },
+    {
+      "id": "economy",
+      "label": "资源与结算",
+      "meaning": "余额、物资、取得/消耗条件与唯一结算者",
+      "writing": "交易未闭环就不假扣款；物品数量0与空库分别定义",
+      "target": "可选玩法/资源协议",
+      "required": false
+    }
+  ],
+  "runtime": {
+    "id": "complete-status-v3",
+    "route": "same",
+    "status": "当前冻结实现的映射；不是平台schema或所有新卡必填清单",
+    "source": "assets/samelayer-complete/frame/frame-main.js:applyRexStatus/mergeCast；frame-features.js:optsOf",
+    "fields": [
+      {
+        "path": "turn",
+        "label": "轮次",
+        "shape": "integer",
+        "when": "每轮",
+        "merge": "覆盖；缺失保留/历史兼容可补偿",
+        "writing": "不拿turn当消息ID",
+        "ui": "世界/编年",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "y",
+        "label": "年份",
+        "shape": "integer",
+        "when": "跨年变化",
+        "merge": "有效非0值覆盖，0不写入",
+        "writing": "按题材历法，可不选",
+        "ui": "顶栏",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "t",
+        "label": "日期时辰",
+        "shape": "string",
+        "when": "时刻变化",
+        "merge": "非空覆盖，按·拆日期与时段",
+        "writing": "不重复维护另一time真源",
+        "ui": "顶栏",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "loc",
+        "label": "具体地点",
+        "shape": "string ≤20",
+        "when": "移动",
+        "merge": "非空覆盖，未知原文保留",
+        "writing": "只用注册名与合法房间后缀",
+        "ui": "地图/顶栏/玩家where",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "region",
+        "label": "地区名",
+        "shape": "string ≤12",
+        "when": "跨区",
+        "merge": "非空合法名更新，非法保留regionRaw",
+        "writing": "与地区ID/地图标题分开",
+        "ui": "地图",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "act",
+        "label": "幕号标题",
+        "shape": "string",
+        "when": "转折",
+        "merge": "解析幕号与标题，空串不清空",
+        "writing": "完整骨架指幕，不是新版示例行动摘要",
+        "ui": "世界/编年",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "threat",
+        "label": "威胁",
+        "shape": "integer 0–5",
+        "when": "变化",
+        "merge": "覆盖且夹取，0有效",
+        "writing": "定义风险事实，不擅加玩家感受",
+        "ui": "世界内部/动荡",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "env",
+        "label": "环境",
+        "shape": "string",
+        "when": "变化",
+        "merge": "非空按·分段提取环境/温度",
+        "writing": "具体光声气味与限制，温度未知不编",
+        "ui": "世界",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sum",
+        "label": "本轮摘要",
+        "shape": "string",
+        "when": "每轮",
+        "merge": "非空覆盖；不强制代码级长度",
+        "writing": "只写已经发生的事实，长度由模型协议约定",
+        "ui": "编年/世界",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "opt",
+        "label": "行动意图",
+        "shape": "string[]",
+        "when": "每轮/按需",
+        "merge": "WORLD最多3条每条20字；[]清空",
+        "writing": "气泡另取原消息最多4条未截字；30字新约定接入前处理E-080",
+        "ui": "气泡/草稿/世界投影",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "near",
+        "label": "邻近地点",
+        "shape": "[地点,距离][]",
+        "when": "移动",
+        "merge": "整组替换，最多8项，[]清空；地点截10/距离12",
+        "writing": "不编造距离，沿用统一地名注册表",
+        "ui": "局部地图",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me",
+        "label": "玩家档案",
+        "shape": "object",
+        "when": "变化",
+        "merge": "按子键合并；{}不删除已有档案",
+        "writing": "不预设玩家人格；loc每轮校正where",
+        "ui": "人物页",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "npcs",
+        "label": "人物名录",
+        "shape": "record<名字,object>",
+        "when": "首见/变化",
+        "merge": "按人物与子键合并；{}不删除旧人",
+        "writing": "改全名/别名需稳定映射，新登场当轮建档",
+        "ui": "人物页/地图",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys",
+        "label": "叙事系统",
+        "shape": "object",
+        "when": "变化",
+        "merge": "按子键合并；{}不清空",
+        "writing": "可选器灵/随身系统，非所有题材必须",
+        "ui": "系统页",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.name / npcs.*.name",
+        "label": "显示名",
+        "shape": "string ≤12",
+        "when": "首见/改名",
+        "merge": "非空覆盖",
+        "writing": "全名/别名映射；显示名不是实体ID",
+        "ui": "人物标题",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.sex / npcs.*.sex",
+        "label": "性别",
+        "shape": "string",
+        "when": "首见/变化",
+        "merge": "当前实现只接受男/女/空字符串",
+        "writing": "题材需要其他枚举须改适配，不推断未知",
+        "ui": "人物",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.lv / npcs.*.lv",
+        "label": "等级称号",
+        "shape": "string ≤20",
+        "when": "成长",
+        "merge": "字符串覆盖",
+        "writing": "境界/职位可重命名，但UI旧题材标签也要映射",
+        "ui": "人物列表/详情",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.rel / npcs.*.rel",
+        "label": "称谓",
+        "shape": "string ≤8",
+        "when": "关系变化",
+        "merge": "非数字文本覆盖；数字仅历史当fav",
+        "writing": "与fav分开，避免一键两义",
+        "ui": "人物关系",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.fav / npcs.*.fav",
+        "label": "好感",
+        "shape": "integer −100–100",
+        "when": "变化",
+        "merge": "覆盖夹取，0有效",
+        "writing": "不等于信任/服从/允许某事",
+        "ui": "人物关系",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.where / npcs.*.where",
+        "label": "所在",
+        "shape": "string ≤20",
+        "when": "移动",
+        "merge": "覆盖并解地名；玩家另由loc校正",
+        "writing": "未知原文保留，与state共同推在场",
+        "ui": "地图/人物",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.state / npcs.*.state",
+        "label": "当前状态",
+        "shape": "string ≤4",
+        "when": "变化",
+        "merge": "覆盖，当前无严格枚举校验",
+        "writing": "字段目录按题材列在场/离场等允许值",
+        "ui": "人物/地图",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.mind / npcs.*.mind",
+        "label": "此刻心声",
+        "shape": "string",
+        "when": "变化",
+        "merge": "覆盖；代码未限制40字",
+        "writing": "第一人称具体判断；限制读心与知识范围",
+        "ui": "人物心理",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.tags / npcs.*.tags",
+        "label": "人物标签",
+        "shape": "string[]",
+        "when": "变化",
+        "merge": "整组替换，最多6项每项8字；[]清空",
+        "writing": "标签不替代行为人设",
+        "ui": "人物",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.Intel / npcs.*.Intel",
+        "label": "稳定档案",
+        "shape": "[键,值][]",
+        "when": "首见/变化",
+        "merge": "按键upsert，值实际截60；[]不删除旧键",
+        "writing": "模型目录可约定年龄/身份/外貌/立场/习性/特长/弱点/忌讳，代码未硬锁8键",
+        "ui": "情报",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.body / npcs.*.body",
+        "label": "身体状态",
+        "shape": "record<部位,string>",
+        "when": "按需变化",
+        "merge": "按部位合并，值截30；{}不删，空串/null跳过",
+        "writing": "本蓝图只给通用身体/伤势写法；部位与题材边界自行选",
+        "ui": "可选身体档案",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.outfit / npcs.*.outfit",
+        "label": "穿搭",
+        "shape": "record<槽,string>",
+        "when": "换装",
+        "merge": "按槽合并；空值跳过；槽按OUTFIT_ORDER",
+        "writing": "衣物写材质状态与行动影响，不硬套所有题材六槽",
+        "ui": "人物穿搭",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.wuhun / npcs.*.wuhun",
+        "label": "能力实体",
+        "shape": "[id,名称,类别,总数,明细[]][]",
+        "when": "能力变化",
+        "merge": "ID/槽位合并，明细按组合键去重累加；[]不删除",
+        "writing": "可映射本命法器/功法等；槽迁移与删除需明确改实现",
+        "ui": "能力页",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.bones / npcs.*.bones",
+        "label": "部位装备",
+        "shape": "record<部位,tuple>",
+        "when": "新得/变化",
+        "merge": "按BONE_KEY/部位白名单合并；{}不删",
+        "writing": "题材另定部位，不把示例骨骼体系强加作品",
+        "ui": "装备页",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.outer / npcs.*.outer",
+        "label": "附加装备",
+        "shape": "tuple[]",
+        "when": "新得/变化",
+        "merge": "按名称合并；[]不删",
+        "writing": "改名会换实体；需要删除/稳定ID须扩展",
+        "ui": "装备页",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.flesh / npcs.*.flesh",
+        "label": "生命比例",
+        "shape": "integer 0–100",
+        "when": "变化",
+        "merge": "只me应用并夹取；0有效，非法当前变0",
+        "writing": "显示HP比例，不是通用生命绝对值",
+        "ui": "玩家状态条",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "me.soul / npcs.*.soul",
+        "label": "能力资源比例",
+        "shape": "integer 0–100",
+        "when": "变化",
+        "merge": "只me应用并夹取；0有效，非法当前变0",
+        "writing": "可改为灵力/法力等，保持比例语义",
+        "ui": "玩家状态条",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys.name",
+        "label": "系统名称",
+        "shape": "string ≤8",
+        "when": "变化",
+        "merge": "非空覆盖，空串不清空",
+        "writing": "可选器灵/系统名",
+        "ui": "系统标题",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys.look",
+        "label": "形象与性格",
+        "shape": "string",
+        "when": "变化",
+        "merge": "非空覆盖，代码实际≤120",
+        "writing": "创作目录可收紧为80；与纯UI头像form分开",
+        "ui": "系统形象说明",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys.say",
+        "label": "系统留言",
+        "shape": "string",
+        "when": "每轮/按需",
+        "merge": "非空覆盖，代码实际≤120",
+        "writing": "可约定短句如40字；不冒充未知信息",
+        "ui": "系统留言",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys.bag",
+        "label": "仓库",
+        "shape": "[名,数量,描述][]",
+        "when": "变化",
+        "merge": "整组替换；[]清空；数量代码最小1",
+        "writing": "耗尽应移除条目，数量0会被改成1",
+        "ui": "系统仓库",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      },
+      {
+        "path": "sys.shop",
+        "label": "货架",
+        "shape": "[名,数量,描述][]",
+        "when": "变化",
+        "merge": "整组替换；[]清空；数量代码最小1",
+        "writing": "无自动经济结算；选择生成意图草稿",
+        "ui": "系统货架",
+        "authority": "模型状态（当前冻结骨架）",
+        "missing": "缺键继承；首屏未知不填演示值",
+        "required": false
+      }
+    ],
+    "compatibilityOnly": [
+      "[cast]历史档案块",
+      "present/tier/flags/map/note",
+      "sys.alias/sys.coins/sys.mood/sys.trait/sys.note",
+      "Intel别名intel/surface、数字rel历史好感"
+    ],
+    "differences": [
+      "气泡opt直接读原消息最多4条，WORLD.opt最多3条且每条20字；目标3条10–30字需要先统一实现，见E-080。",
+      "me/npcs/Intel/body/outfit/bones/sys按键合并；空对象和空字符串多数不能清除旧值。",
+      "tags/opt/near/sys.bag/sys.shop整组替换且[]可清；wuhun/outer是增量集合，[]不会清空。",
+      "字段目录常用的mind40/Intel30或40/sys.look80/sys.say40为生成约束；代码裁剪不同，不能宣称已强制校验。",
+      "早期四维/独立双块/独立货币/固定每十轮全量属于历史方案或可选策略；新卡须按本次玩法决定。"
+    ],
+    "example": {
+      "turn": 1,
+      "t": "3-2·辰时",
+      "loc": "青岚宗·山门",
+      "region": "青岚山域",
+      "act": "1·入山",
+      "threat": 1,
+      "env": "晨雾·松脂气·12℃",
+      "sum": "守门弟子核过引荐信，让你先到廊下等候。",
+      "opt": [
+        "递上引荐信，询问今日考核的安排",
+        "留在廊下观察其余候选人的反应",
+        "请守门弟子指明临时借住的地方"
+      ],
+      "me": {
+        "name": "{{user}}",
+        "lv": "练气三层",
+        "flesh": 100,
+        "soul": 70,
+        "tags": [
+          "持有引荐信"
+        ]
+      },
+      "npcs": {
+        "陆云衡": {
+          "name": "陆云衡",
+          "lv": "筑基初期",
+          "rel": "执事",
+          "fav": 0,
+          "where": "青岚宗·山门",
+          "state": "在场",
+          "mind": "先验信，来历不明的不能放进去。",
+          "Intel": [
+            [
+              "身份",
+              "外门执事"
+            ],
+            [
+              "习性",
+              "先核凭证再问来意"
+            ],
+            [
+              "忌讳",
+              "拿宗门名帖作伪"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "checklist": [
+    "选择本次题材/核心循环和所需字段，允许自由章节与自定义键；不用的维度不建。",
+    "逐项写路径、类型、权威源、更新频率、缺省、清空、UI落点、可读信息边界。",
+    "沿用完整骨架时保持现有原生动作层；变更模型schema只改对应映射，别重新逐项适配原生功能。",
+    "世界书字段目录为模型说明真源，人设留指针；开场与每个示例必须真实解析。",
+    "对所选解析器做缺键/空集合/0/未知/改名/重复快照/回溯验证；不把生成上限当已实现校验。"
+  ]
+}

@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>Host传输回归</title><body>
+<script src="../../kit/core.js"></script><script src="../../kit/actions.js"></script>
+<script src="../../kit/actions-dom.js"></script><script src="../../kit/actions-handlers.js"></script>
+<script src="../../kit/provided-actions.js"></script><script src="../../kit/models.js"></script>
+<script src="../../kit/provided-models.js"></script><script src="../../kit/native.js"></script><script src="../../kit/host.js"></script>
+<script>
+window.__TRANSPORT_RESULTS__={};
+const client=`<script>
+addEventListener('message',event=>{
+ if(event.source!==parent||event.data?.type!=='connect'||!event.ports[0])return;
+ const boot=event.data,port=event.ports[0];let context='',started=false;
+ const request=(id,method,params={})=>port.postMessage({...boot,type:'request',contextId:context,id,method,params});
+ port.onmessage=event=>{
+  const m=event.data;
+  if(m.type==='snapshot'){context=m.contextId;if(!started){started=true;request('fresh','snapshot.now');}return;}
+  if(m.type!=='result')return;
+  parent.__TRANSPORT_RESULTS__[m.id]=m;
+  if(m.id==='fresh')request('send','native.invoke',{action:'sendMessage',payload:{text:'本地桥接测试'}});
+  if(m.id==='send')request('after','snapshot.now');
+  if(m.id==='after')request('denied','unsupported.method');
+ };
+ port.start();port.postMessage({...boot,type:'ready'});
+});
+<\/script>`;
+MmdSameLayerHost.boot({appId:'transport-check',buildId:'transport-001',title:'桥接回归',engine:false,models:true,mode:'mock'},client);
+</script></body>

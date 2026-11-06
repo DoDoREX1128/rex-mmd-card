@@ -1,0 +1,6 @@
+[
+  {"id":"a1","role":"assistant","content":"执事堂传来晨钟声。[status]{\"turn\":1,\"loc\":\"青岚宗·执事堂\",\"me\":{\"state\":\"交差\"},\"npcs\":{\"陆云衡\":{\"where\":\"青岚宗\",\"state\":\"在场\"}},\"opt\":[\"查看药材册\",\"询问来人\"]}[/status]"},
+  {"id":"u1","role":"user","content":"我查看药材册。[status]{\"loc\":\"不应采用的用户引用\"}[/status]"},
+  {"id":"a2","role":"assistant","content":"陆云衡拿来了原始药材册。[status]{\"turn\":1,\"sum\":\"核对药材来源\",\"npcs\":{\"陆云衡\":{\"state\":\"核对药材\"}},\"opt\":[]}[/status]"},
+  {"id":"a3","role":"assistant","content":"尚在生成。[status]{\"turn\":2,"}
+]

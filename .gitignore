@@ -17,3 +17,7 @@ test/tmp/
 
 # 安装器保留的旧版本副本
 *.old-*
+
+# Python构建缓存
+__pycache__/
+*.pyc

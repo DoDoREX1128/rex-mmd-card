@@ -37,6 +37,17 @@ export function validateWorldbook(book) {
   return { errors, warnings, constantChars };
 }
 
+// 创作格式约定；与平台导入结构校验分开，旧书不会被自动重写。
+export function validateWorldbookEnvelopes(book) {
+  const errors=[];
+  for(const [key,entry] of Object.entries(book?.entries||{})){
+    const text=typeof entry?.content==='string'?entry.content.trim():'';
+    const hit=/^<([\p{L}\p{N}_·-]+)>\s*([\s\S]*?)\s*<\/\1>$/u.exec(text);
+    if(!hit||/[<>]/.test(hit[2]))errors.push(`entries[${key}].content 必须且只能用一组同名首尾标签包裹；内部不再使用尖括号`);
+  }
+  return errors;
+}
+
 // Independent MMD lorebook and embedded v2 character book have different schemas.
 export function toCharacterBook(book, name = '') {
   const check = validateWorldbook(book);

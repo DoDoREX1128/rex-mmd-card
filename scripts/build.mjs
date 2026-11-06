@@ -187,7 +187,7 @@ if (usesStatus) {
   if (!declared) {
     worldbook = worldbook || {entries:{}};
     const uid = Math.max(-1,...Object.values(worldbook.entries).map(e=>e.uid)) + 1;
-    worldbook.entries[String(uid)] = {uid,comment:'界面状态输出',content:protocol,constant:true,disable:false,key:'[]',keysecondary:'[]',probability:'100.00',order:10000,position:4,role:0,depth:4};
+    worldbook.entries[String(uid)] = {uid,comment:'界面状态输出',content:'<界面状态输出>\n'+protocol+'\n</界面状态输出>',constant:true,disable:false,key:'[]',keysecondary:'[]',probability:'100.00',order:10000,position:4,role:0,depth:4};
   }
 }
 if (worldbook) {

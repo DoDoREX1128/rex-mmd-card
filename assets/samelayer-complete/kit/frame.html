@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>武魂殿 · 琉璃纪元</title>
+<style>/*__FRAME_CSS__*/</style></head><body>
+<canvas id="bg"></canvas>
+<div class="bg-veil"></div>
+<div class="bg-grain"></div>
+
+<div class="hud">
+  <aside class="rail">
+    <div class="rail__crest crest-wrap" id="railCrest"></div>
+    <div class="rail__list" id="railList"></div>
+  </aside>
+  <section class="brief">
+    <div class="pane__head"><h2 id="briefTitle">人物</h2><span class="cnt" id="briefCnt">CAST</span></div>
+    <div class="pane__body" id="briefBody"></div>
+  </section>
+  <main class="core">
+    <div class="worldbar" id="worldbar"></div>
+    <div class="reader" id="reader"></div>
+    <div class="thread" id="thread"><div id="messages" aria-live="polite"></div></div>
+    <div class="rdr__rail" id="rdrRail"></div>
+    <div class="composer" id="composer">
+      <div class="assist-bar" id="assistBar" hidden></div>
+      <div class="cmp-bar" id="cmpBar">
+        <div id="models-slot"></div>
+        <button type="button" data-cmp="clear">清空</button>
+        <button type="button" data-cmp="copy">复制</button>
+        <button type="button" data-cmp="paste">粘贴</button>
+        <button type="button" data-cmp="clip">剪贴板<i id="clipCount"></i></button>
+        <button type="button" id="library-open" aria-expanded="false">指令集</button>
+        <div class="clip-pop" id="clipPop" hidden></div>
+      </div>
+      <div class="lib-pop" id="libPop" hidden></div>
+      <div class="cmp-box">
+        <label class="sl-hidden" for="text">发送内容</label>
+        <textarea id="text" rows="1" placeholder="以意念开口，或写下你的动作……" maxlength="15000"></textarea>
+        <button type="button" id="cmpExpand" class="cmp-expand" aria-label="展开编辑" title="展开编辑">
+          <svg viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>
+        </button>
+        <button type="button" id="send" disabled>发送</button>
+      </div>
+    </div>
+  </main>
+  <aside class="detail"><div class="dt-scroll" id="detail"></div><div class="dt-feature" id="featureHost"></div></aside>
+</div>
+
+<nav id="feature-nav" aria-label="聊天功能" hidden></nav>
+
+<div class="mph" id="mph" data-lv="brief" data-open="0">
+  <div class="mph__scrim" id="mphScrim"></div>
+  <section class="mph__panel" id="mphPanel" role="dialog" aria-label="信息栏">
+    <div class="mph__bar">
+      <button class="mph__back" id="mphBack" type="button" aria-label="返回">‹ 列表</button>
+      <div class="mph__ttl"><b id="mphTitle">人物</b><i id="mphCx">CAST</i></div>
+      <button class="mph__close" id="mphClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div class="mph__body" id="mphBody"></div>
+    <div class="mph__dock" id="mphDock"></div>
+  </section>
+  <nav class="mph__nav" id="mphNav"></nav>
+</div>
+
+<span id="connection" class="sl-hidden">未连接</span>
+<span id="message-count" class="sl-hidden">0 条</span>
+<button id="menu-open" class="sl-hidden" aria-expanded="false" aria-controls="feature-nav">功能菜单</button>
+<button id="theme-toggle" class="sl-hidden">深色</button>
+<p id="notice" role="status" aria-live="polite">正在等待宿主连接……</p>
+<div id="cmpFull" class="cmp-full" hidden aria-label="长文本编辑">
+  <div class="cmp-full__hd"><b>长文本编辑</b><em id="cmpFullCount">0 字</em>
+    <button type="button" id="cmpFullClose">收起</button></div>
+  <textarea id="cmpFullText" maxlength="15000" placeholder="在这里写长段动作与对白，收起后自动带回输入框"></textarea>
+  <div class="cmp-full__ft"><span>回车换行 · 收起不丢字</span><button type="button" id="cmpFullSend">发送</button></div>
+</div>
+<dialog id="confirm"><h2>确认</h2><p></p><div class="actions"><button id="confirm-ok">确定</button><button id="confirm-cancel">取消</button></div></dialog>
+<input id="file" type="file" accept="application/json,.json" hidden>
+<script>/*__FRAME_JS__*/</script>
+</body></html>

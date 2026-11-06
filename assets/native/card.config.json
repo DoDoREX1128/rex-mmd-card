@@ -1,5 +1,5 @@
 {
-  "beginning": "雨停了。守船人抬头看向 {{user}}，等候回应。",
+  "beginning": "晨钟初歇。外门执事把差事木牌推到 {{user}} 面前，等候回应。",
   "statusbar": "",
   "regex_scripts": [
     {

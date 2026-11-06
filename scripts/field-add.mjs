@@ -9,7 +9,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { load, save, validateEntry, CATS, TYPES, LIFECYCLES, STATUSES } from './lib/fields.mjs';
+import { load, save, validateEntry, CATS, TYPES, LIFECYCLES, STATUSES, loadBlueprints } from './lib/fields.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -21,20 +21,31 @@ const all = doc.fields;
 
 /* ---------- 查 ---------- */
 const find = opt('find');
+if (opt('profile')) {
+  const bp=loadBlueprints();
+  if(opt('profile')==='planning') console.log(JSON.stringify(bp.planning,null,2));
+  else if(opt('profile')===bp.runtime.id)console.log(JSON.stringify(bp.runtime,null,2));
+  else { console.error('蓝图用 planning / complete-status-v3'); process.exit(2); }
+  process.exit(0);
+}
 if (find) {
   const q = String(find).toLowerCase();
   const hits = all.filter((f) =>
     f.name.includes(find) || f.key === q || (f.aliases || []).some((a) => a.includes(find)) ||
-    f.category === q || (f.conflict || '').includes(find)
+    f.category === q || (f.conflict || '').includes(find) || (f.note || '').toLowerCase().includes(q)
   );
-  if (!hits.length) { console.log('没有匹配：' + find); process.exit(0); }
-  console.log(`匹配 ${hits.length} 条：`);
+  const bp=loadBlueprints();
+  const blueHits=[...bp.planning,...bp.runtime.fields].filter(f=>JSON.stringify(f).toLowerCase().includes(q));
+  if (!hits.length && !blueHits.length) { console.log('没有匹配：' + find); process.exit(0); }
+  console.log(`语义候选 ${hits.length} 条；蓝图 ${blueHits.length} 条：`);
   for (const f of hits) {
     const cat = (CATS.find(([id]) => id === f.category) || [])[1] || f.category;
     console.log(`  ${f.name}  ${f.key}  ${f.type}  ${cat}/${f.life}  ${f.range}  [${f.status}]` +
       (f.aliases.length ? '  近义:' + f.aliases.join('、') : '') +
       (f.conflict ? '  组:' + f.conflict : ''));
+    if(f.note)console.log('    '+f.note);
   }
+  for(const f of blueHits)console.log(`  蓝图 ${f.path||f.id}（${f.label}）: ${f.merge||f.meaning}；${f.writing}`);
   process.exit(0);
 }
 
@@ -91,7 +102,7 @@ if (gen.status !== 0) {
   process.exit(1);
 }
 console.log(gen.stdout.trim());
-console.log('下一步：把该键写进卡片的 content.status.fields，并在人设 <输出格式> 里声明。');
+console.log('下一步：按所选路线映射字段与实际解析器，更新世界书字段目录、人设指针、开场示例及验收；入库不等于代码已支持。');
 
 /* ---------- 附：清单提示 ---------- */
 if (has('help')) {

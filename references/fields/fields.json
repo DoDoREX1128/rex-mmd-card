@@ -1,10 +1,10 @@
 {
   "schema": "rex-fields/1",
-  "updated": "2026-10-28",
+  "updated": "2026-11-05",
   "naming": {
-    "name": "2–4 个汉字",
-    "key": "2–4 个小写字母",
-    "rule": "库层用汉字检索，运行时用字母键，一一对应"
+    "name": "简短且语义明确的中文名；现有库内登记用2–4字",
+    "key": "语义池缩写是候选，不改写已有工程的实际路径或大小写",
+    "rule": "语义池、创作设计字段与运行时schema分别维护；接入前显式映射"
   },
   "fields": [
     {
@@ -22,7 +22,8 @@
       ],
       "sources": [
         "persona",
-        "yinyu"
+        "yinyu",
+        "complete-template"
       ],
       "note": ""
     },
@@ -37,7 +38,8 @@
       "conflict": null,
       "aliases": [],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -144,7 +146,8 @@
         "长相"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -233,7 +236,7 @@
       "sources": [
         "persona"
       ],
-      "note": ""
+      "note": "此语义池body指体态，不等于完整骨架me.body/npcs.*.body部位字典；接入必须映射。"
     },
     {
       "name": "称号",
@@ -794,7 +797,8 @@
         "衣着"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -813,7 +817,8 @@
       ],
       "sources": [
         "luoli",
-        "yinyu"
+        "yinyu",
+        "complete-template"
       ],
       "note": ""
     },
@@ -900,9 +905,10 @@
         "名录"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
-      "note": ""
+      "note": "语义候选关系；完整骨架人物rel为称谓文本，fav才是好感数值。"
     },
     {
       "name": "同伴",
@@ -1072,7 +1078,8 @@
         "情报板"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1279,9 +1286,10 @@
       ],
       "sources": [
         "luoli",
-        "yinyu"
+        "yinyu",
+        "complete-template"
       ],
-      "note": ""
+      "note": "候选等级；完整骨架人物lv是等级与称号文本，不是通用数值等级。"
     },
     {
       "name": "经验",
@@ -1434,7 +1442,8 @@
         "回合"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1623,7 +1632,8 @@
       ],
       "sources": [
         "persona",
-        "yuji"
+        "yuji",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1641,7 +1651,8 @@
       ],
       "sources": [
         "yuji",
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1744,7 +1755,8 @@
       ],
       "sources": [
         "persona",
-        "luoli"
+        "luoli",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1761,7 +1773,8 @@
         "日子"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1847,7 +1860,8 @@
         "包裹"
       ],
       "sources": [
-        "luoli"
+        "luoli",
+        "complete-template"
       ],
       "note": ""
     },
@@ -1983,9 +1997,10 @@
         "行动选项"
       ],
       "sources": [
-        "persona"
+        "persona",
+        "complete-template"
       ],
-      "note": ""
+      "note": "文案写下一轮可改行动意图，动词起头、不预设成功，随玩家表达习惯调整；数量与长度按所选解析器，见蓝图差异。"
     },
     {
       "name": "属性",
@@ -2055,6 +2070,186 @@
         "persona"
       ],
       "note": ""
+    },
+    {
+      "name": "环境",
+      "key": "env",
+      "type": "text",
+      "category": "space",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "感官条件与可感知限制；不代替坐标"
+    },
+    {
+      "name": "摘要",
+      "key": "sum",
+      "type": "text",
+      "category": "prog",
+      "life": "每轮",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "记录本轮实际变化，不替玩家决定下一步"
+    },
+    {
+      "name": "威胁",
+      "key": "thrt",
+      "type": "num",
+      "category": "combat",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "仅作品有风险刻度时使用，阈值按玩法定义"
+    },
+    {
+      "name": "心声",
+      "key": "mind",
+      "type": "text",
+      "category": "mind",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "此刻第一人称判断；是否允许读取取决于叙事视角"
+    },
+    {
+      "name": "邻地",
+      "key": "near",
+      "type": "list",
+      "category": "space",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "地点与方向/距离；共享地名注册表，不编造缺失距离"
+    },
+    {
+      "name": "习性",
+      "key": "hab",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "稳定行为习惯，写触发、行动与例外，区别即时心声"
+    },
+    {
+      "name": "忌讳",
+      "key": "tabu",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "具体不能触碰的人/事及越界反应，不写有秘密"
+    },
+    {
+      "name": "软肋",
+      "key": "weak",
+      "type": "text",
+      "category": "identity",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "明确限制、可利用条件与代价，区别暂时伤势"
+    },
+    {
+      "name": "称谓",
+      "key": "addr",
+      "type": "text",
+      "category": "rel",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "人物对玩家的称呼；区别数值好感和关系类型"
+    },
+    {
+      "name": "穿搭",
+      "key": "wear",
+      "type": "list",
+      "category": "item",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "按作品装备槽记录穿着变化；不把语义池体态body误作部位字典"
+    },
+    {
+      "name": "系统",
+      "key": "sys",
+      "type": "list",
+      "category": "meta",
+      "life": "阶段",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "可选叙事系统/随身器灵；嵌套结构见完整运行时字段蓝图"
+    },
+    {
+      "name": "留言",
+      "key": "say",
+      "type": "text",
+      "category": "meta",
+      "life": "每轮",
+      "range": "按所选协议定义",
+      "status": "common",
+      "conflict": null,
+      "aliases": [],
+      "sources": [
+        "complete-template"
+      ],
+      "note": "系统此刻的一句反馈，只陈述已知信息和可执行提示"
     }
   ]
 }

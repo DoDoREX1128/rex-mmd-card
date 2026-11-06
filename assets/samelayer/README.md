@@ -1,5 +1,7 @@
 # 旧版同层最小基座
 
+完整旧版同层作品默认使用[完整同层骨架](../samelayer-complete/README.md)，它已保留完整 HUD 与 81项完整动作目录。本目录仅作最小演示，不用它替换完整骨架后再逐项重做原生适配。
+
 host.js是旧版DOM适配与Host-only存储；frame.html是sandbox=allow-scripts隔离页面。首次向特定Frame发送MessagePort，Frame核验parent来源，后续通过专用port和session通信。Frame没有父DOM与父存储权限。
 
 已实现基础动作：snapshot、setInput、send、openPersona、openMore、fillDialog、confirmDialog、capabilities、storage.get、storage.set、returnNative。编辑/删除/回溯明确未实现。参考上游61项不是本基座数量；capabilities返回当前可用性，真实MMD均需项目验收。
@@ -35,3 +37,7 @@ node scripts/preview-samelayer.mjs --host assets/samelayer/host.js --frame asset
 ```
 
 浏览器打开本地壳后检查：写草稿不发送、不同草稿受保护、人设/更多面板让位、返回MMD/同层、二次进入、路由退出销毁、无scope不能存、不同scope不串档。生产选择器及scope由Host所在项目配置，不能直接把mock账号标识带进正式卡。详见[同层架构](../../references/22-平台-同层卡架构.md)与[真实目标验收](../../references/54-验收-真实平台测试.md)。
+
+## 长篇扩展
+
+[成品模板](../../references/26-平台-旧版同层成品模板.md)提供三份产物的协作方法；[长篇组件](../kits/longform-samelayer/README.md)提供独立题材的 persona/worldbook 与状态回放工具，需明确接入 Frame，不会自动扩展本基座的原生动作。

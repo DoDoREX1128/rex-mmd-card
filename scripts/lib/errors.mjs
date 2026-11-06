@@ -32,6 +32,11 @@ export const LAYER_IDS = new Set(LAYERS.map(([id]) => id));
 /* 版本维度：0 = 旧页（chatVersion:0）、1 = 新版沙盒（chatVersion:1） */
 export const VERSIONS = ['v0', 'v1', 'both'];
 export const VERSION_LABEL = { v0: '旧版 0', v1: '新版 1', both: '两版共用' };
+export const ROUTES = ['sandbox', 'same', 'native'];
+export const ROUTE_LABEL = { sandbox: '新版沙盒卡', same: '旧版同层卡', native: '旧版原生卡' };
+export const routesOf = e => e.routes || ROUTES.filter(r => r === 'sandbox'
+  ? e.versions.includes('v1') || e.versions.includes('both')
+  : e.versions.includes('v0') || e.versions.includes('both'));
 
 /* 归属：回答「这错该谁改」。排障时先分清，不然会去改改不动的东西 */
 export const SCOPES = ['platform', 'author', 'skill'];
@@ -84,6 +89,10 @@ export function validateEntry(e, all, { allowSelf = null } = {}) {
   if (!e.title || e.title.length < 8 || e.title.length > 60) errs.push('标题长度需在 8–60 字之间');
   if (!Array.isArray(e.versions) || !e.versions.length) errs.push('必须至少标注一个版本（v0 / v1 / both）');
   else for (const v of e.versions) if (!VERSIONS.includes(v)) errs.push(`版本「${v}」必须是 ${VERSIONS.join(' / ')}`);
+  if (e.routes !== undefined) {
+    if (!Array.isArray(e.routes) || !e.routes.length || e.routes.some(r => !ROUTES.includes(r))) errs.push('routes 必须包含 sandbox / same / native 中的适用路线');
+    else if (e.routes.some(r => !(e.versions || []).includes('both') && !(e.versions || []).includes(r === 'sandbox' ? 'v1' : 'v0'))) errs.push('routes 与 versions 不相容');
+  }
   if (!LAYER_IDS.has(e.layer)) errs.push(`分层「${e.layer}」不在清单内`);
   if (!SCOPES.includes(e.scope)) errs.push(`归属「${e.scope}」必须是 ${SCOPES.join(' / ')}`);
   if (!VERDICT_IDS.has(e.verdict)) errs.push(`判决「${e.verdict}」不在清单内`);

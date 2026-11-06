@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>武魂殿 · 琉璃纪元 — 预览台</title>
+<style>
+:root{
+  --gold:#D9B36A;--gold-hi:#F6E3AE;--violet:#8C5CFF;--ice:#7FE3F0;
+  --text:#EFE9F8;--text-2:#B3A5C9;--text-3:#75678E;--text-4:#4C4260;
+  --line:rgba(255,255,255,.09);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:
+    radial-gradient(70% 50% at 50% -8%,rgba(140,92,255,.20),transparent 64%),
+    radial-gradient(50% 40% at 50% 108%,rgba(217,179,106,.10),transparent 66%),
+    #05030B;
+  color:var(--text);
+  font:13px/1.6 "PingFang SC","HarmonyOS Sans SC","Microsoft YaHei UI",system-ui,sans-serif;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+header{
+  flex:0 0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:11px 18px;border-bottom:1px solid rgba(217,179,106,.14);
+  background:linear-gradient(180deg,rgba(22,14,40,.86),rgba(10,6,20,.6));
+  backdrop-filter:blur(14px);z-index:5;
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:4px}
+.crest{width:26px;height:26px;clip-path:polygon(50% 2%,66% 38%,50% 98%,34% 38%);
+  background:linear-gradient(180deg,#FFF7DD,#F6E3AE 34%,#D9B36A 62%,rgba(140,92,255,.6));
+  filter:drop-shadow(0 0 10px rgba(246,227,174,.7))}
+.brand b{font-family:"Noto Serif SC","Songti SC",serif;font-size:14px;letter-spacing:.18em;color:var(--gold-hi)}
+.brand i{font-style:normal;font-size:9px;letter-spacing:.2em;color:var(--text-4)}
+.sep{width:1px;height:20px;background:var(--line)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);
+  color:var(--text-2);font-size:11.5px;letter-spacing:.06em;cursor:pointer;transition:.2s;
+  font-family:inherit;
+}
+.chip:hover{border-color:rgba(217,179,106,.36);color:var(--gold-hi)}
+.chip.on{color:#241704;background:linear-gradient(135deg,var(--gold-hi),var(--gold) 58%,#B58F4B);
+  border-color:transparent;font-weight:600;box-shadow:0 6px 18px -8px rgba(217,179,106,.9)}
+.devices{display:flex;gap:4px;margin-left:auto;padding:3px;border-radius:9px;
+  border:1px solid var(--line);background:rgba(8,4,16,.6)}
+.dev{padding:4px 12px;border-radius:7px;font-size:11px;letter-spacing:.08em;color:var(--text-3);
+  cursor:pointer;border:0;background:none;font-family:inherit}
+.dev.on{color:var(--gold-hi);background:rgba(217,179,106,.14)}
+.stage{flex:1;min-height:0;display:grid;place-items:center;padding:14px;position:relative;overflow:hidden}
+.frame-wrap{position:absolute;left:50%;top:50%;transform-origin:center center;will-change:transform}
+iframe{display:block;width:100%;height:100%;border:1px solid rgba(217,179,106,.26);border-radius:10px;background:#06030C;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 40px 90px -30px #000,0 0 80px -30px rgba(140,92,255,.5)}
+.stage.pc .frame-wrap{width:1440px;height:900px}
+.stage.mob .frame-wrap{width:390px;height:844px}
+.stage.mob iframe{border-radius:22px}
+.hint{flex:0 0 auto;padding:7px 18px 10px;font-size:10.5px;color:var(--text-4);
+  display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hint b{color:var(--gold-dim,#8A6F3C);font-weight:400}
+.hint code{font-family:Consolas,monospace;color:var(--text-3);background:rgba(255,255,255,.04);
+  padding:1px 5px;border-radius:4px}
+a{color:var(--ice);text-decoration:none;border-bottom:1px dotted rgba(127,227,240,.4)}
+</style></head>
+<body>
+<header>
+  <div class="brand"><span class="crest"></span>
+    <div><b>武魂殿 · 琉璃纪元</b><br><i>PREVIEW HARNESS</i></div></div>
+  <div class="sep"></div>
+  <div class="chips" id="chips"></div>
+  <div class="devices">
+    <button class="dev on" data-dev="pc">PC 1440×900</button>
+    <button class="dev" data-dev="mob">手机 390×844</button>
+  </div>
+</header>
+<div class="stage pc" id="stage"><div class="frame-wrap" id="wrap">
+  <iframe id="fv" title="预览"></iframe>
+</div></div>
+<div class="hint">
+  <span><b>说明</b> 本地预览，跑的是构建产物 <code>frame.html</code>，带演示数据。</span>
+  <span>手机模式会自动打开上滑信息栏。</span>
+  <span><a href="frame.html#devboot" target="_blank">在新标签打开整页</a></span>
+</div>
+<script>
+const PAGES = [
+  {id:'chat', label:'聊天 · 流式', hash:''},
+  {id:'page', label:'聊天 · 分页', hash:'&read=page'},
+  {id:'cast', label:'人物 · 基础', hash:'&nav=cast', sheet:1},
+  {id:'soul', label:'人物 · 武魂', hash:'&nav=cast&ctab=soul', sheet:1},
+  {id:'bone', label:'人物 · 魂骨', hash:'&nav=cast&cs=bone', sheet:1},
+  {id:'me',   label:'主角 · 武魂', hash:'&nav=cast&cast=me&ctab=soul', sheet:1},
+  {id:'system', label:'系统', hash:'&nav=system', sheet:1},
+  {id:'world', label:'世界', hash:'&nav=world', sheet:1},
+  {id:'bond', label:'关系', hash:'&nav=bond', sheet:1},
+  {id:'chron', label:'编年', hash:'&nav=chron', sheet:1},
+  {id:'map',  label:'地图', hash:'&nav=map', sheet:1},
+  {id:'look', label:'外观', hash:'&nav=look', sheet:1}
+];
+let cur = 'cast', dev = 'pc';
+try {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('p') && PAGES.some(x => x.id === qs.get('p'))) cur = qs.get('p');
+  if (qs.get('dev') === 'mob') dev = 'mob';
+} catch (_) {}
+const fv = document.getElementById('fv');
+const stage = document.getElementById('stage');
+const wrap = document.getElementById('wrap');
+
+document.getElementById('chips').innerHTML = PAGES.map(p =>
+  `<button class="chip" data-id="${p.id}">${p.label}</button>`).join('');
+
+function load(){
+  const p = PAGES.find(x => x.id === cur) || PAGES[0];
+  let h = '#devboot' + (p.hash || '');
+  if (dev === 'mob' && p.sheet) h += '&sheet=detail';
+  /* 时间戳必须放 query：只改 hash 不会真正重载 iframe */
+  fv.src = 'frame.html?t=' + Date.now() + h;
+  document.querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.id === cur));
+}
+function fit(){
+  stage.className = 'stage ' + dev;
+  document.querySelectorAll('.dev').forEach(b => b.classList.toggle('on', b.dataset.dev === dev));
+  const W = dev === 'pc' ? 1440 : 390;
+  const H = dev === 'pc' ? 900 : 844;
+  const sw = stage.clientWidth - 28, sh = stage.clientHeight - 28;
+  const s = Math.min(1, sw / W, sh / H);
+  wrap.style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('.chip');
+  if (c) { cur = c.dataset.id; load(); return; }
+  const d = e.target.closest('.dev');
+  if (d) {
+    dev = d.dataset.dev;
+    document.querySelectorAll('.dev').forEach(b => b.classList.toggle('on', b.dataset.dev === dev));
+    fit(); load();
+  }
+});
+window.addEventListener('resize', fit);
+fit(); load();
+</script>
+</body></html>

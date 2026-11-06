@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>原生消息层夹具</title>
+<style>
+  html,body{margin:0;background:#141019;color:#efe7f7;font:14px/1.65 system-ui,"Microsoft YaHei"}
+  #msglistview{width:430px;padding:14px}
+  .item{padding:10px 8px;border-bottom:1px solid #2b2436}
+  .item .content{display:block;white-space:pre-wrap}
+  .item .tag{font-size:11px;color:#9d8fb5}
+  .msg-option-scope{position:fixed;left:24px;top:24px;z-index:9;background:#241c2f;border:1px solid #5b4a72;border-radius:8px;padding:6px;min-width:150px}
+  .msg-options-box .option-item{padding:7px 12px;border-radius:6px;cursor:pointer}
+  .msg-options-box .option-item:hover{background:#332843}
+  .u-popup__content{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(8,4,12,.55)}
+  .confirm-scope{background:#1d1626;border:1px solid #6a5686;border-radius:10px;padding:18px 18px 14px;min-width:280px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+  .confirm-content{margin:0 0 14px;white-space:pre-wrap}
+  .confirm-bottom{display:flex;gap:10px;justify-content:flex-end}
+  .confirm-bottom .btn{padding:6px 16px;border-radius:6px;border:1px solid #6a5686;background:#2a2036;color:#efe7f7;cursor:pointer}
+  .confirm-bottom .ok-btn{padding:6px 16px;border-radius:6px;border:1px solid #a988d8;background:#3a2b4e;color:#fff;cursor:pointer}
+  .hidden{display:none}
+</style></head>
+<body>
+<div id="chat-input-scope"><textarea id="nativeInput"></textarea><button id="nativeSend">发送</button></div>
+<div id="msglistview"></div>
+<!-- 真站常驻 DOM、display:none 的确认框模板：删除聊天 / 重置聊天 -->
+<div class="u-popup__content hidden" id="tplDeleteChat"><div class="confirm-scope"><p class="confirm-content">确定删除历史聊天记录吗？删除后将无法恢复</p><div class="confirm-bottom"><button class="btn">取消</button><button class="ok-btn">确定</button></div></div></div>
+<div class="u-popup__content hidden" id="tplReset"><div class="confirm-scope"><p class="confirm-content">确定要重置角色吗？所有聊天记录将被清除</p><div class="confirm-bottom"><button class="btn">取消</button><button class="ok-btn">确定</button></div></div></div>
+
+<script src="../../kit/core.js"></script>
+<script src="../../kit/actions.js"></script>
+<script src="../../kit/native.js"></script>
+<script src="../../kit/actions-dom.js"></script>
+<script src="../../kit/actions-handlers.js"></script>
+<script>
+(function () {
+  var qs = new URLSearchParams(location.hash ? location.hash.slice(1) : location.search);
+  var V = {
+    hold: Number(qs.get('hold') || 0),
+    toggle: qs.get('toggle') === '1',
+    /* 确认框文案：full=带「回溯」；plain=只说删除（真站换过文案）；short=只说确定 */
+    text: qs.get('text') || 'full',
+    /* 有没有确认框：off = 点了立即回溯（某些版本） */
+    dialog: qs.get('dialog') !== 'off',
+    /* 真站回溯会连目标一起删（「这条消息及下方所有消息都将被删除」）；keep=1 才保留 */
+    keepTarget: qs.get('keep') === '1',
+    /* 确定按钮是 .ok-btn 还是只有文案 */
+    okClass: qs.get('ok') !== 'plain',
+    /* mmd=真站那套 .mmd-confirm（.mmd-ok 文案「回溯」）；scope=旧的聊天记录确认框 */
+    ui: qs.get('ui') || 'mmd'
+  };
+  var TEXT = {
+    full: '确认回溯？ 这条消息及下方所有消息都将被删除。',
+    plain: '删除此消息下方的所有消息，删除后将无法恢复',
+    short: '确定继续吗？'
+  };
+  var SEED = [
+    ['Ai', '叙述 / 01', '晨钟初歇。执事堂门外已经排起了队。'],
+    ['self', '你 / 02', '我来查看差事。'],
+    ['Ai', '叙述 / 03', '执事翻开名册。\n\n「先看清期限。」他说。'],
+    ['Ai', '叙述 / 04', '「我叫宁素衣。」']
+  ];
+  var list = document.getElementById('msglistview');
+  function paint() {
+    list.innerHTML = '';
+    SEED.forEach(function (row) {
+      var a = document.createElement('div');
+      a.className = 'item ' + row[0];
+      var t = document.createElement('div'); t.className = 'tag'; t.textContent = row[1];
+      var c = document.createElement('div'); c.className = 'content ' + (row[0] === 'Ai' ? 'left' : 'right');
+      c.textContent = row[2];
+      a.append(t, c); list.append(a);
+    });
+    bind();
+  }
+  function bind() {
+    list.querySelectorAll('.item .content').forEach(function (c) {
+      if(V.hold){
+        var timer;
+        c.addEventListener('mousedown',function(){
+          clearTimeout(timer);timer=setTimeout(function(){
+            if(V.toggle&&document.querySelector('.msg-option-scope'))closeMenu();
+            else openMenu(c.closest('.item'));
+          },V.hold);
+        });
+        c.addEventListener('mouseup',function(){clearTimeout(timer);});
+        return;
+      }
+      ['pointerdown', 'mousedown'].forEach(function (type) {
+        c.addEventListener(type, function () { openMenu(c.closest('.item')); });
+      });
+    });
+  }
+  function openMenu(item) {
+    closeMenu();
+    var scope = document.createElement('div'); scope.className = 'msg-option-scope';
+    scope.addEventListener('click',function(e){if(e.target===scope)closeMenu();});
+    var box = document.createElement('div'); box.className = 'msg-options-box';
+    /* 真站实测：用户消息的菜单也是四项（也带「开启新的故事」） */
+    var labels = ['复制', '删除', '回溯', '开启新的故事'];
+    labels.forEach(function (label) {
+      var opt = document.createElement('div'); opt.className = 'option-item'; opt.textContent = label;
+      opt.addEventListener('click', function () {
+        closeMenu();
+        if (label === '回溯') rollback(item);
+        else if (label === '删除') confirmThen(item, '确认删除这条消息？删除后无法恢复', function () { item.remove(); });
+      });
+      box.append(opt);
+    });
+    scope.append(box); document.body.append(scope);
+  }
+  function closeMenu() { var m = document.querySelector('.msg-option-scope'); if (m) m.remove(); }
+  function remove(item, includeSelf) {
+    var rows = [].slice.call(list.querySelectorAll('.item'));
+    var at = rows.indexOf(item);
+    rows.forEach(function (el, i) { if (includeSelf ? i >= at : i > at) el.remove(); });
+  }
+  function confirmThen(item, copy, act) {
+    var pop = document.createElement('div'); pop.className = 'u-popup__content'; pop.id = 'confirmLive';
+    var box = document.createElement('div'); box.className = 'confirm-scope';
+    var p = document.createElement('p'); p.className = 'confirm-content'; p.textContent = copy;
+    var bottom = document.createElement('div'); bottom.className = 'confirm-bottom';
+    var cancel = document.createElement('button'); cancel.className = 'btn'; cancel.textContent = '取消';
+    cancel.addEventListener('click', function () { pop.remove(); });
+    var ok = document.createElement('button'); ok.className = 'ok-btn'; ok.textContent = '确定';
+    ok.addEventListener('click', function () { pop.remove(); act(); });
+    bottom.append(cancel, ok); box.append(p, bottom); pop.append(box); document.body.append(pop);
+  }
+  function rollback(item) {
+    if (!V.dialog) { remove(item, !V.keepTarget); return; }
+    var pop = document.createElement('div'); pop.className = 'u-popup__content'; pop.id = 'confirmLive';
+    var box = document.createElement('div'); box.className = 'confirm-scope';
+    var p = document.createElement('p'); p.className = 'confirm-content'; p.textContent = TEXT[V.text];
+    var bottom = document.createElement('div'); bottom.className = 'confirm-bottom';
+    var cancel = document.createElement('button'); cancel.className = 'btn'; cancel.textContent = '取消';
+    cancel.addEventListener('click', function () { pop.remove(); });
+    var ok = document.createElement('button'); ok.className = V.okClass ? 'ok-btn' : 'btn'; ok.textContent = '确定';
+    ok.addEventListener('click', function () { pop.remove(); remove(item, !V.keepTarget); });
+    bottom.append(cancel, ok); box.append(p, bottom); pop.append(box); document.body.append(pop);
+  }
+
+  /* 测试入口：走真实 actions-dom → actions-handlers */
+  window.__fixture = { variant: V, paint: paint };
+  window.__run = function (opts) {
+    window.__last = null;
+    return (async function () {
+    opts = opts || {};
+    var api = MmdSameLayerActionDOM.dom(document, { actionTimeoutMs: opts.timeout || 900 });
+    var snap = api.snapshot(), rows = snap.messages.items;
+    var at = opts.index == null ? 1 : opts.index, row = rows[at];
+    var before = rows.length;
+    var report = { before: before, at: at, role: row && row.role };
+    try {
+      var res = await api.invoke('rollbackMessage', { revision: snap.messages.revision, messageId: row.id });
+      report.ok = true; report.phase = res.data && res.data.phase;
+    } catch (e) {
+      report.ok = false; report.code = e.code || ''; report.message = e.message || String(e);
+    }
+    report.after = document.querySelectorAll('#msglistview .item').length;
+    report.menuOpen = !!document.querySelector('.msg-option-scope');
+    report.liveDialog = !!document.querySelector('#confirmLive');
+    report.stuckDialog = !!document.querySelector('.u-popup__content:not(.hidden) .confirm-scope');
+    window.__last = report;
+    return report;
+    })();
+  };
+  window.__runDelete = function (opts) {
+    opts = opts || {};
+    window.__last = null;
+    return (async function () {
+      var api = MmdSameLayerActionDOM.dom(document, { actionTimeoutMs: opts.timeout || 900 });
+      var snap = api.snapshot(), rows = snap.messages.items;
+      var at = opts.index == null ? 1 : opts.index, row = rows[at];
+      var report = { before: rows.length, at: at };
+      try {
+        var res = await api.invoke('deleteMessage', { revision: snap.messages.revision, messageId: row.id });
+        report.ok = true; report.phase = res.data && res.data.phase;
+      } catch (e) { report.ok = false; report.code = e.code || ''; report.message = e.message || String(e); }
+      report.after = document.querySelectorAll('#msglistview .item').length;
+      report.texts = [].slice.call(document.querySelectorAll('#msglistview .item .content')).map(function (e) { return e.textContent.slice(0, 6); });
+      report.stuckDialog = !!document.querySelector('.u-popup__content:not(.hidden) .confirm-scope');
+      window.__last = report;
+      return report;
+    })();
+  };
+  paint();
+})();
+</script>
+</body></html>

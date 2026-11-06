@@ -1,7 +1,35 @@
 # 错题本 · 规则
 
 > 记录「一次排障得出的结论」，并允许后来的复测推翻它。
-> 与 [字段库](../fields/README.md) 的区别：字段库只增不删，错题本**必须可证伪**。
+> [字段库](../fields/README.md)维护语义与映射；错题本的经验结论**必须可证伪**。
+
+## 0. Agent 必须执行的读取入口
+
+创建、修改、修复和继续任务，先定三条路线，再按下表读取本次模块的完整条目；方案确定前、写对应模块前、故障定位时、交付前均回查适用项。不能等踩坑后才搜索，也不能以“看过索引”代替读解法与边界。纯内容任务只读内容组，小修只读受影响组，不强制遍历全库。
+
+| 阶段/模块 | 实施前完整读取 |
+|---|---|
+| 选路线、复用已有工程 | [E-009](cases.md#e-009)、[E-026](cases.md#e-026)、[E-029](cases.md#e-029)、[E-070](cases.md#e-070)、[E-088](cases.md#e-088) |
+| 人设、世界书、开场与字段设计 | [E-037](cases.md#e-037)、[E-060](cases.md#e-060)、[E-061](cases.md#e-061)、[E-062](cases.md#e-062)、[E-080](cases.md#e-080)、[E-081](cases.md#e-081)、[E-086](cases.md#e-086)、[E-087](cases.md#e-087) |
+| 旧版同层原生动作、确认、关闭与桥接 | [E-038](cases.md#e-038) 至 [E-046](cases.md#e-046)，生图另读 [E-059](cases.md#e-059)，动作链验收读 [E-089](cases.md#e-089) |
+| 旧版同层状态、实体、编年与地图 | [E-031](cases.md#e-031) 至 [E-037](cases.md#e-037)、[E-053](cases.md#e-053)、[E-054](cases.md#e-054) |
+| 旧版原生逐消息引擎 | [E-002](cases.md#e-002)、[E-003](cases.md#e-003)、[E-006](cases.md#e-006)、[E-007](cases.md#e-007)、[E-030](cases.md#e-030)、[E-077](cases.md#e-077)、[E-090](cases.md#e-090) |
+| 新版沙盒SDK、生命周期与净化 | [E-014](cases.md#e-014) 至 [E-021](cases.md#e-021)、[E-030](cases.md#e-030)、[E-071](cases.md#e-071)、[E-073](cases.md#e-073)、[E-074](cases.md#e-074)、[E-085](cases.md#e-085) |
+| 交互、阅读、全屏、主题与移动布局 | [E-047](cases.md#e-047) 至 [E-058](cases.md#e-058)、[E-082](cases.md#e-082)、[E-083](cases.md#e-083)、[E-084](cases.md#e-084)，依具体模块选读 |
+| 审阅同步、存档与续档 | [E-063](cases.md#e-063)、[E-068](cases.md#e-068)、[E-075](cases.md#e-075)、[E-076](cases.md#e-076) |
+| 点火、打包、更新与交付 | [E-001](cases.md#e-001) 至 [E-005](cases.md#e-005)、[E-013](cases.md#e-013)、[E-064](cases.md#e-064) 至 [E-068](cases.md#e-068)、[E-078](cases.md#e-078)、[E-079](cases.md#e-079)、[E-089](cases.md#e-089)、[E-091](cases.md#e-091)、[E-092](cases.md#e-092)，线上更新仅本次任务涉及才读E-092 |
+
+在已有工程任务记录中写“适用编号 → 本次采用的做法 → 验证结果/未验证项”。无关项说明不适用即可；不在用户正文增加工程解释。查阅不算命中，不自动执行 `--hit`。同一工程未改前提的既有结论可复用；平台/协议/模块变化再回查。
+
+```text
+node scripts/error-log.mjs --route same
+node scripts/error-log.mjs --find 回溯 --route same
+node scripts/error-log.mjs --find 载体 --route native
+node scripts/error-log.mjs --find 生命周期 --route sandbox
+node scripts/error-log.mjs --show E-040
+```
+
+三条路线的清单见[索引](index.md)，完整解法见[逐条记录](cases.md)。索引处置摘要有截断，不能作为完整方案。
 
 ## 1. 为什么要有这个东西
 
@@ -36,6 +64,10 @@
 | `note` | 归档时必填 | 为什么归档 |
 | `source` | 否 | 出处：哪次事故、哪份文档、哪个对照实验 |
 | `date` | 是 | 最后核验日期 |
+| `routes` | 新记录推荐 | `sandbox` 新版沙盒 / `same` 旧版同层 / `native` 旧版原生；比v0/v1更精确 |
+| `verification` | 新记录推荐 | 修改后怎样证明症状消失；本地与目标站分列 |
+| `limits` | 新记录推荐 | 适用前提、尚未实现、不可推广的范围 |
+| `example` | 否 | 必要的调用或修复示例，与该条解法一起维护 |
 
 ## 3. 分层：按「发生在哪一层」，不按症状
 
@@ -73,7 +105,7 @@
 
 | 标记 | 含义 |
 |---|---|
-| `v0` | 旧页（`chatVersion:0`，`img onerror` 点火、可选 iframe 同层） |
+| `v0` | 旧页；离线导入包不写chatVersion。旧版原生可逐消息onerror，完整同层使用匹配的文档级点火链 |
 | `v1` | 新版沙盒（`chatVersion:1`，`sdk.*` + `[data-chat]`） |
 | 两个都给 | 两版都会遇到，或问题出在产物之外（编码、限额、流程） |
 
@@ -83,6 +115,8 @@
 - 「样式被盖住」：`v0` 是平台 chrome 的层级；`v1` 是舞台层 2000 / 全屏层 3000。
 
 **跨版本套结论是本库最常见的误用。** 记录时必须标版本，检索时必须先筛版本。
+
+同为v0仍须用routes区分同层与原生。未填routes的旧条目按versions宽泛筛选，使用时另核对前提；新条目应填精确路线。
 
 ## 5. 判决：六种，会互相转化
 
@@ -172,6 +206,7 @@ node scripts/error-log.mjs --restore E-002
 |---|---|
 | [errors.json](errors.json) | 唯一真源 |
 | [index.md](index.md) | 按版本 → 层生成的索引，含失效区（勿手改） |
+| [cases.md](cases.md) | 从真源生成完整条目、修复示例与复测，按稳定E编号链接（勿手改） |
 | `archive.jsonl` | 删除条目的墓碑，运行时生成（不存在属正常）；`--restore` 从这里取 |
 | `scripts/gen-errors.mjs` | 生成索引，`--check` 进自测 |
 | `scripts/error-log.mjs` | 增 / 查 / 改 / 归档 / 删除 / 恢复 |

@@ -1,6 +1,6 @@
 {
   "schema": "rex-errors/2",
-  "updated": "2026-10-28",
+  "updated": "2026-11-05",
   "naming": {
     "id": "E-三位序号",
     "rule": "编号只增不复用；判决改变时保留编号与历史"
@@ -16,14 +16,17 @@
       "scope": "platform",
       "symptom": "一百多条分片只有第一条跑，后面全部不执行；页面空白，控制台干净。",
       "cause": "平台可能不是把上一条替换结果串给下一条，而是每条规则各自作用于原文。链式标记传到第二条就找不到了。",
-      "fix": "默认按独立拓扑写：所有标记一次性放进 beginning，每条规则只认自己那一个。要复刻链式成品才用链式，并双语义重放。",
+      "fix": "先确认实际点火入口与替换拓扑。完整同层骨架保留 statusbar 链式实现，在累积语义下验证收敛；另跑独立语义定位断链，不能把链式在独立语义下的失败写成通过。明确要独立拓扑时才让各标记同时进入可执行入口，并验证入口限额。",
       "verdict": "confirmed",
       "evidence": "device",
       "checks": 3,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §1 真站对照实验",
-      "date": "2026-10-28"
+      "source": "完整骨架 pack.py/pack_base.py；26 §6；双语义重放对照",
+      "date": "2026-10-28",
+      "routes": [
+        "same"
+      ]
     },
     {
       "id": "E-002",
@@ -41,8 +44,12 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §3 对照实验：合法 gif → slp:null；data:, → slp:60",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-003",
@@ -54,14 +61,18 @@
       "scope": "platform",
       "symptom": "代码在本地看着对，贴进平台后变形：__X__ 变粗体、/*x*/ 变斜体、< 被当标签开头提前闭合。",
       "cause": "注入内容会被聊天管线或编辑器再处理一遍，Markdown 语法先于脚本生效。",
-      "fix": "内联代码里避免裸 _ * < >：全局名用纯大写、循环用 !==、比较用减法、标记用【…】。打包器加 guard() 检测到危险字符直接退出。",
+      "fix": "按 HTML/属性/JS/JSON/Markdown 所在层分别转义或编码，回读最终载体。已有 launcher 的 guard 字符集只约束该注入段，不能把下划线、星号、比较符列为全部业务代码的禁用字符。",
       "verdict": "confirmed",
       "evidence": "device",
       "checks": 3,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §2",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-004",
@@ -79,8 +90,11 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §5",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same"
+      ]
     },
     {
       "id": "E-005",
@@ -98,8 +112,12 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §4",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-006",
@@ -118,11 +136,15 @@
       "instead": null,
       "fixedIn": null,
       "source": "24 §4.1 实测：高 102px / 子元素合计 51px",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-007",
-      "title": "元素 ID 不带时间戳，第二次打开就失效",
+      "title": "重复注入实例ID冲突导致再次进入时定位错误",
       "versions": [
         "v0"
       ],
@@ -130,14 +152,18 @@
       "scope": "author",
       "symptom": "第一次进页面正常，切走再回来按钮全哑；或同一页面出现两套同名元素。",
       "cause": "同一父文档内元素 ID 必须唯一。固定 ID 在重复注入时产生冲突，后挂的节点抢不到引用。",
-      "fix": "ID 统一命名 类型_功能_毫秒时间戳，同模块共用同一时间戳；data-s 引用的 ID 与 label for 必须一致。",
+      "fix": "实例 ID 保持唯一并与销毁/复用策略一致；可以用计数器或作用域 ID，不强制时间戳。定位与 label 引用同步更新。",
       "verdict": "confirmed",
       "evidence": "device",
       "checks": 2,
       "instead": null,
       "fixedIn": null,
       "source": "24 §4.2",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-008",
@@ -157,7 +183,12 @@
       "instead": null,
       "fixedIn": null,
       "source": "20 分流表 / 洛璃 mmd.md",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-009",
@@ -176,7 +207,11 @@
       "instead": null,
       "fixedIn": null,
       "source": "20 §5 真实事故 2026-10-27",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-010",
@@ -194,8 +229,11 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §8",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same"
+      ]
     },
     {
       "id": "E-011",
@@ -207,14 +245,17 @@
       "scope": "author",
       "symptom": "面板还开着，里面所有按钮都不响应，关掉重开又正常。",
       "cause": "每次开面板 revision+1，动作带旧 revision 调用会被判过期。面板没重开就继续用时 revision 不匹配。",
-      "fix": "动作调用带当前 revision；界面提供\"重开面板\"的显式入口，或在过期时自动重挂。",
+      "fix": "动作前读取当前目标与内容指纹，按实际处理器更新 revision；自己动作后仅 revision 变而内容未变不应锁为外部冲突。只对已证实高频失效的菜单采用元素/目标校验，保留提交目标与数据冲突保护。",
       "verdict": "confirmed",
       "evidence": "device",
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §8",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same"
+      ]
     },
     {
       "id": "E-012",
@@ -232,8 +273,11 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §8",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "same"
+      ]
     },
     {
       "id": "E-013",
@@ -252,8 +296,13 @@
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "53 §6",
-      "date": "2026-10-28"
+      "source": "历史原生动作排障记录；对应实现见kit/actions-dom.js、actions-handlers.js与Frame功能模块",
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-014",
@@ -272,26 +321,33 @@
       "instead": null,
       "fixedIn": null,
       "source": "21 §6 事件表",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-015",
-      "title": "sdk.save.get 在首次保存前不可用",
+      "title": "瘦预览同步读档抛错导致整卡初始化中断",
       "versions": [
         "v1"
       ],
       "layer": "sdk",
       "scope": "platform",
-      "symptom": "首次进卡时读存档拿到 null 或直接抛错，界面初始化中断。",
-      "cause": "存档键在第一次 save 之前不存在，get 没有可返回值。",
-      "fix": "所有读存档都用 try/catch 包住并给默认值；写入放在首次有效交互之后。",
+      "symptom": "创卡页瘦预览中 save.get/save.keys 同步抛错；正常聊天里不存在的键也可能只返回空值。",
+      "cause": "把瘦预览的能力不可用和正常首次读空档混为一谈，又用 Promise.catch 接同步异常。",
+      "fix": "save.get/save.keys 用 try/catch；空档走默认初始化，读取失败保留原档并提示，不能宣称所有部署首次保存前都不支持读取。",
       "verdict": "confirmed",
       "evidence": "source",
       "checks": 2,
       "instead": null,
       "fixedIn": null,
-      "source": "21 §6 / 瘦预览矩阵",
-      "date": "2026-10-28"
+      "source": "21 §10 能力矩阵；25 SDK 签名与异常形态",
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ],
+      "example": "```js\nfunction loadState(key) {\n  try { return sdk.save.get(key) || null; }\n  catch (e) { sdk.debug.log('save unavailable', e && e.code); return null; }\n}\n```\n\n不包 `try/catch` 的后果：整段脚本失效，页面无提示。瘦预览打开就炸。\n\n"
     },
     {
       "id": "E-016",
@@ -310,7 +366,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "21 §11 瘦预览矩阵",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-017",
@@ -322,14 +381,17 @@
       "scope": "platform",
       "symptom": "自绘 HUD 在本地正常，真站里被舞台 / 立绘盖住，点击也点不到。",
       "cause": "平台自身占用较高层级：舞台内容约 2000、全屏层约 3000，作者层的 1000–1999 落在它们下面。",
-      "fix": "作者页面级浮层用 3500–7999；气泡内元素才用 1–999；不要把 1000–3499 当安全带。",
+      "fix": "检查实际 document、祖先 opacity/transform/filter 与层叠上下文，再核对平台当前层级。3500–7999 仅为历史页面级浮层参考，气泡上下文不能靠无限 z-index 穿透。",
       "verdict": "confirmed",
       "evidence": "manual",
       "checks": 2,
       "instead": null,
       "fixedIn": null,
       "source": "洛璃 mmd-sandbox 实测区间；本 skill 42 §4 已按此改",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-018",
@@ -348,7 +410,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "洛璃平台文档 / 官方 contract 的扁平 CSS 要求",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-019",
@@ -367,7 +432,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "洛璃 sandbox-kit 主题层 / 21 §4",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-020",
@@ -386,7 +454,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "compilePattern 等价逻辑 / validate.mjs 已加规则",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-021",
@@ -405,7 +476,10 @@
       "instead": null,
       "fixedIn": "2026-10-28 全链改【rex-xxx】",
       "source": "21 §1 禁令 / 洛璃 7 条 WARN",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-022",
@@ -425,7 +499,12 @@
       "instead": null,
       "fixedIn": null,
       "source": "facts.json limits.replaceString",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-023",
@@ -445,7 +524,12 @@
       "instead": null,
       "fixedIn": null,
       "source": "未在本机复现，按编码常识记录",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-024",
@@ -464,7 +548,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "21 §11 导入顺序",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-025",
@@ -483,7 +570,10 @@
       "instead": null,
       "fixedIn": null,
       "source": "2026-10-28 交叉实测（洛璃 SBK 产物）",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-026",
@@ -503,7 +593,12 @@
       "instead": null,
       "fixedIn": "2026-10-28 45 重写",
       "source": "作者当面纠正",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-027",
@@ -523,7 +618,12 @@
       "instead": null,
       "fixedIn": "2026-10-28 全库替换",
       "source": "2026-10-28 术语审计",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-028",
@@ -543,7 +643,12 @@
       "instead": null,
       "fixedIn": "2026-10-28 facts.json",
       "source": "2026-10-28 漂移审计",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
     },
     {
       "id": "E-029",
@@ -554,15 +659,18 @@
       "layer": "process",
       "scope": "author",
       "symptom": "按同层卡方式写了 iframe 与原生桥接，新版页面里既不显示也无法交互。",
-      "cause": "新版是沙盒模型：没有 iframe 宿主、没有原生动作桥，能力全部走 sdk.* 与 DOM 插槽。",
-      "fix": "选路线前先定版本：新版走 sdk + [data-chat]，旧版才谈 iframe 与动作注册表。两套产物不可互换。",
+      "cause": "把旧页原生 DOM/Host 协议直接用于新版公开 SDK 路线，目标页面不提供同一接口。",
+      "fix": "先锁定新版沙盒、旧版同层或旧版原生；新版用公开 SDK 与槽位，旧版同层用匹配的 Host/Frame。判断接口边界，不能泛称新版没有任何 iframe。",
       "verdict": "confirmed",
       "evidence": "source",
       "checks": 1,
       "instead": null,
       "fixedIn": null,
       "source": "21 / 22 边界表",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox"
+      ]
     },
     {
       "id": "E-030",
@@ -583,7 +691,1540 @@
       "fixedIn": null,
       "note": "",
       "source": "52 §5 与 e2e 断言：切宽屏 / 重进页面后动作只执行一次",
-      "date": "2026-10-28"
+      "date": "2026-10-28",
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ]
+    },
+    {
+      "id": "E-031",
+      "title": "隐藏后状态不更新且正文没变时被跳过",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "正文正常但世界/人物停在旧值，单改状态仍不刷新",
+      "cause": "innerText 跳过 hidden 节点，缓存又只比较显示正文",
+      "fix": "Host 分开采集 raw=textContent 与显示文本；解析与变更签名使用原文，显示剥离协议",
+      "verification": "保持正文不变只修改隐藏状态，验证两轮更新与正文无JSON",
+      "limits": "不能把任意可见DOM文本当原始协议",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-032",
+      "title": "长状态隐藏时尾部字段被截掉",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "regex",
+      "scope": "author",
+      "symptom": "短块正常，长档案字段丢失或后文被吞",
+      "cause": "用替换捕获组搬整段数据触及目标替换长度与净化行为",
+      "fix": "完整骨架沿用只改边界的隐藏实现，保留原文供Host读取；新隐藏策略先做长块净化对照",
+      "verification": "短块/超长块/后接正文各回读原文、解析值、显示文本",
+      "limits": "不是任意平台都支持同一隐藏容器",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-033",
+      "title": "协议换名后只归一开标签导致全块失配",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "旧标签可读，新旧混合闭合时状态全空",
+      "cause": "归一只处理开标签，闭标签仍保留旧名",
+      "fix": "归一开闭两端并覆盖带属性历史标签；生成只用[status]",
+      "verification": "新方括号、旧尖括号、带属性、开闭历史组合逐项回放",
+      "limits": "兼容读取不要求新稿继续生成旧标签",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-034",
+      "title": "流式半截状态与裸JSON泄漏到正文",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "生成中出现大段JSON，结束后才消失",
+      "cause": "隐藏正则等待完整闭合；显示剥离与解析各维护了一份",
+      "fix": "显示从已识别开标签剥到结尾并处理半截标记；同步所有显示路径，完整且校验通过才应用状态",
+      "verification": "逐字符推入半块、闭合后应用一次，正文恢复且后续文字保留",
+      "limits": "裸JSON补救仅限明确历史兼容通道",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-035",
+      "title": "只应用末条或按旧turn跳过导致历史档案丢失",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "后续增量没带的角色/装备消失，重置后仍是旧世界",
+      "cause": "末条不是全量；turn非消息身份；缓存未在重置时清掉",
+      "fix": "完整历史按宿主顺序回放assistant块；缺键继承，重复快照幂等；重置/切会话清基线再拉取",
+      "verification": "三轮增量、重复turn、编辑、删除、重置与切会话分别检查",
+      "limits": "内置turn补偿不是完整的编辑/删除重建保证，扩展需专项实现",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-036",
+      "title": "改名后实体重复且空数组不能删除旧装备",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "同一能力越改名卡越多，写空表仍有旧装备",
+      "cause": "按显示名认实体；增量集合没有定义删除语义",
+      "fix": "稳定ID优先并声明槽位迁移；旧无ID按空槽认领，满槽残项隔离；需要删除时另设计删除标记并改解析器",
+      "verification": "同ID改名、无ID旧档、满槽、显式新ID和空集合分别验证",
+      "limits": "内置能力环/外附集合仍只增不删，不能把[]当已实现删除",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-037",
+      "title": "未知数值被当成零或已发生事实",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "未知能力显示0级/未觉醒，缺地名却切到默认地图",
+      "cause": "缺省演示值与业务零混用",
+      "fix": "未知显示未知或问号，已知零单独保留；保留未知原文与来源，不编造默认地点",
+      "verification": "缺失/null/合法0/未知枚举四类输入分别检查",
+      "limits": "未知不等于未觉醒、死亡或不存在",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §3；frame/frame-main.js 状态解析与合并；状态协议制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-038",
+      "title": "图标采集为空且可写输入被漏掉",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "肉眼看到按钮，结构扫描却没有动作或输入框",
+      "cause": "uni-image真实图在background-image，img透明；可写控件可能0×0且预览readonly",
+      "fix": "结构发现与可操作性分开；保留已适配图标签名与顺序，写入只用确认可写控件并回读",
+      "verification": "背景图图标、淡入层、readonly镜像与真实输入四种夹具",
+      "limits": "不全局取消可见性检查，不删除readonly绕过平台约束",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-039",
+      "title": "常驻隐藏模板被当成已开的面板与确认框",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "NATIVE_PANEL_BUSY、点了隐藏确定、气泡飘到屏幕外",
+      "cause": "querySelector命中display:none模板或PC/手机重复项",
+      "fix": "面板/确认框/气泡锚点只认当前有布局盒的目标，结构图标扫描另处理；按对象与文案分辨同类弹窗",
+      "verification": "同类隐藏模板与一个真实弹窗并存，宽窄各点一次",
+      "limits": "opacity淡入和display:none不同，不能仅用节点存在判已打开",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-040",
+      "title": "回溯菜单短按不出现或二次长按把菜单关掉",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "HUD回溯超时，平台手动长按能打开",
+      "cause": "真实菜单要保持mousedown约1000ms且是toggle，旧夹具却立即弹出",
+      "fix": "已开菜单先收掉；保持按下直到菜单出现再释放；检验所需标签，不写死总项数",
+      "verification": "真实计时长按、预开toggle、用户/AI四项菜单、旧菜单变体",
+      "limits": "1000ms是已观测页面行为；平台变动定向改共享适配",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-041",
+      "title": "确认流程换文案或无二次确认时回溯误报失败",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "消息已消失仍TIMEOUT，或.mmd-confirm无人处理",
+      "cause": "写死confirm-scope/ok-btn/保留目标/二次确认等假设",
+      "fix": "复用完整处理器兼容mmd-confirm/mmd-ok与旧样式；按角色正文签名核对允许的最终列表，成功则停止，不重复执行",
+      "verification": "无确认、一次/二次确认、目标保留/连目标删除、末条不可回溯",
+      "limits": "破坏性真实闭环仅在已授权测试数据上；夹具不能代表当前站DOM",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-042",
+      "title": "关闭与返回被忙锁卡住且原生浮层残留",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "动作卡住后不能关面板，回原生页叠着旧窗口",
+      "cause": "关闭也await动作或受busy锁；部分弹层仅有遮罩无关闭按钮",
+      "fix": "本地立即关闭/返回，原生后台收尾；优先close-btn否则已定位遮罩；finally解锁并清非当前层",
+      "verification": "动作超时/异常/无关闭按钮时仍可返回且残留为零",
+      "limits": "不能点击未识别的任意遮罩",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-043",
+      "title": "自写多步提交被revision变化误判外部编辑",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "自己刚保存下一步就STALE_VIEW，草稿被快照抹掉",
+      "cause": "revision高频重算；仅比较版本，没比较内容与提交目标",
+      "fix": "每步重读目标，内容投影与用户草稿分开；版本和内容都变才认冲突，并保留确认令牌目标约束",
+      "verification": "自身保存、外部改内容、只变revision、同名不同ID四类验证",
+      "limits": "不可全局关闭revision和指纹保护",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-044",
+      "title": "桥接返回读错层与快照方法被传输层拒绝",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "动作实际成功却永久等待；devStub正常真MessagePort失败",
+      "cause": "处理器回{ok,data}却读result；snapshot.now有dispatch但不在接收白名单",
+      "fix": "按真实返回结构读data并立即报契约错误；HUD调用、传输白名单、dispatch、处理器和回读一起维护",
+      "verification": "用真实MessagePort测snapshot.now/native.invoke/写后回读及未知方法拒绝",
+      "limits": "devStub直调绕过传输，不能证明桥接全链已通",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "assets/samelayer-complete/frame/frame-main.js:applyRexStatus；kit/host.js；testing/transport.mjs",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-045",
+      "title": "选项指令与地图前往冲掉草稿或重复追加",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "玩家已写的字被替换，连点一条重复堆叠，原生输入没同步",
+      "cause": "入口各自赋value，没共享追加与镜像流程",
+      "fix": "完整骨架沿用追加、按空行整段去重、焦点落末尾、触发input并立即镜像；失败保留草稿，不自动发送",
+      "verification": "空框/有草稿/多条/重复/镜像失败/光标/自动增高逐项检查",
+      "limits": "手打完全相同段落也会去重；替换需求应显式切模式",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-046",
+      "title": "创建外观选了却没到HUD或污染模型文本",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "头像选择无效或模型把主题/头像当剧情事实",
+      "cause": "纯UI偏好与角色设定共用提交块，删文本后又漏接本地状态",
+      "fix": "把角色选择、开局种子、纯UI偏好分开；UI偏好经已校验桥接存储并重绘，提交只写需要模型知道的设定",
+      "verification": "换头像后提交块无此字段，HUD和刷新后偏好一致；返回步骤草稿仍在",
+      "limits": "界面选择不是已发生剧情，不把玩家意图写成确定结果",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §5；kit/actions-dom.js、actions-handlers.js、host.js；原生动作制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-047",
+      "title": "根属性撞点击委托与拖拽吞掉子按钮",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "整片导航无反应、手机地图按钮失效",
+      "cause": "closest匹配到根data-nav/data-skin后提前return，pointercapture夺走click目标",
+      "fix": "根容器与动作属性分名；委托限制目标范围；手势先排除按钮输入链接，避免嵌套button",
+      "verification": "点击空白、子图标、按钮、拖拽后按钮和触屏各验",
+      "limits": "修共享事件路由，不逐个按钮贴补丁",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-048",
+      "title": "全屏浮层被filter祖先裁在栏目里",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "fixed全屏仍只占右栏，抬z-index也无效",
+      "cause": "backdrop-filter/transform祖先改变包含块或层叠上下文",
+      "fix": "让合适容器本身全屏或移到正确根；再排层级，不靠无限增大z-index",
+      "verification": "有filter与无filter、开关全屏、ESC、窄屏返回验证",
+      "limits": "Frame内部全屏不等于覆盖跨源宿主页",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-049",
+      "title": "跨模块同名类与hidden覆盖造成排版异常",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "文本变每行五字、hidden面板仍显示、深色层次消失",
+      "cause": "无作用域类互相覆盖；display:flex覆盖hidden；层级token同色",
+      "fix": "按组件根限定类，显式维护[hidden]隐藏；用叠加明度和边框分层，换肤检查硬编码",
+      "verification": "同屏装两模块、hidden切换、深浅主题计算样式与截图",
+      "limits": "风格选择不是平台限制，具体配色不固定",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-050",
+      "title": "窄屏硬宽度与textarea默认行数造成溢出",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "横滚、按钮点不到、输入栏无法压缩",
+      "cause": "固定宽子项、flex默认min-width、textarea默认两行、hover独占反馈",
+      "fix": "弹性子项min-width:0；按钮按内容保可点，textarea显式rows/高度；触屏提供常显反馈与键盘检查",
+      "verification": "320/360/412等实际目标宽度、长地名、长输入、软键盘检查",
+      "limits": "桌面模拟不算实体设备通过，尺寸按作品实测",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-051",
+      "title": "字体内联引号截断导致各芯片同字形",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "charset",
+      "scope": "author",
+      "symptom": "字体选择看起来不同但实际计算字体相同",
+      "cause": "style属性外层与font-family内部双引号碰撞",
+      "fix": "正确转义属性或用style.fontFamily赋值，不直接拼不受控HTML",
+      "verification": "含空格/双引号字体栈回读属性与computedStyle",
+      "limits": "不把单一引号习惯当所有层通用规则",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-052",
+      "title": "翻页重影页码漂移与切模式跳回首屏",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "一页多条重影，翻页计数受transform影响，切模式丢阅读位置",
+      "cause": "scroll-snap或整屏高度代替真实分栏；拿内容顶当视口顶",
+      "fix": "沿用CSS分栏、offsetLeft/实际页宽、边缘裁切；以视口文字节点和offset存锚，局部滚动不滚所有祖先",
+      "verification": "同段往返、长短混合消息、字体/宽度变化、页边不露下一栏",
+      "limits": "分栏是完整骨架路线；不强制所有原创卡都要翻页",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-053",
+      "title": "编年重复追加且删除后不减",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "多次快照堆同一摘要，删消息后历史仍在",
+      "cause": "按写入次数或幕标题推记录，而不是消息身份",
+      "fix": "从当前消息ID与sum重建编年；重复快照幂等，删除同步减少；排序用宿主确认顺序",
+      "verification": "3消息推4次仍3条，删1变2条，编辑摘要更新原条",
+      "limits": "模型turn和幕号都不是消息唯一ID",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-054",
+      "title": "地区标题混用与未知地名强制切默认图",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "帝国名被当城名，人物与当前地点出现在不同地图",
+      "cause": "regionId/regionName/viewTitle混用，多份别名表与演示兜底",
+      "fix": "单一地名注册表共享loc/where/near；地区ID名标题分层，loc可校正region，未知保留原文并提示",
+      "verification": "注册名/别名/房间后缀/非法region/loc冲突/未知地名验证",
+      "limits": "换题材重建注册表；不复制示例地理当通用事实",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-055",
+      "title": "连点锁定缩放越点越变形且选中不重绘",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "尺寸累积漂移、收藏选中无反馈、编辑中光标丢失",
+      "cause": "布局反读上次自己写的尺寸；重绘key漏状态或全量重建输入",
+      "fix": "只从原始数据算布局；key覆盖收藏锁定选择；同层更新保滚动与输入节点",
+      "verification": "连点12次尺寸相同，选中即时反馈，编辑光标与滚动不跳",
+      "limits": "地图标签先夹取再评分避让，不用固定坐标硬摆",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-056",
+      "title": "全角符号按盒居中仍明显偏斜",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "问号视觉偏左，动画又把校正量顶掉",
+      "cause": "字体advance盒与墨迹包围盒不同，transform覆盖偏移",
+      "fix": "使用实际字体measureText墨迹边界校正；动画保留校正变量，字体就绪/变化后重新测量",
+      "verification": "换字体、字号、首次字体未就绪与减少动态模式截图",
+      "limits": "无包围盒能力时给可解释回退，不套padding百分比魔法数",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-057",
+      "title": "原型整页接入后样式泄漏或重写交互走样",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "封面进卡后HUD全乱，已通过原型交互丢失",
+      "cause": "全局CSS侵入；移植时从头重写并漏生命周期",
+      "fix": "完整封面复用ShadowDOM隔离，改root/query根/动效承载；移除评审条和假HUD，销毁监听observer",
+      "verification": "原型与集成版关键行为对照，关闭重开和reduced-motion验证",
+      "limits": "ShadowDOM不赋予访问父DOM权限，非必须每组件都套shadow",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-058",
+      "title": "首次动效跳动与手机画布挡内容掉帧",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "首帧布局闪跳、手机按钮被视效盖住、发热卡顿",
+      "cause": "显现早于布局；画布层级与DPR/粒子/刷新率不受控",
+      "fix": "先定布局后显现；装饰层不吃交互，分层蒙版；按设备实测限制DPR/帧率/粒子，认减少动态并销毁资源",
+      "verification": "低功耗与高DPR、后台再进、触摸、动态关闭验证",
+      "limits": "具体帧率/粒子数是作品预算，不是平台硬值",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-059",
+      "title": "生图入口认错且提交被误称已经出图",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "点复制却进生图，费用显示与平台不一致，超时重复生成",
+      "cause": "复制生图同尺寸图标且位置/能力有限；把提交当完成",
+      "fix": "沿用已验证图标组合和顺序降级识别，仅能力存在时显示；镜像原生模式/段落/费用，只报已提交，不代扣不自动重试计费",
+      "verification": "最后AI/非末条、禁用段、合并、费用、滚动、关闭与提交确认验证",
+      "limits": "本地夹具不调用计费；真实生成另按本次授权测",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §2；frame界面模块与CSS；交互/阅读/地图制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-060",
+      "title": "世界书priority当数组序号导致关键规则最低",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "data",
+      "scope": "author",
+      "symptom": "重要输出规则被资料挤走，调uid却无改善",
+      "cause": "把order、数组位置与UID混成一个顺序",
+      "fix": "order按实际优先级，大值更优先；稳定UID独立；按分组分配可插空区间，触发用实际文本回放",
+      "verification": "关键规则与多资料同时命中，核对order和启用状态及预算",
+      "limits": "步长10/常驻全高于触发是项目策略，不是所有作品硬要求",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "31/32/02；世界书与审阅同步制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-061",
+      "title": "世界书缩标题后创建参考失去触发",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "data",
+      "scope": "author",
+      "symptom": "目录有条目但提交选择名称后模型拿不到介绍",
+      "cause": "缩短comment却删旧key或新短名未加入关键词",
+      "fix": "保留原触发词、添加新短名，用实际创建提交文本回放；同义重复先看是否预期多条共触发",
+      "verification": "每项选择都可触发正确条目，检查漏触发与抢词预算",
+      "limits": "不强求全库关键词零重叠；只消除非预期竞争",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "31/32/02；世界书与审阅同步制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-062",
+      "title": "人物资料常驻重复与示例标点导致模型格式错",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "token膨胀又漏字段；模型照示例输出全角逗号JSON",
+      "cause": "人设/世界书/解析器各一张冲突字段表，格式样例未真实解析",
+      "fix": "字段目录单一真源、人设保留指针；示例逐块JSON.parse，检查关键大小写、类型、边界；只修格式不重写正常正文",
+      "verification": "常驻预算回读、样例解析、首见建档、增量与全量样例一致",
+      "limits": "不把固定六块、每十轮或三选项当所有题材必填",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "31/32/02；世界书与审阅同步制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-063",
+      "title": "审阅稿回灌错UID或覆盖未处理修改意见",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "重排后意见落错条，双改被静默覆盖或未处理意见进导入文件",
+      "cause": "用W序号/数组位置当UID，审阅与源双真值",
+      "fix": "稳定映射与源/审阅/产物基线；双改或意见非空停止相应构建，先处理再同步；保留未知元数据",
+      "verification": "重排、双改、意见、标题含分隔符、往返零差异验证",
+      "limits": "完整骨架使用现有review脚本；历史单向稿不自动假定可逆",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "31/32/02；世界书与审阅同步制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-064",
+      "title": "构建漏模块或重铺基座覆盖原生补丁",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "tooling",
+      "scope": "skill",
+      "symptom": "frame少大段、面板空指针、已修动作下次又坏",
+      "cause": "隐式文件扫描漏模块；上游同步覆盖本地定制或拼接尾段两份",
+      "fix": "显式模块清单+缺文件断言+语法检查；复用已补丁快照，需上游同步时保存可重放补丁并assert",
+      "verification": "删除模块构建失败、补丁重放一致、产物完整性与行为回归",
+      "limits": "不在每次出包运行上游重铺，不手改生成regex",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §6–8；构建、验收与制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-065",
+      "title": "压缩包还原不一致却只数规则宣布成功",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "tooling",
+      "scope": "skill",
+      "symptom": "分片齐但启动失败，或payload与实际Frame不同",
+      "cause": "base64截断、索引缺失、不确定压缩、依赖旧WebView缺失API",
+      "fix": "保留确定性LZ77纯JS解码；校验令牌收敛、连续索引、逐片/完整SHA、还原字节与长度；规则总数含隐藏启动",
+      "verification": "重复构建一致、损坏片拒绝、导出JSON还原Frame逐字节一致",
+      "limits": "哈希只证明传输一致，不证明目标平台已执行",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §6–8；构建、验收与制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-066",
+      "title": "同hash导航与多层iframe让验证读到旧卡",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "accept",
+      "scope": "skill",
+      "symptom": "发布后仍旧界面，顶层截图空但聊天内已有HUD",
+      "cause": "SPA同hash不reload；Host与Frame位于不同文档",
+      "fix": "核对实际构建标记与入口，必要时真实刷新；分别定位应用iframe与内部Frame并留证",
+      "verification": "更新前后构建标记不同，确认操作的是真目标文档",
+      "limits": "入口由用户提供，不自行换相似卡测试",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §6–8；构建、验收与制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-067",
+      "title": "夹具全绿被当成真站导入和实机通过",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "accept",
+      "scope": "skill",
+      "symptom": "模拟菜单立即弹却真站要长按，注入能跑但导入不明",
+      "cause": "夹具按自己假设造；本地/注入/导入/实体证据混用",
+      "fix": "先目标只读取DOM时序/源码再做夹具；E3/E4导入/E5分列，缺闭环写PARTIAL或NOT RUN；断言真实结果",
+      "verification": "报告含目标构建、实际路径、前后结果，截图模拟不能算真机",
+      "limits": "破坏性和计费功能只有适当授权才实测，未测不能报100%",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §6–8；构建、验收与制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-068",
+      "title": "文档计数与清单落后却反改产物迁就文字",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "条目规则数互相矛盾，旧版报告被当当前状态",
+      "cause": "多个手写计数和过时记录争夺真源",
+      "fix": "从当前交付回读并生成manifest，文档引用同一统计；记录文件SHA与核验日期，失效结论改判保留",
+      "verification": "比对UID数/启用常驻/触发/停用/片数/总规则与SHA",
+      "limits": "停用条不计入启用常驻，规则数不等于分片数",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "26 §6–8；构建、验收与制作记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-069",
+      "title": "只有余额或购买按钮但交易无法闭环",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "点击购买看似扣款却未落状态，价格与叙事不符",
+      "cause": "UI发明了无权威源的经济系统",
+      "fix": "先确定唯一结算者；无完整结算就只提交可改意图草稿，不改余额、不假报买成",
+      "verification": "确认草稿、失败保留、已提交/已结算两态与数值来源验证",
+      "limits": "保留货币可选性，不把某卡删货币当通用禁令",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-070",
+      "title": "只改标题配色就误称完成通用模板换题材",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "新卡还露旧地图技能文案或存档串卡",
+      "cause": "题材数据、schema、世界书、UI与scope没有一起映射",
+      "fix": "列出内容/字段/地理/创建/视觉/存储适配表；复用原生骨架，按用户需求替换各题材模块，核对实际界面",
+      "verification": "全文源扫描加关键页面/空态/旧档迁移检查，不能只搜标题",
+      "limits": "工程骨架复用不强迫沿用示例题材和作者人设结构",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-071",
+      "title": "新版查询早于挂载且自定义属性被净化",
+      "versions": [
+        "v1"
+      ],
+      "routes": [
+        "sandbox"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "querySelector恒空，事件绑定从未成功",
+      "cause": "脚本早于Vue内容挂载，自写data属性不在当前净化白名单",
+      "fix": "内容查询放message生命周期，长期UI用stage；依赖公开插槽，清理订阅并验证净化后的实际DOM",
+      "verification": "冷启动、mount/unmount、再进入及属性回读",
+      "limits": "不要把新版data-chat规则套到旧版原生",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-072",
+      "title": "正则字面量重复或标记未进入执行入口",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "regex",
+      "scope": "author",
+      "symptom": "规则数正确但后条永不命中、HTML从不出现",
+      "cause": "编译失败/重复消耗同一标记/入口缺失，没有实际替换重放",
+      "fix": "按目标版本编译并回放命中顺序；唯一标记接实际入口，确认令牌全消耗与渲染",
+      "verification": "重复式/无入口/非法flags/正常式负正对照",
+      "limits": "不是所有未带斜杠都错误，需区分允许的字面量与正则",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-073",
+      "title": "SDK值当函数或关闭stage仍用节点存在判开关",
+      "versions": [
+        "v1"
+      ],
+      "routes": [
+        "sandbox"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "version()抛TypeError，舞台关闭时仍以为已打开",
+      "cause": "未按SDK签名，stage.el关闭时也可能返回DIV",
+      "fix": "version按值读，stage开关查visible，参数返回按25；错误上屏并按能力降级",
+      "verification": "值属性、关闭节点、瘦预览与正常聊天分别验证",
+      "limits": "不猜测未公开SDK签名",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。",
+      "example": "```js\nif (sdk.version !== '1') sdk.debug.log('unexpected sdk version', sdk.version);\n```\n\n写 `sdk.version()` 会抛 `TypeError`。\n\n```js\nsdk.stage.open('content');\nconst el = sdk.stage.el();       // 关着也返回节点\nif (!sdk.stage.visible()) return; // 判断开关只能用它\n```\n\n"
+    },
+    {
+      "id": "E-074",
+      "title": "ready不补发且发送重入让界面冷启动失效",
+      "versions": [
+        "v1"
+      ],
+      "routes": [
+        "sandbox"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "等ready没渲染，连点发送BUSY又丢草稿",
+      "cause": "ready最后到且不回放；send未完成不排队",
+      "fix": "首屏按mount/done挂载，ready仅诊断；提交加finally锁，失败保留草稿，成功后再消费一次性上下文",
+      "verification": "冷启动事件序列、连点、失败重试与重入销毁验证",
+      "limits": "传输接受不等于回复生成完或服务器持久化",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。",
+      "example": "不排队、不是限频。发送锁自己加：\n\n```js\nvar sending = false;\nasync function send(text) {\n  if (sending) return;\n  sending = true;\n  try { await sdk.message.send(text); }\n  catch (e) { sdk.debug.log('send fail', e && e.code); }\n  finally { sending = false; }\n}\n```\n\n限频（60 秒窗口）：`save.set` 20 次；`message.send` 手势 3 次 / 自动 3 次；`message.edit` 10 次。\n\n"
+    },
+    {
+      "id": "E-075",
+      "title": "持久化使用临时消息ID或固定scope导致丢档串卡",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "刷新后历史失联，不同角色读到同一存档",
+      "cause": "本地msg.id会变化；localStorage键没有账号角色会话隔离",
+      "fix": "新版持久身份用serverId并判空；旧版查真实Host标识再定scope，版本迁移保护原档；cache只存临时UI",
+      "verification": "刷新、换会话/角色/账号、读失败、不兼容与导出恢复验证",
+      "limits": "完整模板原有固定键需要换卡适配，不宣称自动隔离",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。",
+      "example": "`serverId === null` 表示服务端还不认得这条（开场白、刚发出未落库）。调用前判空，否则抛 `INVALID_ARGS`。\n\n"
+    },
+    {
+      "id": "E-076",
+      "title": "存档异步旧写覆盖新写且失败toast冒充保存",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "提示成功但刷新丢失，重试写成了另一份数据",
+      "cause": "没有串行队列，吞异常或失败后静默换后端",
+      "fix": "串行写、捕获失败载荷、明确未保存与可重试；读取失败禁止自动覆盖，不静默换后端",
+      "verification": "反序完成、写失败、重试原载荷、刷新回读及续档一次性发送",
+      "limits": "默认组件与扩展支持分别核验",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-077",
+      "title": "旧版逐消息载体定位引号与实例作用域出错",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "native"
+      ],
+      "layer": "ignite",
+      "scope": "author",
+      "symptom": "一条引擎不绑定、空白行增多、重入时定位到旧容器",
+      "cause": "载体在容器外、closest或属性引号错误、ID重复、pre-line保留换行",
+      "fix": "按24分开逐消息与文档级初始化；编码HTML属性与JS，实例根唯一，销毁旧监听并核对换行布局",
+      "verification": "多消息同时挂载、同一消息重绘、嵌套引号与换行对照",
+      "limits": "保留旧页聊天，不换成完整同层卡来修局部引擎",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-078",
+      "title": "外链CSP跨域与字体回退被当成本地可用",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "本地file可读但https加载失败、Canvas污染或主流程卡死",
+      "cause": "script/font/connect/img策略不同，CORS与CSP混淆",
+      "fix": "按目标部署查具体指令、网络和taint；依赖延迟加载、可见降级并保主流程，字体给可用系统回退",
+      "verification": "断网/拒绝依赖/字体失败/媒体拒播/Canvas导出分别验证",
+      "limits": "不宣称某站永远只许inline或所有外链都不可用",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-079",
+      "title": "真站入口探针与实体连接缺失被误判卡坏",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "accept",
+      "scope": "skill",
+      "symptom": "旧版因无data-chat失败，设备unauthorized却写手机通过",
+      "cause": "把新版自动探针套旧版，BrowserSkill或设备链未连接",
+      "fix": "按54安装连接bsk并核对浏览器；旧版按真实Host/Frame验；设备授权由用户完成，缺环境NOT RUN",
+      "verification": "正确入口与登录、bsk doctor、真实设备标识、焦点键盘横屏记录",
+      "limits": "模拟viewport不算E5，截屏空先查iframe/活动页",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-080",
+      "title": "字段目录允许30字而状态投影仍截20字",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "较长选项在气泡完整但WORLD.opt镜像末尾消失",
+      "cause": "内容协议与applyRexStatus的slice(0,20)不同步",
+      "fix": "换卡前核对字段映射与实际裁剪；要支持30字须同时修改投影与测试并更新完整性哈希，不能只改世界书",
+      "verification": "用21至30字opt对比气泡、WORLD状态、存档三处",
+      "limits": "当前冻结运行时仍截20；本条记录差异，不声称已修",
+      "verdict": "confirmed",
+      "evidence": "source",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "assets/samelayer-complete/frame/frame-main.js:applyRexStatus；frame/frame-features.js:optsOf；字段目录与状态投影对照",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-081",
+      "title": "字段候选键与实际嵌套路径混用造成静默无效",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "配置了body/rel/act却显示错误，直接加未知键毫无效果",
+      "cause": "语义候选与不同解析器键形不同；body可指体态也可指部位字典",
+      "fix": "设计字段表时记录完整路径/类型/权威源/UI；使用实际解析器支持的schema或先做映射扩展",
+      "verification": "逐字段新值落UI、缺省/空/边界、同名异义与大小写验证",
+      "limits": "字段库不是平台schema，原生KV/新版平面/完整嵌套不可互换",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-082",
+      "title": "作品内实现说明挤占界面且样例带进交付",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "用户看到评审条、假HUD、实现术语与旧模板例子",
+      "cause": "工程解释与实际用户流程混在一起，删说明时又删了错误反馈",
+      "fix": "实现说明留工程；界面保留可操作标签、空态、危险后果、错误原因；原型占位在集成前清理",
+      "verification": "首屏与全路径扫残留，失败仍可理解且返回可达",
+      "limits": "审美偏好不入错题；此条针对无效内容污染与漏反馈",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-083",
+      "title": "素材与视觉主题只套滤镜导致不一致",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "照片与舆图不协调、标注互压、组件换肤花脸",
+      "cause": "素材风格与信息表达未统一，随机纹理代替地理结构，硬编码色漏换",
+      "fix": "先出关键静态样张确认；按题材重绘结构层，标注避让，语义token控制主题，素材来源与许可核对",
+      "verification": "关键宽度地图标签/深浅主题/素材失败对照",
+      "limits": "示例美术风格不当通用标准；许可按具体素材核对",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-084",
+      "title": "反复重绘与未清理资源造成滚动卡顿内存上涨",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "css",
+      "scope": "author",
+      "symptom": "长对话越来越卡，切走仍在跑动画",
+      "cause": "流式每字全量重绘、读写布局交错、每消息新引擎未销毁",
+      "fix": "只更新变化节点并按体验节流；大库延迟，滤镜局部化；监听计时器observer引擎随生命周期释放",
+      "verification": "长对话生成、三次重进/切页、后台再回及资源计数验证",
+      "limits": "节流间隔与视觉预算由目标设备实测，不固定通用数字",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-085",
+      "title": "历史save.remove故障被当成所有部署永久不可用",
+      "versions": [
+        "v1"
+      ],
+      "routes": [
+        "sandbox"
+      ],
+      "layer": "sdk",
+      "scope": "author",
+      "symptom": "文档照旧断言remove不能用，实际部署行为未核对",
+      "cause": "单一旧目标NETWORK探针被升级为平台通用限制",
+      "fix": "先测当前部署返回；历史问题保留目标边界，可选set(key,null)墓碑方案需读档识别并核对keys语义",
+      "verification": "当前目标删除/读回/枚举与异常分别记录",
+      "limits": "墓碑写null不等价物理删除，不含历史故障必然复现的保证",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "25 §3.1 历史目标save.remove探针；SDK错误形态与墓碑替代示例",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。",
+      "example": "以下是历史目标的墓碑替代示例，仅在已选择该策略时使用；它不是物理删除。\n\n历史样本就绪态抛 `NETWORK`，该样本重试无效，当前部署需复验。删档改用 `save.set(key, null)`，读的时候把 `null` 当\"无存档\"。\n\n```js\nasync function dropSave(key) {\n  try { await sdk.save.set(key, null); }\n  catch (e) { sdk.debug.log('drop fail', e && e.code); }\n}\n```\n\n"
+    },
+    {
+      "id": "E-086",
+      "title": "示例字段与样例输出超出自身协议范围",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "protocol",
+      "scope": "author",
+      "symptom": "提示词写3条10至30字，示例却短于下限或含被删键",
+      "cause": "修规则只替文字，旧样例与初始状态未按契约回读",
+      "fix": "从选定项目字段契约检查全部示例/开场/常驻说明；设计边界与实现限制分列，有差异先修或明示",
+      "verification": "最小/增量/全量样例实际解析并核对路径、数量和长度",
+      "limits": "数量范围按作品选定，不把参考卡3条作为所有卡规范",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-087",
+      "title": "单层世界书包裹重复嵌套与闭标签写成开标签",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "data",
+      "scope": "author",
+      "symptom": "条目首尾不配对、内文大量伪标签，分类与文本边界不清",
+      "cause": "复制旧写法、重复标题与嵌套标签未规范化",
+      "fix": "新稿每条content恰一组同名首尾标签，内部普通分节；运行validate-worldbook --author-format，导入旧书先报告不擅改",
+      "verification": "全书逐条验证且保持UID/key/order等元数据",
+      "limits": "这是本skill新稿格式约定，不冒充平台解析硬限制",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-088",
+      "title": "三轮制作频繁换骨架抹掉已有打磨成果",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "same",
+        "sandbox",
+        "native"
+      ],
+      "layer": "process",
+      "scope": "skill",
+      "symptom": "修按钮或点火却整卡换成教学小样，成熟体验大量丢失",
+      "cause": "误判根因或为适配skill倒过来重写作品",
+      "fix": "按文案/皮肤/模块/骨架评估最小有效改动；原生动作修共享层，保留完整Frame和既有内容，再做对照回归",
+      "verification": "原动作清单与返回链无缺项，已有稿件差异可解释",
+      "limits": "只在用户要求重做或确有架构不适用时更换",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-089",
+      "title": "动作已注册但HUD参数传输结果链断裂",
+      "versions": [
+        "v0"
+      ],
+      "routes": [
+        "same"
+      ],
+      "layer": "accept",
+      "scope": "skill",
+      "symptom": "目录计数全对，点按钮仍没效果或参数丢失",
+      "cause": "只验注册表、devStub或stdout，不检查HUD事件与真实MessagePort",
+      "fix": "动作目录→HUD参数→允许方法→处理器→原生变化→快照回读→可见反馈逐段核对；使用工程内真实源码夹具",
+      "verification": "81项逐项标实现/本地/目标/设备与N/A原因，相关流程做正负断言",
+      "limits": "动作数不代表全部真站动作已执行，打印面板数据不算PASS",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "完整同层工程制作记录与制卡规范；现有流程/平台/内容/验收文档归并",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-090",
+      "title": "把动态文本拼进HTML或跨层转义导致结构破坏",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ],
+      "layer": "charset",
+      "scope": "author",
+      "symptom": "含引号/尖括号/美元符的角色或物品名让界面错乱、内容丢失",
+      "cause": "HTML/JS/JSON/正则替换具有不同转义规则，innerHTML引入可执行内容，$可被当捕获引用",
+      "fix": "动态文本优先textContent；属性/数据编码按实际层处理；替换使用正确转义或回调，分片按安全载体编码而非硬切源码",
+      "verification": "引号/尖括号/美元捕获符/换行/非BMP文本往返与布局验证",
+      "limits": "不把任意业务代码eval，不依赖净化器消除注入风险；$不是全部位置都特殊",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "22 §5 同层反模式；24逐消息引擎；构建与原生提交记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-091",
+      "title": "完整代码塞状态栏或动作巨函数让换卡难以维护",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ],
+      "layer": "tooling",
+      "scope": "author",
+      "symptom": "状态栏超限，改一动作必须重读全部，分片截断语法",
+      "cause": "短入口、传输载荷与业务模块不分层，按字符硬切JS",
+      "fix": "状态栏只放短令牌，业务按模块组织、显式合并并编码分片；解析还原后做语法与字节验证",
+      "verification": "入口长度、规则长度、缺模块失败、解压全量与动作回归",
+      "limits": "具体限制以facts.json和对应构建器为准，不把某次片数写死",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "22 §5 同层反模式；24逐消息引擎；构建与原生提交记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
+    },
+    {
+      "id": "E-092",
+      "title": "线上重复提交负ID把更新当成新增记录",
+      "versions": [
+        "v0",
+        "v1"
+      ],
+      "routes": [
+        "sandbox",
+        "same",
+        "native"
+      ],
+      "layer": "data",
+      "scope": "author",
+      "symptom": "更新一次规则数越来越多，重复条目抢匹配",
+      "cause": "把离线导入包id=-1与平台已存记录ID混用，直接反复新增",
+      "fix": "离线包仍遵守目标格式；若本次已授权线上更新，先读取真实记录并按稳定映射复用平台ID，分批更新后回读去重",
+      "verification": "同一更新执行两次，平台记录数不增加，顺序与内容一致",
+      "limits": "不猜平台写接口；此条不要求普通导入包使用正ID，也不授权额外发布",
+      "verdict": "confirmed",
+      "evidence": "manual",
+      "checks": 1,
+      "date": "2026-11-05",
+      "source": "22 §5 同层反模式；24逐消息引擎；构建与原生提交记录",
+      "note": "依据制作记录或静态源码复核；目标站与实体设备的实际验证结果另行记录。"
     }
   ],
   "scopeRule": "platform=平台机制约束，只能绕；author=作者代码写法，可改；skill=本 skill 的文档或工具，由维护者改"
