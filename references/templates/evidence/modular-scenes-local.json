@@ -1,0 +1,425 @@
+{
+  "schema": 1,
+  "template": "sl-modular-scenes",
+  "date": "2026-11-09",
+  "scope": "local-browser-with-mock-native-host",
+  "viewports": [
+    1440,
+    390
+  ],
+  "sameRuntimeAcrossVariants": true,
+  "variants": [
+    {
+      "variant": "harbor",
+      "buildId": "915aa1eefca42b636a2e",
+      "assertions": 46,
+      "tests": [
+        {
+          "name": "1440 模块注册与实际宿主握手",
+          "pass": true
+        },
+        {
+          "name": "1440 视口无横向溢出",
+          "pass": true
+        },
+        {
+          "name": "1440 Frame真实视口与布局断点",
+          "pass": true
+        },
+        {
+          "name": "1440 创建返回保留草稿",
+          "pass": true
+        },
+        {
+          "name": "1440 人物详情打开",
+          "pass": true
+        },
+        {
+          "name": "1440 创建只生成草稿不发送",
+          "pass": true
+        },
+        {
+          "name": "1440 草稿经真实MessagePort写入",
+          "pass": true
+        },
+        {
+          "name": "1440 发送经宿主并回读消息",
+          "pass": true
+        },
+        {
+          "name": "1440 失败不清空草稿",
+          "pass": true
+        },
+        {
+          "name": "1440 历史重放、用户过滤、空列表清空、坏JSON保留",
+          "pass": true
+        },
+        {
+          "name": "1440 删除历史后重建",
+          "pass": true
+        },
+        {
+          "name": "1440 状态版本可忽略恢复",
+          "pass": true
+        },
+        {
+          "name": "1440 百科正文可打开",
+          "pass": true
+        },
+        {
+          "name": "1440 分类筛选",
+          "pass": true
+        },
+        {
+          "name": "1440 地图缩放与地点详情",
+          "pass": true
+        },
+        {
+          "name": "1440 保存确认与偏好生效",
+          "pass": true
+        },
+        {
+          "name": "1440 刷新恢复偏好与创建稿",
+          "pass": true
+        },
+        {
+          "name": "1440 命名存档与恢复",
+          "pass": true
+        },
+        {
+          "name": "1440 会话隔离无串档",
+          "pass": true
+        },
+        {
+          "name": "1440 内置音景可播放",
+          "pass": true
+        },
+        {
+          "name": "1440 返回原生入口",
+          "pass": true
+        },
+        {
+          "name": "1440 重入不重复挂载",
+          "pass": true
+        },
+        {
+          "name": "1440 无页面运行异常",
+          "pass": true
+        },
+        {
+          "name": "390 模块注册与实际宿主握手",
+          "pass": true
+        },
+        {
+          "name": "390 视口无横向溢出",
+          "pass": true
+        },
+        {
+          "name": "390 Frame真实视口与布局断点",
+          "pass": true
+        },
+        {
+          "name": "390 创建返回保留草稿",
+          "pass": true
+        },
+        {
+          "name": "390 人物详情打开",
+          "pass": true
+        },
+        {
+          "name": "390 创建只生成草稿不发送",
+          "pass": true
+        },
+        {
+          "name": "390 草稿经真实MessagePort写入",
+          "pass": true
+        },
+        {
+          "name": "390 发送经宿主并回读消息",
+          "pass": true
+        },
+        {
+          "name": "390 失败不清空草稿",
+          "pass": true
+        },
+        {
+          "name": "390 历史重放、用户过滤、空列表清空、坏JSON保留",
+          "pass": true
+        },
+        {
+          "name": "390 删除历史后重建",
+          "pass": true
+        },
+        {
+          "name": "390 状态版本可忽略恢复",
+          "pass": true
+        },
+        {
+          "name": "390 百科正文可打开",
+          "pass": true
+        },
+        {
+          "name": "390 分类筛选",
+          "pass": true
+        },
+        {
+          "name": "390 地图缩放与地点详情",
+          "pass": true
+        },
+        {
+          "name": "390 保存确认与偏好生效",
+          "pass": true
+        },
+        {
+          "name": "390 刷新恢复偏好与创建稿",
+          "pass": true
+        },
+        {
+          "name": "390 命名存档与恢复",
+          "pass": true
+        },
+        {
+          "name": "390 会话隔离无串档",
+          "pass": true
+        },
+        {
+          "name": "390 内置音景可播放",
+          "pass": true
+        },
+        {
+          "name": "390 返回原生入口",
+          "pass": true
+        },
+        {
+          "name": "390 重入不重复挂载",
+          "pass": true
+        },
+        {
+          "name": "390 无页面运行异常",
+          "pass": true
+        }
+      ],
+      "runtimeFiles": {
+        "frame/layout.css": "2315ab03d559ed6375ecefa5acbe3f36f55e963b591c2ed359d1f7470ec8d987",
+        "frame/runtime.js": "31e1e7e3d1b50e44a2bff05bd58a805126be9bb2ff08f05b6eec744f95f3f47e",
+        "frame/state.js": "48b2312ee3994358ebe4ef02739126a62928cd6754af581926bbcd0da2ef2121",
+        "host/actions-dom.js": "d4a2b77fa4de0b7a29bca92b2dd1419b3af53dd3a4530ea265fb2e1d5442a9c3",
+        "host/actions-handlers.js": "2e81beb5038ad8e97d92c2bfcfdea948ffd20230f6839a23db050b355b06f076",
+        "host/actions.js": "1541b46b478ab4173308e4dd91377563018dd79ebc17b3d3c81555cd138e9601",
+        "host/core.js": "19eb9aad4f1d8d5f610d860b120fbd16b765ede743963238c45d552dd29949f8",
+        "host/host.js": "c3a6ee90a2a12bda634a020e68dfc1e79e908b5c8d5e7b1d26916f7443164086",
+        "host/models.js": "ba85079ac4258aedec24bdae1e84927efc594764fcb57d7317630242ea55b179",
+        "host/native.js": "fee8d30e74faeab694cab1dec6acbc62cb1e13d6c15780e83bcde5777f005832",
+        "host/provided-actions.js": "3645fe68a1c7d5b0ce5686073045488e688d8f1694141d6a26dbb3b317d58201",
+        "host/provided-models.js": "1729087019bb2ccc6708a38ae149ce4e3ab14fba7ea0ee746a039b6aced074b7"
+      }
+    },
+    {
+      "variant": "orbit",
+      "buildId": "07346f7bf1af064a8e87",
+      "assertions": 46,
+      "tests": [
+        {
+          "name": "1440 模块注册与实际宿主握手",
+          "pass": true
+        },
+        {
+          "name": "1440 视口无横向溢出",
+          "pass": true
+        },
+        {
+          "name": "1440 Frame真实视口与布局断点",
+          "pass": true
+        },
+        {
+          "name": "1440 创建返回保留草稿",
+          "pass": true
+        },
+        {
+          "name": "1440 人物详情打开",
+          "pass": true
+        },
+        {
+          "name": "1440 创建只生成草稿不发送",
+          "pass": true
+        },
+        {
+          "name": "1440 草稿经真实MessagePort写入",
+          "pass": true
+        },
+        {
+          "name": "1440 发送经宿主并回读消息",
+          "pass": true
+        },
+        {
+          "name": "1440 失败不清空草稿",
+          "pass": true
+        },
+        {
+          "name": "1440 历史重放、用户过滤、空列表清空、坏JSON保留",
+          "pass": true
+        },
+        {
+          "name": "1440 删除历史后重建",
+          "pass": true
+        },
+        {
+          "name": "1440 状态版本可忽略恢复",
+          "pass": true
+        },
+        {
+          "name": "1440 百科正文可打开",
+          "pass": true
+        },
+        {
+          "name": "1440 分类筛选",
+          "pass": true
+        },
+        {
+          "name": "1440 地图缩放与地点详情",
+          "pass": true
+        },
+        {
+          "name": "1440 保存确认与偏好生效",
+          "pass": true
+        },
+        {
+          "name": "1440 刷新恢复偏好与创建稿",
+          "pass": true
+        },
+        {
+          "name": "1440 命名存档与恢复",
+          "pass": true
+        },
+        {
+          "name": "1440 会话隔离无串档",
+          "pass": true
+        },
+        {
+          "name": "1440 内置音景可播放",
+          "pass": true
+        },
+        {
+          "name": "1440 返回原生入口",
+          "pass": true
+        },
+        {
+          "name": "1440 重入不重复挂载",
+          "pass": true
+        },
+        {
+          "name": "1440 无页面运行异常",
+          "pass": true
+        },
+        {
+          "name": "390 模块注册与实际宿主握手",
+          "pass": true
+        },
+        {
+          "name": "390 视口无横向溢出",
+          "pass": true
+        },
+        {
+          "name": "390 Frame真实视口与布局断点",
+          "pass": true
+        },
+        {
+          "name": "390 创建返回保留草稿",
+          "pass": true
+        },
+        {
+          "name": "390 人物详情打开",
+          "pass": true
+        },
+        {
+          "name": "390 创建只生成草稿不发送",
+          "pass": true
+        },
+        {
+          "name": "390 草稿经真实MessagePort写入",
+          "pass": true
+        },
+        {
+          "name": "390 发送经宿主并回读消息",
+          "pass": true
+        },
+        {
+          "name": "390 失败不清空草稿",
+          "pass": true
+        },
+        {
+          "name": "390 历史重放、用户过滤、空列表清空、坏JSON保留",
+          "pass": true
+        },
+        {
+          "name": "390 删除历史后重建",
+          "pass": true
+        },
+        {
+          "name": "390 状态版本可忽略恢复",
+          "pass": true
+        },
+        {
+          "name": "390 百科正文可打开",
+          "pass": true
+        },
+        {
+          "name": "390 分类筛选",
+          "pass": true
+        },
+        {
+          "name": "390 地图缩放与地点详情",
+          "pass": true
+        },
+        {
+          "name": "390 保存确认与偏好生效",
+          "pass": true
+        },
+        {
+          "name": "390 刷新恢复偏好与创建稿",
+          "pass": true
+        },
+        {
+          "name": "390 命名存档与恢复",
+          "pass": true
+        },
+        {
+          "name": "390 会话隔离无串档",
+          "pass": true
+        },
+        {
+          "name": "390 内置音景可播放",
+          "pass": true
+        },
+        {
+          "name": "390 返回原生入口",
+          "pass": true
+        },
+        {
+          "name": "390 重入不重复挂载",
+          "pass": true
+        },
+        {
+          "name": "390 无页面运行异常",
+          "pass": true
+        }
+      ],
+      "runtimeFiles": {
+        "frame/layout.css": "2315ab03d559ed6375ecefa5acbe3f36f55e963b591c2ed359d1f7470ec8d987",
+        "frame/runtime.js": "31e1e7e3d1b50e44a2bff05bd58a805126be9bb2ff08f05b6eec744f95f3f47e",
+        "frame/state.js": "48b2312ee3994358ebe4ef02739126a62928cd6754af581926bbcd0da2ef2121",
+        "host/actions-dom.js": "d4a2b77fa4de0b7a29bca92b2dd1419b3af53dd3a4530ea265fb2e1d5442a9c3",
+        "host/actions-handlers.js": "2e81beb5038ad8e97d92c2bfcfdea948ffd20230f6839a23db050b355b06f076",
+        "host/actions.js": "1541b46b478ab4173308e4dd91377563018dd79ebc17b3d3c81555cd138e9601",
+        "host/core.js": "19eb9aad4f1d8d5f610d860b120fbd16b765ede743963238c45d552dd29949f8",
+        "host/host.js": "c3a6ee90a2a12bda634a020e68dfc1e79e908b5c8d5e7b1d26916f7443164086",
+        "host/models.js": "ba85079ac4258aedec24bdae1e84927efc594764fcb57d7317630242ea55b179",
+        "host/native.js": "fee8d30e74faeab694cab1dec6acbc62cb1e13d6c15780e83bcde5777f005832",
+        "host/provided-actions.js": "3645fe68a1c7d5b0ce5686073045488e688d8f1694141d6a26dbb3b317d58201",
+        "host/provided-models.js": "1729087019bb2ccc6708a38ae149ce4e3ab14fba7ea0ee746a039b6aced074b7"
+      }
+    }
+  ],
+  "targetSite": "NOT RUN",
+  "physicalDevice": "NOT RUN"
+}

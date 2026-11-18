@@ -1,0 +1,73 @@
+{
+  "schema": "rex-template-catalog/1",
+  "routes": {
+    "same": "references/26-平台-旧版同层成品模板.md",
+    "native": "references/27-平台-旧版原生成品模板.md",
+    "sandbox": "references/28-平台-新版沙盒成品模板.md"
+  },
+  "entries": [
+    {
+      "id": "sl-full-hud",
+      "title": "完整 HUD 与多面板应用",
+      "route": "same",
+      "architecture": "host-frame",
+      "maturity": "buildable",
+      "tags": {
+        "direction": [
+          "长篇阅读",
+          "角色创建",
+          "世界探索"
+        ],
+        "layout": [
+          "全屏应用",
+          "分级导航",
+          "移动单列",
+          "桌面分区"
+        ],
+        "style": []
+      },
+      "guide": "references/templates/legacy-samelayer/01-full-hud.md",
+      "implementation": "assets/samelayer-complete/README.md",
+      "evidence": {
+        "source": "included",
+        "reskin": "project-specific",
+        "targetSite": "project-specific",
+        "physicalDevice": "project-specific"
+      },
+      "kind": "implementation-template",
+      "runtimeRoute": "same"
+    },
+    {
+      "id": "sl-modular-scenes",
+      "title": "模块化场景与阅读布局",
+      "route": "same",
+      "architecture": "scene-registry-host-frame",
+      "maturity": "reskin-verified",
+      "tags": {
+        "direction": [
+          "角色创建",
+          "资料百科",
+          "阅读增强"
+        ],
+        "layout": [
+          "场景切换",
+          "桌面侧栏",
+          "消息尾栏",
+          "移动单列"
+        ],
+        "style": []
+      },
+      "guide": "references/templates/legacy-samelayer/02-modular-scenes.md",
+      "implementation": "assets/modular-scenes/README.md",
+      "evidence": {
+        "source": "included",
+        "reskin": "PASS",
+        "targetSite": "NOT RUN",
+        "physicalDevice": "NOT RUN",
+        "reskinReport": "references/templates/evidence/modular-scenes-local.json"
+      },
+      "kind": "implementation-template",
+      "runtimeRoute": "same"
+    }
+  ]
+}

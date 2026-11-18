@@ -13,7 +13,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://nodejs.org"><img alt="Node.js 18 or newer" src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg"></a>
-  <a href="references/02-项目工作区与审阅交付.md"><img alt="Version 2.3.0" src="https://img.shields.io/badge/version-2.3.0-informational.svg"></a>
+  <a href="references/02-项目工作区与审阅交付.md"><img alt="Version 2.4.0" src="https://img.shields.io/badge/version-2.4.0-informational.svg"></a>
 </p>
 
 [这是什么](#这是什么) · [能做什么](#能做什么) · [安装](#安装) · [怎么用](#怎么用) · [三条路线](#三条路线) · [工具链](#工具链) · [目录](#目录)
@@ -42,6 +42,12 @@ MMD 做卡容易遇到的麻烦是：有些错误看起来没有报错，却让�
 这些是可组合的能力，不是一张必须填满的清单。只要人设就写人设，只要换肤就改换肤；地图、身体档案、捏人和复杂游戏模块都按需选择。
 
 世界书的关键词触发可以减少每轮常驻设定，但触发后的正文仍会占用上下文，需要做预算。
+
+## 成品制作方法库
+
+以三条路线为根目录：[26旧版同层](references/26-平台-旧版同层成品模板.md)、[27旧版原生](references/27-平台-旧版原生成品模板.md)、[28新版沙盒](references/28-平台-新版沙盒成品模板.md)，再按方法、方向、布局与视觉标签选择。旧版同层已有完整 HUD 和模块化场景两套可克隆实现；模块化场景附两套皮肉与本地行为验证。原生和沙盒暂无正式好卡示例，基础模板仍可使用。
+
+后续收录遵守 [分类与融合规范](references/29-平台-模板分类与融合规范.md)：中性命名、去除专用前缀与来源痕迹、只学习制作方法、拆分骨架与皮肉、独立换题材复测；依法/依许可必须保留的声明不删除。实现与验证成熟度分别标注。
 
 ## 安装
 

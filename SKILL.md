@@ -4,7 +4,7 @@ description: 为 MMD 创建、修改、检查角色人设、世界书、状态�
 license: MIT
 metadata:
   author: DoDoREX1128
-  version: "2.3.0"
+  version: "2.4.0"
   repository: https://github.com/DoDoREX1128/rex-mmd-card
   compatibility: Node.js 18+；完整同层骨架构建另需 Python 3.10+，均无第三方依赖；浏览器回归需要 Chrome 或 Edge。
 ---
@@ -15,7 +15,7 @@ metadata:
 
 ## 从零做整卡：先准备用户交付区与Agent工程区
 
-路线确定后，先准备工作区再创作。完整旧版同层卡使用 [完整成品骨架](assets/samelayer-complete/README.md)及 `complete-samelayer.py init`；其他路线和最小演示使用 `project.mjs init`。主目录只分为“交付”和“工程”；不要把用户项目直接堆在 skill 安装目录，也不要迁移或覆盖已有工程来凑规范。
+路线确定后，先准备工作区再创作。旧版同层先选方法：完整 HUD 用 [完整成品骨架](assets/samelayer-complete/README.md)及 `complete-samelayer.py init`；模块化场景用 [完整场景模板](assets/modular-scenes/README.md)及 `modular-scenes.mjs init`。其他路线和最小演示用 `project.mjs init`。主目录只分为“交付”和“工程”；不要把用户项目直接堆在 skill 安装目录，也不要迁移或覆盖已有工程来凑规范。
 
 “交付”固定准备：`00-使用与验收.md`、`01-人设审阅.txt`、`02-开场白审阅.txt`、`03-世界书审阅.md`，以及生成的 `persona.txt`、`regex.json`、`worldbook.json`。标准空白初始化要标草稿；完整骨架导入已有内容时保留实际稿件，regex 仅成功构建后生成，不能伪装为已验收角色卡。
 
@@ -67,6 +67,12 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
 
 新版正则包五个必填键：chatVersion/pageDepth/statusbar/beginning/regex_scripts；personality 可选且导入正则不写入人设栏。旧版正则包恰好 pageDepth/statusbar/beginning/regex_scripts 四键，不带 chatVersion/personality；每条规则四字段，旧版 id 固定 -1，新版为负整数。状态栏可为空，不为纯换肤或纯人设虚构 HUD。
 
+## 成品方法库与新卡融合
+
+三条路线的父级目录分别为 [26旧版同层](references/26-平台-旧版同层成品模板.md)、[27旧版原生](references/27-平台-旧版原生成品模板.md)、[28新版沙盒](references/28-平台-新版沙盒成品模板.md)。先选路线，再选制作方法，最后按方向、布局和视觉标签筛选；按需读方法子页，不把一个示例当整条路线的唯一界面。
+
+收录新卡或维护方法库必须读 [29分类与融合规范](references/29-平台-模板分类与融合规范.md)：只提炼制作机制，正式方法使用中性名称，去除来源名称、专用前缀、推广与题材耦合，保留必要许可。明确固定骨架、皮肤、内容和字段适配位置，验证另一套皮肉无需重写骨架即可工作；工艺说明、可构建实现与换题材已验证分开登记，不宣称待适配条目已完整融合。该规范不自动改变现有启动策略或运行时。
+
 ## 人设与内容自由
 
 - 人设结构、章节、字段、长度分配、语言和文风由本次需求决定。自由正文、Markdown、YAML、成对标签、笔记体及用户自定义格式均可；不强制六块、固定角色标签、行长、标点密度或十条句式禁令。
@@ -92,7 +98,7 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
 
 旧版原生先读 [24](references/24-平台-旧版事实.md)；逐消息 onerror 与文档级 script 初始化分开。HTML 属性引号和内部 JS 引号必须正确转义，不能要求内外都用单引号。样式用作品作用域，不把新版 data-chat 当旧版稳定接口。
 
-旧版完整同层卡优先使用 [完整骨架](assets/samelayer-complete/README.md)：原生 DOM/处理器、81项完整动作目录、面板回写、阅读器、封面创建、状态和压缩打包均有可复用实现；先复制完整实现，再替换题材/字段/视觉，不回退到最小基座从头适配。平台未变化时沿用现有原生适配；仅对实际失败的动作修共享层。先读 [26](references/26-平台-旧版同层成品模板.md)与文件改造表。原生动作已注册不等于在任意部署都通过，能力与结果仍按目标验收。
+旧版完整同层卡优先使用 [完整骨架](assets/samelayer-complete/README.md)：原生 DOM/处理器、81项完整动作目录、面板回写、阅读器、封面创建、状态和压缩打包均有可复用实现；先复制完整实现，再替换题材/字段/视觉，不回退到最小基座从头适配。平台未变化时沿用现有原生适配；仅对实际失败的动作修共享层。先读 [26](references/26-平台-旧版同层成品模板.md)选具体方法与文件改造表；选模块化场景时使用其独立完整模板和 modular-scenes.mjs，不以最小基座替换，也不让另一种构建器覆盖工程。原生动作已注册不等于在任意部署都通过，能力与结果仍按目标验收。
 
 [最小基座](assets/samelayer/README.md)只用于小型演示或明确要求从零设计；它与完整骨架的桥接/权限模型不同，不能混接。longform-samelayer 的小型状态工具仅供独立扩展，不替代成品的实际回放与字段协议。
 
@@ -118,6 +124,8 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
     node --test scripts/test-authoring.mjs
     node --test scripts/test-project.mjs
     node --test scripts/test-libraries.mjs
+    node --test scripts/test-template-catalog.mjs
+    node --test scripts/test-modular-scenes.mjs
 
 维护骨架的封面/创建流程时，另跑 `node scripts/e2e-authoring.mjs`，验证发布包的四种开局配置和真实按钮/输入行为；它不是每张纯文字卡的强制步骤。
 
@@ -147,6 +155,7 @@ Agent在“工程”维护源文件、任务记录、构建快照、报告和备
 | 模块、布局、视觉 | [40真实接口与扩展例子](references/40-界面-卡架构.md)、[41三种布局](references/41-界面-基线.md)、[42主题与视觉](references/42-界面-视觉.md) |
 | 封面、捏人、改造与素材 | [43构图与交互](references/43-界面-封面与捏人.md)、[44创建协议](references/44-界面-捏人协议.md)、[45骨架与内容](references/45-界面-骨架与皮肉.md)、[可选身体档案](assets/kits/body-dossier/authoring.md) |
 | 外链、媒体、宿主 | [46 CSP与回退](references/46-界面-外链与CSP.md)、[47三个换肤通道](references/47-界面-宿主与弹窗边界.md) |
+| 选择成品方法、融入新好卡 | [26同层目录](references/26-平台-旧版同层成品模板.md)、[27原生目录](references/27-平台-旧版原生成品模板.md)、[28沙盒目录](references/28-平台-新版沙盒成品模板.md)、[29融合规范](references/29-平台-模板分类与融合规范.md) |
 | 拆卡与复刻 | [50历史样本](references/50-验收-示例拆解.md)、[51导出/重放/对照](references/51-验收-复刻验收.md) |
 | 校验、排障、真站、交付 | [52冒烟](references/52-验收-静态与冒烟.md)、[53排障](references/53-验收-真平台踩坑.md)、[54可执行用例](references/54-验收-真实平台测试.md)、[55交付清单](references/55-交付-发布前检查.md) |
 

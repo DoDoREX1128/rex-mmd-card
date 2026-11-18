@@ -1,0 +1,24 @@
+{
+  "entries": {
+    "0": {
+      "uid": 0,
+      "key": "[]",
+      "comment": "世界与通行规则",
+      "content": "<world_rules>\n海岸小道在涨潮时封闭。向导知道潮汐规律，但天气仍可能改变通行条件。不要把路线开放当成永恒事实。\n</world_rules>",
+      "constant": true,
+      "enabled": true,
+      "order": 100,
+      "position": 0
+    },
+    "1": {
+      "uid": 1,
+      "key": "[\"晨湾\",\"灯塔\",\"山间驿站\"]",
+      "comment": "地区与资料",
+      "content": "<world_places>\n晨湾：码头旁有旅店、档案室与每日更新的公告栏。\n山间驿站：沿山路而建，能补给，也能交换沿途消息。\n灯塔：雾天仍亮着灯，值班册留存了多年航行记录。\n</world_places>",
+      "constant": false,
+      "enabled": true,
+      "order": 90,
+      "position": 0
+    }
+  }
+}

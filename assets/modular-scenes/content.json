@@ -1,0 +1,198 @@
+{
+  "appId": "harbor-record",
+  "title": "晨湾手记",
+  "subtitle": "HARBOR ARCHIVE / 01",
+  "description": "潮水带来一封没有寄件人的信。从港口到山间驿站，创建身份与同伴，用自己的选择开启旅程。",
+  "coverNote": "资料、地图、阅读与进度共用一套状态；所有发送均需玩家确认。",
+  "readingSample": "傍晚的灯火沿着岸线亮起。纸上的字迹微微晕开，信里却没有写明归期。",
+  "theme": {
+    "bg": "#201d19",
+    "surface": "#2c2822",
+    "ink": "#f3ebdb",
+    "muted": "#beb4a5",
+    "accent": "#dbb97b",
+    "line": "#ffffff25"
+  },
+  "creation": [
+    {
+      "key": "name",
+      "label": "姓名",
+      "type": "text",
+      "step": 0
+    },
+    {
+      "key": "age",
+      "label": "年龄",
+      "type": "text",
+      "step": 0
+    },
+    {
+      "key": "gender",
+      "label": "性别",
+      "type": "select",
+      "options": [
+        "未指定",
+        "女",
+        "男",
+        "自定义"
+      ],
+      "step": 0
+    },
+    {
+      "key": "origin",
+      "label": "出身",
+      "type": "select",
+      "options": [
+        "行商",
+        "学徒",
+        "旅人"
+      ],
+      "step": 0
+    },
+    {
+      "key": "location",
+      "label": "初始所在地",
+      "type": "select",
+      "options": [
+        "晨湾",
+        "山间驿站",
+        "灯塔"
+      ],
+      "step": 1
+    },
+    {
+      "key": "goal",
+      "label": "旅程目标",
+      "type": "text",
+      "step": 1
+    },
+    {
+      "key": "background",
+      "label": "背景补充",
+      "type": "textarea",
+      "step": 1
+    }
+  ],
+  "characters": [
+    {
+      "id": "guide",
+      "name": "林禾",
+      "brief": "往返山海之间的信使。",
+      "body": "她记得每条山路上的休息处，却不轻易替别人决定去留。收到委托时，总先确认收信人的名字。"
+    },
+    {
+      "id": "keeper",
+      "name": "沈知",
+      "brief": "照管灯塔与旧档案的守望者。",
+      "body": "他相信记录比传闻可靠。每逢雾夜，总会在值班册上写下航灯亮起的时刻。"
+    }
+  ],
+  "entries": [
+    {
+      "id": "rule",
+      "category": "世界规则",
+      "title": "潮汐与通行",
+      "brief": "行动需要考虑时间和资源。",
+      "body": "海岸小道在涨潮时封闭。向导知道潮汐规律，但天气仍可能改变通行条件。不要把路线开放当成永恒事实。"
+    },
+    {
+      "id": "place",
+      "category": "地区",
+      "title": "晨湾纪要",
+      "brief": "故事的起点，也是信息汇聚之处。",
+      "body": "晨湾靠海，来往商船带来消息。港口的公告栏每日更新，旧消息仍保留在档案室供人核对。"
+    },
+    {
+      "id": "relation",
+      "category": "关系",
+      "title": "建立信任",
+      "brief": "信任通过具体行动积累。",
+      "body": "人物各有责任、偏好和知识边界。一次帮忙不能换来无条件信任，承诺需要后续行动兑现。"
+    }
+  ],
+  "places": [
+    {
+      "id": "start",
+      "name": "晨湾",
+      "x": 150,
+      "y": 310,
+      "description": "码头旁有旅店、档案室与每日更新的公告栏。"
+    },
+    {
+      "id": "middle",
+      "name": "山间驿站",
+      "x": 410,
+      "y": 160,
+      "description": "沿山路而建，能补给，也能交换沿途消息。"
+    },
+    {
+      "id": "end",
+      "name": "灯塔",
+      "x": 650,
+      "y": 280,
+      "description": "雾天仍亮着灯，值班册留存了多年航行记录。"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "quiet",
+      "title": "潮声余韵",
+      "description": "低音双声部，适合安静阅读。",
+      "frequencies": [
+        130.81,
+        196
+      ]
+    },
+    {
+      "id": "travel",
+      "title": "山路回响",
+      "description": "柔和三声部，适合旅途与资料浏览。",
+      "frequencies": [
+        174.61,
+        261.63,
+        349.23
+      ]
+    }
+  ],
+  "statusFields": [
+    {
+      "key": "location",
+      "label": "地点"
+    },
+    {
+      "key": "time",
+      "label": "时间"
+    },
+    {
+      "key": "energy",
+      "label": "精力"
+    },
+    {
+      "key": "goal",
+      "label": "目标"
+    }
+  ],
+  "initialState": {
+    "location": "晨湾",
+    "time": "第一日·傍晚",
+    "energy": 100,
+    "goal": "核对来信",
+    "characters": [],
+    "inventory": [],
+    "options": []
+  },
+  "help": [
+    {
+      "title": "创建与发送",
+      "body": "创建角色后生成可编辑草稿。写入原生输入框不会发送；确认发送才提交请求。失败时保留草稿。"
+    },
+    {
+      "title": "状态与历史",
+      "body": "模型使用 [status]JSON[/status] 提供增量状态。缺字段继承，空列表清空。编辑、删除或重生成后按消息顺序重建。"
+    },
+    {
+      "title": "恢复与隔离",
+      "body": "进度按作品、账号、角色与会话隔离；未确认作用域时保存会明确失败。导入文件只接受当前作品的版本1存档。"
+    }
+  ]
+}
